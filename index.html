@@ -127,6 +127,7 @@ select option{background:#1e1e1e}
 .btn-remove-route:active{color:var(--danger)}
 .route-body{display:none;padding:0 14px 14px}
 .route-card.expanded .route-body{display:block}
+/* Route fields: 2-col grid, no color field */
 .route-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .route-fields .field.full{grid-column:1/-1}
 .result-toggle{display:flex;gap:6px}
@@ -151,8 +152,12 @@ select option{background:#1e1e1e}
 .chart-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);padding:16px;margin-bottom:16px}
 .chart-card-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
 
-/* GOALS */
+/* GOALS — merged, no tabs */
 .goals-content{padding:16px 20px}
+.goal-section-header{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.8px;margin:24px 0 10px;display:flex;align-items:center;gap:8px}
+.goal-section-header:first-child{margin-top:0}
+.goal-section-divider{height:.5px;background:var(--border);margin-bottom:14px}
+
 .goal-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;animation:slideUp .25s ease both}
 .goal-card.achieved{border-color:rgba(76,175,80,.4);background:rgba(76,175,80,.04)}
 .goal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
@@ -168,20 +173,17 @@ select option{background:#1e1e1e}
 .btn-delete-goal{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;transition:color .2s}
 .btn-delete-goal:active{color:var(--danger)}
 
-/* goal type tabs */
-.goal-type-tabs{display:flex;gap:6px;margin-bottom:16px}
-.goal-tab{flex:1;padding:10px;border-radius:10px;border:.5px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;text-align:center;transition:all .15s}
-.goal-tab.active{background:rgba(127,119,221,.15);border-color:var(--accent);color:var(--accent)}
-
-.add-goal-form{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
+/* add goal forms side by side in one card */
+.add-goal-form{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:24px}
 .add-goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.add-goal-grid .field.full{grid-column:1/-1}
 .btn-add-goal{width:100%;padding:14px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:opacity .15s}
 .btn-add-goal:active{opacity:.8}
+.btn-add-goal.count-btn{background:var(--hang)}
 
 /* HANGBOARD */
 .hang-content{padding:16px 20px}
 
-/* PR cards row for hangboard */
 .hang-pr-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-bottom:20px}
 .hang-pr-scroll::-webkit-scrollbar{display:none}
 .hang-pr-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:14px 16px;flex-shrink:0;min-width:130px}
@@ -189,7 +191,6 @@ select option{background:#1e1e1e}
 .hang-pr-val{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--hang);line-height:1}
 .hang-pr-sub{font-size:11px;color:var(--muted);margin-top:3px}
 
-/* hang session card */
 .hang-card{margin-bottom:12px;background:var(--surface);border-radius:14px;border:.5px solid var(--border);overflow:hidden;animation:slideUp .3s ease both}
 .hang-card-header{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 16px 12px}
 .hang-card-date{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase}
@@ -201,11 +202,14 @@ select option{background:#1e1e1e}
 .hang-set-detail{font-size:12px;color:var(--muted);text-align:right;line-height:1.5}
 .hang-set-time{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--hang);line-height:1;text-align:right;min-width:44px}
 
-/* hang set cards in form */
 .hang-set-card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .2s}
 .hang-set-card.expanded{border-color:rgba(233,30,140,.3)}
 .hang-set-card .route-card-header{padding:12px 14px}
-.hang-set-card .route-body{padding:0 14px 14px}
+/* route-body is default display:none via .route-card rule, maar hang-set-card is geen .route-card meer */
+.hang-set-card .route-body{display:none;padding:0 14px 14px}
+.hang-set-card.expanded .route-body{display:block}
+/* chevron rotatie ook voor hang-set-card */
+.hang-set-card.expanded .route-chevron{transform:rotate(180deg)}
 .hang-set-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .hang-set-fields .field.full{grid-column:1/-1}
 
@@ -239,7 +243,6 @@ select option{background:#1e1e1e}
 .toast{position:fixed;bottom:calc(80px + var(--safe-bot));left:50%;transform:translateX(-50%) translateY(20px);background:var(--success);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 24px;border-radius:40px;opacity:0;transition:all .3s;z-index:200;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* divider */
 .divider{height:.5px;background:var(--border);margin:0 20px 0}
 </style>
 </head>
@@ -301,43 +304,37 @@ select option{background:#1e1e1e}
   </div>
 </div>
 
-<!-- GOALS -->
+<!-- GOALS — één gemengde lijst -->
 <div id="page-goals" class="page">
-  <div class="page-header"><div class="page-title">Doelen</div><div class="page-sub">Graad-doelen en herhaling-doelen</div></div>
+  <div class="page-header"><div class="page-title">Doelen</div></div>
   <div class="goals-content">
-    <div class="goal-type-tabs">
-      <button class="goal-tab active" id="gtab-grade" onclick="switchGoalTab('grade')">🧗 Graad</button>
-      <button class="goal-tab" id="gtab-count" onclick="switchGoalTab('count')">📊 Herhaling</button>
+
+    <!-- Gemengde lijst -->
+    <div id="goals-list-all"></div>
+
+    <!-- Graad doel toevoegen -->
+    <div class="goal-section-header">🧗 Graad-doel toevoegen</div>
+    <div class="add-goal-form">
+      <div class="add-goal-grid">
+        <div class="field"><label>Graad</label><select id="gg-grade"></select></div>
+        <div class="field"><label>Resultaat</label><select id="gg-result"><option value="top">Top</option><option value="flash">Flash</option></select></div>
+        <div class="field full"><label>Deadline (optioneel)</label><input type="date" id="gg-deadline"></div>
+      </div>
+      <button class="btn-add-goal" onclick="addGradeGoal()">Toevoegen</button>
     </div>
 
-    <!-- grade goal: top a grade before date -->
-    <div id="goal-panel-grade">
-      <div id="goals-list-grade"></div>
-      <div class="add-goal-form">
-        <div class="form-section-title">Nieuw graad-doel</div>
-        <div class="add-goal-grid">
-          <div class="field"><label>Graad</label><select id="gg-grade"></select></div>
-          <div class="field"><label>Resultaat</label><select id="gg-result"><option value="top">Top</option><option value="flash">Flash</option></select></div>
-          <div class="field full"><label>Deadline (optioneel)</label><input type="date" id="gg-deadline"></div>
-        </div>
-        <button class="btn-add-goal" onclick="addGradeGoal()">Doel toevoegen</button>
+    <!-- Herhaling doel toevoegen -->
+    <div class="goal-section-header">📊 Herhaling-doel toevoegen</div>
+    <div class="add-goal-form">
+      <div class="add-goal-grid">
+        <div class="field"><label>Graad</label><select id="gc-grade"></select></div>
+        <div class="field"><label>Resultaat</label><select id="gc-result"><option value="top">Top</option><option value="flash">Flash</option></select></div>
+        <div class="field"><label>Aantal keer</label><input type="number" id="gc-count" value="5" min="1" max="999"></div>
+        <div class="field"><label>Deadline (optioneel)</label><input type="date" id="gc-deadline"></div>
       </div>
+      <button class="btn-add-goal count-btn" onclick="addCountGoal()">Toevoegen</button>
     </div>
 
-    <!-- count goal: climb grade X times -->
-    <div id="goal-panel-count" style="display:none">
-      <div id="goals-list-count"></div>
-      <div class="add-goal-form">
-        <div class="form-section-title">Nieuw herhaling-doel</div>
-        <div class="add-goal-grid">
-          <div class="field"><label>Graad</label><select id="gc-grade"></select></div>
-          <div class="field"><label>Resultaat</label><select id="gc-result"><option value="top">Top</option><option value="flash">Flash</option></select></div>
-          <div class="field"><label>Aantal keer</label><input type="number" id="gc-count" value="5" min="1" max="999"></div>
-          <div class="field"><label>Deadline (optioneel)</label><input type="date" id="gc-deadline"></div>
-        </div>
-        <button class="btn-add-goal" onclick="addCountGoal()">Doel toevoegen</button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -346,7 +343,6 @@ select option{background:#1e1e1e}
   <div class="page-header"><div class="page-title">Hangboard</div><div class="page-sub">Log je hang-sets en volg je PR's</div></div>
   <div class="hang-content">
 
-    <!-- PR row -->
     <div class="form-section-title" style="padding:0 0 10px">PR per grip</div>
     <div class="hang-pr-scroll" id="hang-pr-row">
       <div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sets gelogd</div>
@@ -430,13 +426,31 @@ let routeCount=0,hangSetCount=0;
 
 /* ══════════════════════════════════════════
    STORAGE
+   — sessies en hangsessies worden elk apart opgeslagen
 ══════════════════════════════════════════ */
 const SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1';
-function save(){try{localStorage.setItem(SK,JSON.stringify(sessions))}catch(e){toast('Opslaan mislukt','#e53935')}}
-function saveGyms(){try{localStorage.setItem(GYK,JSON.stringify(gyms))}catch(e){}}
-function saveGoals(){try{localStorage.setItem(GOK,JSON.stringify(goals))}catch(e){}}
-function saveHang(){try{localStorage.setItem(HSK,JSON.stringify(hangSessions))}catch(e){toast('Opslaan mislukt','#e53935')}}
-function loadArr(k,fb){try{const r=localStorage.getItem(k)||(fb?localStorage.getItem(fb):null);if(r){const p=JSON.parse(r);if(Array.isArray(p))return p}}catch(e){}return[]}
+
+function save(){
+  try{localStorage.setItem(SK,JSON.stringify(sessions))}
+  catch(e){toast('Opslaan mislukt','#e53935')}
+}
+function saveGyms(){
+  try{localStorage.setItem(GYK,JSON.stringify(gyms))}catch(e){}
+}
+function saveGoals(){
+  try{localStorage.setItem(GOK,JSON.stringify(goals))}catch(e){}
+}
+function saveHang(){
+  try{localStorage.setItem(HSK,JSON.stringify(hangSessions))}
+  catch(e){toast('Opslaan mislukt','#e53935')}
+}
+function loadArr(k,fb){
+  try{
+    const r=localStorage.getItem(k)||(fb?localStorage.getItem(fb):null);
+    if(r){const p=JSON.parse(r);if(Array.isArray(p))return p}
+  }catch(e){}
+  return[]
+}
 
 /* ══════════════════════════════════════════
    UTILS
@@ -480,7 +494,11 @@ function showPage(id){
   if(id==='log')refreshGymSelect();
 }
 
-function toast(msg,color){const t=document.getElementById('toast');t.textContent=msg;t.style.background=color||'var(--success)';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function toast(msg,color){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.background=color||'var(--success)';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)
+}
 
 /* ══════════════════════════════════════════
    FEED
@@ -496,7 +514,8 @@ function renderFeed(){
   if(!sessions.length){feed.innerHTML='<div class="empty-state"><div class="big">Nog geen sessies</div><div>Log je eerste bouldering sessie!</div></div>';return}
   feed.innerHTML=[...sessions].reverse().map((s,i)=>{
     const mg=maxGrade(s.routes);
-    const chips=s.routes.map(r=>`<div class="route-chip chip-${r.result}"><div class="dot"></div>${r.grade}${r.type?' · '+r.type:''}${r.color?' · '+r.color:''}</div>`).join('');
+    // Chips tonen graad + type (geen kleur meer)
+    const chips=s.routes.map(r=>`<div class="route-chip chip-${r.result}"><div class="dot"></div>${r.grade}${r.type?' · '+r.type:''}</div>`).join('');
     return`<div class="activity-card" style="animation-delay:${i*.05}s">
       <div class="activity-header">
         <div>
@@ -528,8 +547,20 @@ function confirmDelete(id){document.getElementById('conf-ov')?.remove();sessions
    GYMS
 ══════════════════════════════════════════ */
 const getFavGym=()=>{const f=gyms.find(g=>g.fav);return f?f.name:(gyms[0]?gyms[0].name:'')};
-function refreshGymSelect(){const sel=document.getElementById('inp-gym-select'),cur=sel.value;sel.innerHTML='<option value="">— Kies een gym —</option>';gyms.forEach(g=>{const o=document.createElement('option');o.value=g.name;o.textContent=g.name+(g.fav?' ★':'');sel.appendChild(o)});const fav=getFavGym();if(cur&&gyms.find(g=>g.name===cur))sel.value=cur;else if(fav)sel.value=fav}
-function addGym(){const inp=document.getElementById('inp-new-gym'),name=inp.value.trim();if(!name)return;if(gyms.find(g=>g.name.toLowerCase()===name.toLowerCase())){toast('Gym bestaat al','#e53935');return}gyms.push({name,fav:gyms.length===0});saveGyms();inp.value='';renderGymsPage();refreshGymSelect();toast('Gym toegevoegd!')}
+function refreshGymSelect(){
+  const sel=document.getElementById('inp-gym-select'),cur=sel.value;
+  sel.innerHTML='<option value="">— Kies een gym —</option>';
+  gyms.forEach(g=>{const o=document.createElement('option');o.value=g.name;o.textContent=g.name+(g.fav?' ★':'');sel.appendChild(o)});
+  const fav=getFavGym();
+  if(cur&&gyms.find(g=>g.name===cur))sel.value=cur;
+  else if(fav)sel.value=fav
+}
+function addGym(){
+  const inp=document.getElementById('inp-new-gym'),name=inp.value.trim();
+  if(!name)return;
+  if(gyms.find(g=>g.name.toLowerCase()===name.toLowerCase())){toast('Gym bestaat al','#e53935');return}
+  gyms.push({name,fav:gyms.length===0});saveGyms();inp.value='';renderGymsPage();refreshGymSelect();toast('Gym toegevoegd!')
+}
 function setFav(name){gyms.forEach(g=>g.fav=(g.name===name));saveGyms();renderGymsPage();refreshGymSelect()}
 function deleteGym(name){gyms=gyms.filter(g=>g.name!==name);if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms();renderGymsPage();refreshGymSelect()}
 function renderGymsPage(){
@@ -546,9 +577,9 @@ function openGymPickerModal(){
 function selectGymFromModal(name){document.getElementById('gym-modal')?.remove();document.getElementById('inp-gym-select').value=name}
 
 /* ══════════════════════════════════════════
-   ROUTE CARDS
+   ROUTE CARDS — kleur veld verwijderd
 ══════════════════════════════════════════ */
-function addRouteCard(grade='6a',color='',attempts=1,result='top',type=''){
+function addRouteCard(grade='6a',attempts=1,result='top',type=''){
   routeCount++;const id=routeCount;
   const div=document.createElement('div');div.className='route-card expanded';div.id='rc-'+id;
   div.innerHTML=`<div class="route-card-header" onclick="toggleRC(${id})">
@@ -567,7 +598,6 @@ function addRouteCard(grade='6a',color='',attempts=1,result='top',type=''){
   <div class="route-body">
     <div class="route-fields">
       <div class="field"><label>Graad</label><select id="rg-${id}" onchange="updRS(${id})">${GRADES.map(g=>`<option ${g===grade?'selected':''}>${g}</option>`).join('')}</select></div>
-      <div class="field"><label>Kleur</label><input type="text" id="rcol-${id}" value="${color}" placeholder="rood, blauw..."></div>
       <div class="field"><label>Type</label><select id="rt-${id}"><option value="">— type —</option>${TYPES.map(t=>`<option ${t===type?'selected':''}>${t}</option>`).join('')}</select></div>
       <div class="field"><label>Pogingen</label><input type="number" id="ra-${id}" value="${attempts}" min="1" max="99"></div>
       <div class="field full"><label>Resultaat</label>
@@ -592,24 +622,27 @@ function saveSession(){
   const cards=document.querySelectorAll('.route-card');
   if(!cards.length){toast('Voeg een route toe','#e53935');return}
   const routes=[];
-  cards.forEach(c=>{const id=c.id.replace('rc-','');routes.push({grade:document.getElementById('rg-'+id).value,color:document.getElementById('rcol-'+id).value.trim(),type:document.getElementById('rt-'+id).value,attempts:parseInt(document.getElementById('ra-'+id).value)||1,result:document.getElementById('rr-'+id).value})});
-  sessions.push({date,gym,note,routes,id:Date.now()});sessions.sort((a,b)=>a.date.localeCompare(b.date));
-  save();document.getElementById('route-cards').innerHTML='';document.getElementById('inp-note').value='';routeCount=0;addRouteCard();
+  cards.forEach(c=>{
+    const id=c.id.replace('rc-','');
+    routes.push({
+      grade:document.getElementById('rg-'+id).value,
+      type:document.getElementById('rt-'+id).value,
+      attempts:parseInt(document.getElementById('ra-'+id).value)||1,
+      result:document.getElementById('rr-'+id).value
+    })
+  });
+  sessions.push({date,gym,note,routes,id:Date.now()});
+  sessions.sort((a,b)=>a.date.localeCompare(b.date));
+  save();
+  document.getElementById('route-cards').innerHTML='';
+  document.getElementById('inp-note').value='';
+  routeCount=0;addRouteCard();
   toast('Sessie opgeslagen! 🏴');showPage('home');
 }
 
 /* ══════════════════════════════════════════
-   GOALS — two types
+   GOALS — twee secties, geen tabs
 ══════════════════════════════════════════ */
-let activeGoalTab='grade';
-function switchGoalTab(tab){
-  activeGoalTab=tab;
-  document.getElementById('gtab-grade').className='goal-tab'+(tab==='grade'?' active':'');
-  document.getElementById('gtab-count').className='goal-tab'+(tab==='count'?' active':'');
-  document.getElementById('goal-panel-grade').style.display=tab==='grade'?'block':'none';
-  document.getElementById('goal-panel-count').style.display=tab==='count'?'block':'none';
-}
-
 function gradeGoalAchieved(g){
   return allRoutes().some(r=>{const gOk=gi(r.grade)>=gi(g.grade),rOk=g.result==='flash'?r.result==='flash':(r.result==='top'||r.result==='flash');return gOk&&rOk});
 }
@@ -630,67 +663,99 @@ function addCountGoal(){
 function deleteGoal(id){goals=goals.filter(g=>g.id!==id);saveGoals();renderGoals()}
 
 function renderGoals(){
-  const gradeGoals=goals.filter(g=>g.type==='grade');
-  const countGoals=goals.filter(g=>g.type==='count');
-
-  // Grade goals
-  const gl=document.getElementById('goals-list-grade');
-  gl.innerHTML=gradeGoals.length?gradeGoals.map(g=>{
-    const done=gradeGoalAchieved(g),rLabel=g.result==='flash'?'Flash':'Top';
-    return`<div class="goal-card ${done?'achieved':''}">
-      <div class="goal-header">
-        <div><div class="goal-grade">${g.grade}</div><div class="goal-meta">${rLabel}${g.deadline?' · Deadline: '+fmtDate(g.deadline):''}</div></div>
-        <div style="display:flex;align-items:center;gap:10px">
-          ${done?'<div class="goal-achieved-badge">✓ Gehaald!</div>':'<div style="font-size:22px">⏳</div>'}
-          <button class="btn-delete-goal" onclick="deleteGoal(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button>
+  const trashSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>`;
+  // Één lijst op volgorde van aanmaken (id = Date.now())
+  const sorted=[...goals].sort((a,b)=>a.id-b.id);
+  const container=document.getElementById('goals-list-all');
+  if(!sorted.length){
+    container.innerHTML='<div class="empty-state" style="padding:16px 0 24px"><div class="big">Nog geen doelen</div><div>Voeg hieronder een graad- of herhaling-doel toe.</div></div>';
+    return;
+  }
+  container.innerHTML=sorted.map(g=>{
+    const rLabel=g.result==='flash'?'Flash':'Top';
+    if(g.type==='grade'){
+      const done=gradeGoalAchieved(g);
+      return`<div class="goal-card ${done?'achieved':''}">
+        <div class="goal-header">
+          <div>
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">🧗 Graad-doel</div>
+            <div class="goal-grade">${g.grade}</div>
+            <div class="goal-meta">${rLabel}${g.deadline?' · '+fmtDate(g.deadline):''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            ${done?'<div class="goal-achieved-badge">✓ Gehaald!</div>':'<div style="font-size:22px">⏳</div>'}
+            <button class="btn-delete-goal" onclick="deleteGoal(${g.id})">${trashSVG}</button>
+          </div>
         </div>
-      </div>
-      ${done?'<div class="goal-progress-bar"><div class="goal-progress-fill" style="width:100%"></div></div>':''}
-    </div>`;
-  }).join(''):'<div class="empty-state" style="padding:20px 0"><div>Voeg een graad-doel toe hieronder.</div></div>';
-
-  // Count goals
-  const cl=document.getElementById('goals-list-count');
-  cl.innerHTML=countGoals.length?countGoals.map(g=>{
-    const prog=countGoalProgress(g),pct=Math.min(100,Math.round((prog/g.count)*100)),done=prog>=g.count,rLabel=g.result==='flash'?'Flash':'Top';
-    return`<div class="goal-card ${done?'achieved':''}">
-      <div class="goal-header">
-        <div><div class="goal-grade">${g.grade}</div><div class="goal-meta">${rLabel} · ${g.count}×${g.deadline?' · '+fmtDate(g.deadline):''}</div></div>
-        <div style="display:flex;align-items:center;gap:10px">
-          ${done?'<div class="goal-achieved-badge">✓ Gehaald!</div>':''}
-          <button class="btn-delete-goal" onclick="deleteGoal(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button>
+        ${done?'<div class="goal-progress-bar"><div class="goal-progress-fill" style="width:100%"></div></div>':''}
+      </div>`;
+    }else{
+      const prog=countGoalProgress(g),pct=Math.min(100,Math.round((prog/g.count)*100)),done=prog>=g.count;
+      return`<div class="goal-card ${done?'achieved':''}">
+        <div class="goal-header">
+          <div>
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">📊 Herhaling-doel</div>
+            <div class="goal-grade">${g.grade}</div>
+            <div class="goal-meta">${rLabel} · ${g.count}×${g.deadline?' · '+fmtDate(g.deadline):''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            ${done?'<div class="goal-achieved-badge">✓ Gehaald!</div>':''}
+            <button class="btn-delete-goal" onclick="deleteGoal(${g.id})">${trashSVG}</button>
+          </div>
         </div>
-      </div>
-      <div class="goal-progress-bar"><div class="goal-progress-fill" style="width:${pct}%"></div></div>
-      <div class="goal-progress-label"><span>${prog} / ${g.count} routes</span><span class="goal-progress-pct">${pct}%</span></div>
-    </div>`;
-  }).join(''):'<div class="empty-state" style="padding:20px 0"><div>Voeg een herhaling-doel toe hieronder.</div></div>';
+        <div class="goal-progress-bar"><div class="goal-progress-fill" style="width:${pct}%"></div></div>
+        <div class="goal-progress-label"><span>${prog} / ${g.count} routes</span><span class="goal-progress-pct">${pct}%</span></div>
+      </div>`;
+    }
+  }).join('');
 }
 
 /* ══════════════════════════════════════════
    HANGBOARD
+   — bug fix: hang-set-cards selector was te breed,
+     waardoor bouldering route cards ook mee werden
+     gepakt. Nu filteren we op hang-set-card class.
 ══════════════════════════════════════════ */
 
 /* -- Timer -- */
 let timerSecs=0,timerInterval=null,timerRunning=false;
 function toggleTimer(){
-  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('btn-timer').textContent='Hervatten';document.getElementById('btn-timer').className='btn-timer-start';document.getElementById('timer-sub').textContent=`Gepauzeerd op ${fmtSecs(timerSecs)}`}
-  else{timerInterval=setInterval(()=>{timerSecs++;document.getElementById('timer-display').textContent=fmtSecs(timerSecs);document.getElementById('timer-sub').textContent='Hangend...'},1000);timerRunning=true;document.getElementById('btn-timer').textContent='Stop';document.getElementById('btn-timer').className='btn-timer-start running';document.getElementById('timer-sub').textContent='Hangend...'}
+  if(timerRunning){
+    clearInterval(timerInterval);timerRunning=false;
+    document.getElementById('btn-timer').textContent='Hervatten';
+    document.getElementById('btn-timer').className='btn-timer-start';
+    document.getElementById('timer-sub').textContent=`Gepauzeerd op ${fmtSecs(timerSecs)}`
+  }else{
+    timerInterval=setInterval(()=>{timerSecs++;document.getElementById('timer-display').textContent=fmtSecs(timerSecs);document.getElementById('timer-sub').textContent='Hangend...'},1000);
+    timerRunning=true;
+    document.getElementById('btn-timer').textContent='Stop';
+    document.getElementById('btn-timer').className='btn-timer-start running';
+    document.getElementById('timer-sub').textContent='Hangend...'
+  }
 }
-function resetTimer(){clearInterval(timerInterval);timerRunning=false;timerSecs=0;document.getElementById('timer-display').textContent='0:00';document.getElementById('btn-timer').textContent='Start';document.getElementById('btn-timer').className='btn-timer-start';document.getElementById('timer-sub').textContent='Druk start om te beginnen'}
+function resetTimer(){
+  clearInterval(timerInterval);timerRunning=false;timerSecs=0;
+  document.getElementById('timer-display').textContent='0:00';
+  document.getElementById('btn-timer').textContent='Start';
+  document.getElementById('btn-timer').className='btn-timer-start';
+  document.getElementById('timer-sub').textContent='Druk start om te beginnen'
+}
 
 /* -- Hang set cards -- */
 function addHangSetCard(){
   hangSetCount++;const id=hangSetCount;
-  const div=document.createElement('div');div.className='hang-set-card expanded route-card';div.id='hs-'+id;
-  div.innerHTML=`<div class="route-card-header" onclick="document.getElementById('hs-${id}').classList.toggle('expanded')">
+  const div=document.createElement('div');
+  // Klasse is nu 'hang-set-card expanded' — NIET 'route-card' erbij,
+  // zodat saveHangSession() alleen echte hang-set-cards oppakt.
+  div.className='hang-set-card expanded';div.id='hsc-'+id;
+  div.innerHTML=`<div class="route-card-header" onclick="document.getElementById('hsc-${id}').classList.toggle('expanded')">
     <div class="rc-left">
       <div class="route-num">Set ${id}</div>
       <div class="route-summary" id="hss-${id}"><div class="rs-grade" id="hsg-${id}">Volgreep</div></div>
     </div>
     <div class="rc-right">
       <svg class="route-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="6 9 12 15 18 9"/></svg>
-      <button class="btn-remove-route" onclick="event.stopPropagation();document.getElementById('hs-${id}').remove()">×</button>
+      <button class="btn-remove-route" onclick="event.stopPropagation();document.getElementById('hsc-${id}').remove()">×</button>
     </div>
   </div>
   <div class="route-body">
@@ -712,27 +777,46 @@ function addHangSetCard(){
 function saveHangSession(){
   const date=document.getElementById('hang-date').value,note=document.getElementById('hang-note').value.trim();
   if(!date){toast('Vul een datum in','#e53935');return}
-  const cards=document.querySelectorAll('[id^="hs-"]');
+  // Selecteer alleen kaarten binnen #hang-set-cards met class hang-set-card
+  const cards=document.querySelectorAll('#hang-set-cards .hang-set-card');
   if(!cards.length){toast('Voeg een set toe','#e53935');return}
   const sets=[];
-  cards.forEach(c=>{const id=c.id.replace('hs-','');sets.push({grip:document.getElementById('hgrip-'+id).value,time:parseInt(document.getElementById('htime-'+id).value)||10,rest:parseInt(document.getElementById('hrest-'+id).value)||60,reps:parseInt(document.getElementById('hreps-'+id).value)||3,weight:parseFloat(document.getElementById('hwt-'+id).value)||0})});
-  hangSessions.push({date,note,sets,id:Date.now()});hangSessions.sort((a,b)=>a.date.localeCompare(b.date));
-  saveHang();document.getElementById('hang-set-cards').innerHTML='';document.getElementById('hang-note').value='';hangSetCount=0;
-  toast('Hangsessie opgeslagen! 💪',`var(--hang)`);renderHangPage();
+  cards.forEach(c=>{
+    const id=c.id.replace('hsc-','');
+    sets.push({
+      grip:document.getElementById('hgrip-'+id).value,
+      time:parseInt(document.getElementById('htime-'+id).value)||10,
+      rest:parseInt(document.getElementById('hrest-'+id).value)||60,
+      reps:parseInt(document.getElementById('hreps-'+id).value)||3,
+      weight:parseFloat(document.getElementById('hwt-'+id).value)||0
+    })
+  });
+  hangSessions.push({date,note,sets,id:Date.now()});
+  hangSessions.sort((a,b)=>a.date.localeCompare(b.date));
+  saveHang();
+  document.getElementById('hang-set-cards').innerHTML='';
+  document.getElementById('hang-note').value='';
+  hangSetCount=0;
+  toast('Hangsessie opgeslagen! 💪','#e91e8c');
+  renderHangPage();
 }
 
 function deleteHangSession(id){
-  hangSessions=hangSessions.filter(s=>s.id!==id);saveHang();renderHangPage();toast('Verwijderd','#e53935');
+  hangSessions=hangSessions.filter(s=>s.id!==id);
+  saveHang();renderHangPage();toast('Verwijderd','#e53935');
 }
 
 function renderHangPage(){
-  // PR per grip: longest hang time
+  // PR per grip: langste hangtijd
   const prRow=document.getElementById('hang-pr-row');
   const allSets=hangSessions.flatMap(s=>s.sets.map(st=>({...st,date:s.date})));
-  if(!allSets.length){prRow.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sets gelogd</div>';return}
-  const prByGrip={};
-  allSets.forEach(st=>{if(!prByGrip[st.grip]||st.time>prByGrip[st.grip].time)prByGrip[st.grip]=st});
-  prRow.innerHTML=Object.entries(prByGrip).map(([grip,st])=>`<div class="hang-pr-card"><div class="hang-pr-grip">${grip}</div><div class="hang-pr-val">${fmtSecs(st.time)}</div><div class="hang-pr-sub">${st.weight>0?'+'+st.weight+'kg · ':''}${fmtDate(st.date)}</div></div>`).join('');
+  if(!allSets.length){
+    prRow.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sets gelogd</div>';
+  }else{
+    const prByGrip={};
+    allSets.forEach(st=>{if(!prByGrip[st.grip]||st.time>prByGrip[st.grip].time)prByGrip[st.grip]=st});
+    prRow.innerHTML=Object.entries(prByGrip).map(([grip,st])=>`<div class="hang-pr-card"><div class="hang-pr-grip">${grip}</div><div class="hang-pr-val">${fmtSecs(st.time)}</div><div class="hang-pr-sub">${st.weight>0?'+'+st.weight+'kg · ':''}${fmtDate(st.date)}</div></div>`).join('');
+  }
 
   // Feed
   const feed=document.getElementById('hang-feed');
@@ -774,10 +858,17 @@ function renderStats(){
 /* ══════════════════════════════════════════
    INIT
 ══════════════════════════════════════════ */
-sessions=loadArr(SK,'bsessions');gyms=loadArr(GYK);goals=loadArr(GOK);hangSessions=loadArr(HSK);
+sessions=loadArr(SK,'bsessions');
+gyms=loadArr(GYK);
+goals=loadArr(GOK);
+hangSessions=loadArr(HSK);
 
-// Populate grade selects
-['gg-grade','gc-grade'].forEach(sid=>{const s=document.getElementById(sid);GRADES.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;s.appendChild(o)});s.value='6c'});
+// Vul graad-selects
+['gg-grade','gc-grade'].forEach(sid=>{
+  const s=document.getElementById(sid);
+  GRADES.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;s.appendChild(o)});
+  s.value='6c'
+});
 
 document.getElementById('inp-date').value=new Date().toISOString().split('T')[0];
 document.getElementById('hang-date').value=new Date().toISOString().split('T')[0];
