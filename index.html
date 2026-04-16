@@ -14,469 +14,233 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a0a0a;
-  --surface: #141414;
-  --surface2: #1e1e1e;
-  --border: rgba(255,255,255,0.08);
-  --accent: #7f77dd;
-  --accent2: #afa9ec;
-  --text: #f5f5f5;
-  --muted: #888;
-  --success: #4caf50;
-  --flash: #ffc107;
-  --attempt: #555;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bot: env(safe-area-inset-bottom, 0px);
+  --bg:#0a0a0a;--surface:#141414;--surface2:#1e1e1e;
+  --border:rgba(255,255,255,.08);--accent:#7f77dd;--accent2:#afa9ec;
+  --text:#f5f5f5;--muted:#888;--success:#4caf50;--flash:#ffc107;
+  --attempt:#555;--danger:#e53935;--hang:#e91e8c;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);
 }
-
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { background: var(--bg); }
-body {
-  font-family: 'Barlow', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100dvh;
-  max-width: 430px;
-  margin: 0 auto;
-  position: relative;
-  overflow-x: hidden;
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;max-width:430px;margin:0 auto;position:relative;overflow-x:hidden}
 
 /* NAV */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 430px;
-  background: rgba(14,14,14,0.95);
-  backdrop-filter: blur(12px);
-  border-top: 0.5px solid var(--border);
-  display: flex;
-  padding-bottom: var(--safe-bot);
-  z-index: 100;
-}
-.nav-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 10px 0 8px;
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-family: 'Barlow', sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: color 0.2s;
-  text-transform: uppercase;
-}
-.nav-btn.active { color: var(--accent); }
-.nav-btn svg { width: 22px; height: 22px; }
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(14,14,14,.97);backdrop-filter:blur(12px);border-top:.5px solid var(--border);display:flex;padding-bottom:var(--safe-bot);z-index:100}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;background:none;border:none;color:var(--muted);font-family:'Barlow',sans-serif;font-size:9px;font-weight:500;letter-spacing:.3px;cursor:pointer;transition:color .2s;text-transform:uppercase}
+.nav-btn.active{color:var(--accent)}
+.nav-btn svg{width:21px;height:21px}
 
 /* PAGES */
-.page { display: none; padding-bottom: calc(70px + var(--safe-bot)); }
-.page.active { display: block; }
+.page{display:none;padding-bottom:calc(70px + var(--safe-bot))}
+.page.active{display:block}
 
 /* HEADER */
-.page-header {
-  padding: calc(var(--safe-top) + 16px) 20px 16px;
-  position: sticky;
-  top: 0;
-  background: rgba(10,10,10,0.92);
-  backdrop-filter: blur(12px);
-  z-index: 50;
-  border-bottom: 0.5px solid var(--border);
-}
-.page-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-.page-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.page-header{padding:calc(var(--safe-top) + 16px) 20px 16px;position:sticky;top:0;background:rgba(10,10,10,.93);backdrop-filter:blur(12px);z-index:50;border-bottom:.5px solid var(--border)}
+.page-title{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.page-sub{font-size:13px;color:var(--muted);margin-top:2px}
 
-/* FEED / HOME */
-.hero-stats {
-  padding: 24px 20px 20px;
-  background: linear-gradient(160deg, #0f0d1f 0%, var(--bg) 60%);
-  border-bottom: 0.5px solid var(--border);
-}
-.hero-greeting {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-bottom: 4px;
-}
-.hero-name {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 36px;
-  font-weight: 800;
-  line-height: 1;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-}
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-}
-.stat-box {
-  background: var(--surface);
-  padding: 14px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-.stat-num {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--text);
-}
-.stat-label {
-  font-size: 10px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  text-align: center;
-}
+/* HERO */
+.hero-stats{padding:24px 20px 20px;background:linear-gradient(160deg,#0f0d1f 0%,var(--bg) 60%);border-bottom:.5px solid var(--border)}
+.hero-greeting{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+.hero-name{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:800;line-height:1;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.hero-flag{font-size:32px;line-height:1;display:inline-block;animation:flagWave 2s ease-in-out infinite;transform-origin:bottom left}
+@keyframes flagWave{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(4deg)}}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:12px;overflow:hidden}
+.stat-box{background:var(--surface);padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.stat-num{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--text)}
+.stat-num.streak-active{color:#ff7043}
+.stat-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;text-align:center}
 
-.section-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  padding: 20px 20px 10px;
-}
+/* STREAK BANNER */
+.streak-banner{margin:12px 16px 0;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(255,112,67,.15),rgba(255,112,67,.04));border:.5px solid rgba(255,112,67,.3)}
+.streak-fire{font-size:28px}
+.streak-text-main{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:#ff7043;text-transform:uppercase}
+.streak-text-sub{font-size:12px;color:var(--muted)}
+
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:20px 20px 10px}
 
 /* ACTIVITY CARD */
-.activity-card {
-  margin: 0 16px 12px;
-  background: var(--surface);
-  border-radius: 16px;
-  border: 0.5px solid var(--border);
-  overflow: hidden;
-  animation: slideUp 0.3s ease both;
-}
-@keyframes slideUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: none; } }
+.activity-card{margin:0 16px 12px;background:var(--surface);border-radius:16px;border:.5px solid var(--border);overflow:hidden;animation:slideUp .3s ease both}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.activity-header{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 16px 0}
+.activity-gym{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase}
+.activity-date{font-size:12px;color:var(--muted);margin-top:2px}
+.activity-note{font-size:12px;color:var(--muted);margin-top:4px;font-style:italic}
+.activity-max{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--accent);line-height:1}
+.activity-max-label{font-size:10px;color:var(--muted);text-transform:uppercase;text-align:right;letter-spacing:.5px}
+.activity-routes{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px 14px}
+.route-chip{display:flex;align-items:center;gap:5px;background:var(--surface2);border-radius:20px;padding:4px 10px 4px 6px;font-size:13px;font-weight:500}
+.route-chip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.chip-top .dot{background:var(--success)}.chip-flash .dot{background:var(--flash)}.chip-poging .dot{background:var(--attempt)}
 
-.activity-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 14px 16px 0;
-}
-.activity-gym {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-.activity-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.activity-max {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 32px;
-  font-weight: 800;
-  color: var(--accent);
-  line-height: 1;
-}
-.activity-max-label { font-size: 10px; color: var(--muted); text-transform: uppercase; text-align: right; letter-spacing: 0.5px; }
+.btn-delete-session{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;transition:color .2s,background .2s;margin-top:2px}
+.btn-delete-session:active{color:var(--danger);background:rgba(229,57,53,.12)}
 
-.activity-routes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 12px 16px 14px;
-}
-.route-chip {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--surface2);
-  border-radius: 20px;
-  padding: 4px 10px 4px 6px;
-  font-size: 13px;
-  font-weight: 500;
-}
-.route-chip .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-.chip-top .dot { background: var(--success); }
-.chip-flash .dot { background: var(--flash); }
-.chip-poging .dot { background: var(--attempt); }
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-state .big{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase}
 
-.btn-delete-session {
-  background: none;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s, background 0.2s;
-  -webkit-tap-highlight-color: transparent;
-  margin-top: 2px;
-}
-.btn-delete-session:active { color: #e53935; background: rgba(229,57,53,0.12); }
+/* OVERLAYS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(5px);z-index:300;display:flex;align-items:flex-end;justify-content:center;padding-bottom:calc(20px + var(--safe-bot))}
+.confirm-box,.modal-box{background:var(--surface2);border-radius:20px;padding:24px 20px 20px;width:calc(100% - 32px);max-width:400px;border:.5px solid var(--border)}
+.modal-box{max-height:75dvh;display:flex;flex-direction:column}
+.confirm-title,.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.modal-title{font-size:22px;margin-bottom:16px}
+.confirm-sub{font-size:14px;color:var(--muted);margin-bottom:20px}
+.confirm-btns{display:flex;gap:10px}
+.confirm-cancel,.modal-close{flex:1;padding:14px;background:var(--surface);border:.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer}
+.modal-close{flex:none;width:100%}
+.confirm-delete{flex:1;padding:14px;background:rgba(229,57,53,.15);border:.5px solid var(--danger);border-radius:12px;color:var(--danger);font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer}
+.modal-gym-list{overflow-y:auto;flex:1;margin-bottom:14px}
+.modal-gym-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface);border-radius:10px;margin-bottom:6px;border:.5px solid var(--border);cursor:pointer;transition:background .15s}
+.modal-gym-item:active{background:rgba(127,119,221,.1)}
+.modal-gym-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase}
 
-/* CONFIRM OVERLAY */
-.confirm-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(4px);
-  z-index: 300;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: calc(20px + var(--safe-bot));
-}
-.confirm-box {
-  background: var(--surface2);
-  border-radius: 20px;
-  padding: 24px 20px 20px;
-  width: calc(100% - 32px);
-  max-width: 400px;
-  border: 0.5px solid var(--border);
-}
-.confirm-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
-}
-.confirm-sub { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
-.confirm-btns { display: flex; gap: 10px; }
-.confirm-cancel {
-  flex: 1; padding: 14px;
-  background: var(--surface);
-  border: 0.5px solid var(--border);
-  border-radius: 12px;
-  color: var(--text);
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 17px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.5px;
-  cursor: pointer;
-}
-.confirm-delete {
-  flex: 1; padding: 14px;
-  background: rgba(229,57,53,0.15);
-  border: 0.5px solid #e53935;
-  border-radius: 12px;
-  color: #e53935;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 17px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.5px;
-  cursor: pointer;
-}
+/* LOG FORM */
+.log-form{padding:16px 20px}
+.form-section{margin-bottom:20px}
+.form-section-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.input-row{display:flex;gap:10px;margin-bottom:10px}
+.field{flex:1;display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+input[type=text],input[type=date],input[type=number],select,textarea{background:var(--surface);border:.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:12px 14px;width:100%;-webkit-appearance:none;appearance:none;outline:none}
+textarea{resize:none;height:80px;line-height:1.4}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select option{background:#1e1e1e}
+.gym-selector{display:flex;gap:8px;align-items:center}
+.gym-selector select{flex:1}
+.btn-manage-gyms{background:var(--surface2);border:.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Barlow',sans-serif;font-size:13px;padding:12px 14px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:color .2s,border-color .2s}
+.btn-manage-gyms:active{color:var(--accent);border-color:var(--accent)}
 
-.empty-feed {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--muted);
-}
-.empty-feed .big { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 6px; text-transform: uppercase; }
+/* ROUTE CARDS */
+.route-card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .2s}
+.route-card.expanded{border-color:rgba(127,119,221,.3)}
+.route-card-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;user-select:none}
+.rc-left{display:flex;align-items:center;gap:10px}
+.route-num{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.route-summary{display:flex;align-items:center;gap:6px}
+.rs-grade{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700}
+.rs-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rc-right{display:flex;align-items:center;gap:8px}
+.route-chevron{color:var(--muted);transition:transform .2s;flex-shrink:0}
+.route-card.expanded .route-chevron{transform:rotate(180deg)}
+.btn-remove-route{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px;line-height:1;border-radius:6px;transition:color .2s}
+.btn-remove-route:active{color:var(--danger)}
+.route-body{display:none;padding:0 14px 14px}
+.route-card.expanded .route-body{display:block}
+.route-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.route-fields .field.full{grid-column:1/-1}
+.result-toggle{display:flex;gap:6px}
+.result-btn{flex:1;padding:10px 4px;border-radius:8px;border:.5px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
+.result-btn.sel-top{background:rgba(76,175,80,.2);border-color:var(--success);color:var(--success)}
+.result-btn.sel-flash{background:rgba(255,193,7,.2);border-color:var(--flash);color:var(--flash)}
+.result-btn.sel-poging{background:rgba(85,85,85,.3);border-color:#777;color:#ccc}
 
-/* LOG PAGE */
-.log-form { padding: 16px 20px; }
-.form-section { margin-bottom: 20px; }
-.form-section-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
-}
-.input-row { display: flex; gap: 10px; margin-bottom: 10px; }
-.field { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-.field label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-input[type=text], input[type=date], input[type=number], select {
-  background: var(--surface);
-  border: 0.5px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  font-family: 'Barlow', sans-serif;
-  font-size: 15px;
-  padding: 12px 14px;
-  width: 100%;
-  -webkit-appearance: none;
-  appearance: none;
-  outline: none;
-}
-input:focus, select:focus { border-color: var(--accent); }
-select option { background: #1e1e1e; }
+.btn-add-route{width:100%;padding:13px;background:none;border:.5px dashed rgba(255,255,255,.2);border-radius:12px;color:var(--muted);font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer;margin-bottom:12px;transition:all .15s}
+.btn-add-route:active{background:var(--surface)}
+.btn-save{width:100%;padding:16px;background:var(--accent);border:none;border-radius:14px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:transform .1s,opacity .1s}
+.btn-save:active{transform:scale(.98);opacity:.9}
 
-/* ROUTE CARDS in log */
-.route-card {
-  background: var(--surface);
-  border: 0.5px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 10px;
-  position: relative;
-}
-.route-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.route-num {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.btn-remove-route {
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 20px;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-}
-.route-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.route-fields .field.full { grid-column: 1 / -1; }
+/* STATS */
+.stats-content{padding:16px 20px}
+.pr-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.pr-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);padding:16px}
+.pr-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.pr-grade{font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:800;line-height:1;color:var(--accent)}
+.pr-grade.flash{color:var(--flash)}
+.pr-date{font-size:11px;color:var(--muted);margin-top:4px}
+.chart-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);padding:16px;margin-bottom:16px}
+.chart-card-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
 
-/* RESULT TOGGLE */
-.result-toggle { display: flex; gap: 6px; }
-.result-btn {
-  flex: 1;
-  padding: 10px 4px;
-  border-radius: 8px;
-  border: 0.5px solid var(--border);
-  background: var(--surface2);
-  color: var(--muted);
-  font-family: 'Barlow', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.15s;
-}
-.result-btn.sel-top { background: rgba(76,175,80,0.2); border-color: var(--success); color: var(--success); }
-.result-btn.sel-flash { background: rgba(255,193,7,0.2); border-color: var(--flash); color: var(--flash); }
-.result-btn.sel-poging { background: rgba(85,85,85,0.3); border-color: #777; color: #ccc; }
+/* GOALS */
+.goals-content{padding:16px 20px}
+.goal-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;animation:slideUp .25s ease both}
+.goal-card.achieved{border-color:rgba(76,175,80,.4);background:rgba(76,175,80,.04)}
+.goal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.goal-grade{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--accent);line-height:1}
+.goal-card.achieved .goal-grade{color:var(--success)}
+.goal-meta{font-size:12px;color:var(--muted);margin-top:3px}
+.goal-achieved-badge{font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--success);text-transform:uppercase;background:rgba(76,175,80,.15);border-radius:20px;padding:3px 10px}
+.goal-progress-bar{background:var(--surface2);border-radius:6px;height:8px;overflow:hidden;margin-bottom:6px}
+.goal-progress-fill{height:100%;border-radius:6px;background:var(--accent);transition:width .5s cubic-bezier(.4,0,.2,1)}
+.goal-card.achieved .goal-progress-fill{background:var(--success)}
+.goal-progress-label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
+.goal-progress-pct{color:var(--text);font-weight:600}
+.btn-delete-goal{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;transition:color .2s}
+.btn-delete-goal:active{color:var(--danger)}
 
-.btn-add-route {
-  width: 100%;
-  padding: 13px;
-  background: none;
-  border: 0.5px dashed rgba(255,255,255,0.2);
-  border-radius: 12px;
-  color: var(--muted);
-  font-family: 'Barlow', sans-serif;
-  font-size: 14px;
-  cursor: pointer;
-  margin-bottom: 12px;
-  transition: all 0.15s;
-}
-.btn-add-route:active { background: var(--surface); }
+/* goal type tabs */
+.goal-type-tabs{display:flex;gap:6px;margin-bottom:16px}
+.goal-tab{flex:1;padding:10px;border-radius:10px;border:.5px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;text-align:center;transition:all .15s}
+.goal-tab.active{background:rgba(127,119,221,.15);border-color:var(--accent);color:var(--accent)}
 
-.btn-save {
-  width: 100%;
-  padding: 16px;
-  background: var(--accent);
-  border: none;
-  border-radius: 14px;
-  color: #fff;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: transform 0.1s, opacity 0.1s;
-}
-.btn-save:active { transform: scale(0.98); opacity: 0.9; }
+.add-goal-form{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
+.add-goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.btn-add-goal{width:100%;padding:14px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:opacity .15s}
+.btn-add-goal:active{opacity:.8}
 
-/* STATS PAGE */
-.stats-content { padding: 16px 20px; }
-.pr-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.pr-card {
-  background: var(--surface);
-  border-radius: 14px;
-  border: 0.5px solid var(--border);
-  padding: 16px;
-}
-.pr-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
-.pr-grade {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 40px;
-  font-weight: 800;
-  line-height: 1;
-  color: var(--accent);
-}
-.pr-grade.flash { color: var(--flash); }
-.pr-date { font-size: 11px; color: var(--muted); margin-top: 4px; }
+/* HANGBOARD */
+.hang-content{padding:16px 20px}
 
-.chart-card {
-  background: var(--surface);
-  border-radius: 14px;
-  border: 0.5px solid var(--border);
-  padding: 16px;
-  margin-bottom: 16px;
-}
-.chart-card-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 14px;
-}
-.chart-wrap { position: relative; }
+/* PR cards row for hangboard */
+.hang-pr-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-bottom:20px}
+.hang-pr-scroll::-webkit-scrollbar{display:none}
+.hang-pr-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:14px 16px;flex-shrink:0;min-width:130px}
+.hang-pr-grip{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.hang-pr-val{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--hang);line-height:1}
+.hang-pr-sub{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* hang session card */
+.hang-card{margin-bottom:12px;background:var(--surface);border-radius:14px;border:.5px solid var(--border);overflow:hidden;animation:slideUp .3s ease both}
+.hang-card-header{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 16px 12px}
+.hang-card-date{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase}
+.hang-card-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.hang-card-note{font-size:12px;color:var(--muted);font-style:italic;margin-top:4px}
+.hang-sets{display:flex;flex-direction:column;gap:6px;padding:0 16px 14px}
+.hang-set-row{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:10px;padding:10px 12px}
+.hang-set-grip{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;flex:1;text-transform:uppercase;letter-spacing:.3px}
+.hang-set-detail{font-size:12px;color:var(--muted);text-align:right;line-height:1.5}
+.hang-set-time{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--hang);line-height:1;text-align:right;min-width:44px}
+
+/* hang set cards in form */
+.hang-set-card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .2s}
+.hang-set-card.expanded{border-color:rgba(233,30,140,.3)}
+.hang-set-card .route-card-header{padding:12px 14px}
+.hang-set-card .route-body{padding:0 14px 14px}
+.hang-set-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hang-set-fields .field.full{grid-column:1/-1}
+
+/* TIMER */
+.timer-display{font-family:'Barlow Condensed',sans-serif;font-size:64px;font-weight:800;color:var(--hang);line-height:1;text-align:center;letter-spacing:2px;padding:10px 0 4px}
+.timer-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px}
+.timer-btns{display:flex;gap:8px}
+.btn-timer-start{flex:2;padding:14px;background:rgba(233,30,140,.15);border:.5px solid var(--hang);border-radius:12px;color:var(--hang);font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:all .15s}
+.btn-timer-start.running{background:rgba(229,57,53,.15);border-color:var(--danger);color:var(--danger)}
+.btn-timer-reset{flex:1;padding:14px;background:var(--surface);border:.5px solid var(--border);border-radius:12px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer}
+
+/* GYMS */
+.gyms-content{padding:16px 20px}
+.gym-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;animation:slideUp .2s ease both}
+.gym-item.is-fav{border-color:rgba(127,119,221,.4);background:rgba(127,119,221,.06)}
+.gym-item-name{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase}
+.gym-item-fav-badge{font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.gym-actions{display:flex;align-items:center;gap:8px}
+.btn-fav{background:none;border:.5px solid var(--border);border-radius:8px;color:var(--muted);padding:6px 10px;font-size:11px;font-family:'Barlow',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:all .15s}
+.btn-fav.active{color:var(--accent);border-color:var(--accent);background:rgba(127,119,221,.1)}
+.btn-del-gym{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;transition:color .2s}
+.btn-del-gym:active{color:var(--danger)}
+.add-gym-row{display:flex;gap:8px}
+.add-gym-row input{flex:1}
+.btn-add-gym{background:var(--accent);border:none;border-radius:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;padding:12px 18px;cursor:pointer;text-transform:uppercase;flex-shrink:0;transition:opacity .15s}
+.btn-add-gym:active{opacity:.8}
+.btn-save-hang{width:100%;padding:16px;background:var(--hang);border:none;border-radius:14px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:transform .1s,opacity .1s;margin-top:4px}
+.btn-save-hang:active{transform:scale(.98);opacity:.9}
 
 /* TOAST */
-.toast {
-  position: fixed;
-  bottom: calc(80px + var(--safe-bot));
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: var(--success);
-  color: #fff;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 12px 24px;
-  border-radius: 40px;
-  opacity: 0;
-  transition: all 0.3s;
-  z-index: 200;
-  pointer-events: none;
-  white-space: nowrap;
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast{position:fixed;bottom:calc(80px + var(--safe-bot));left:50%;transform:translateX(-50%) translateY(20px);background:var(--success);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 24px;border-radius:40px;opacity:0;transition:all .3s;z-index:200;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* divider */
+.divider{height:.5px;background:var(--border);margin:0 20px 0}
 </style>
 </head>
 <body>
@@ -485,195 +249,264 @@ select option { background: #1e1e1e; }
 <div id="page-home" class="page active">
   <div class="hero-stats">
     <div class="hero-greeting">Jouw stats</div>
-    <div class="hero-name" id="home-title">Flag it</div>
+    <div class="hero-name"><span>Flag it</span><span class="hero-flag">🏴</span></div>
     <div class="stats-row">
       <div class="stat-box"><div class="stat-num" id="hs-sessions">0</div><div class="stat-label">Sessies</div></div>
       <div class="stat-box"><div class="stat-num" id="hs-routes">0</div><div class="stat-label">Routes</div></div>
       <div class="stat-box"><div class="stat-num" id="hs-pr">—</div><div class="stat-label">PR Top</div></div>
+      <div class="stat-box"><div class="stat-num" id="hs-streak">0</div><div class="stat-label">🔥 Streak</div></div>
     </div>
   </div>
+  <div id="streak-banner-area"></div>
   <div class="section-title">Recente sessies</div>
   <div id="feed"></div>
 </div>
 
 <!-- LOG -->
 <div id="page-log" class="page">
-  <div class="page-header">
-    <div class="page-title">Nieuwe sessie</div>
-  </div>
+  <div class="page-header"><div class="page-title">Nieuwe sessie</div></div>
   <div class="log-form">
     <div class="form-section">
       <div class="form-section-title">Sessie info</div>
+      <div class="input-row"><div class="field"><label>Datum</label><input type="date" id="inp-date"></div></div>
       <div class="input-row">
-        <div class="field">
-          <label>Datum</label>
-          <input type="date" id="inp-date">
+        <div class="field"><label>Gym</label>
+          <div class="gym-selector">
+            <select id="inp-gym-select"><option value="">— Kies een gym —</option></select>
+            <button class="btn-manage-gyms" onclick="openGymPickerModal()">⚙ Gyms</button>
+          </div>
         </div>
       </div>
-      <div class="input-row">
-        <div class="field">
-          <label>Gym</label>
-          <input type="text" id="inp-gym" placeholder="bijv. Monk, ClimbUp...">
-        </div>
-      </div>
+      <div class="input-row"><div class="field"><label>Notitie (optioneel)</label><textarea id="inp-note" placeholder="Hoe voelde de sessie? Wat werkte goed?"></textarea></div></div>
     </div>
-
     <div class="form-section">
       <div class="form-section-title">Routes</div>
       <div id="route-cards"></div>
       <button class="btn-add-route" onclick="addRouteCard()">+ Route toevoegen</button>
     </div>
-
     <button class="btn-save" onclick="saveSession()">Sessie opslaan</button>
   </div>
 </div>
 
 <!-- STATS -->
 <div id="page-stats" class="page">
-  <div class="page-header">
-    <div class="page-title">Voortgang</div>
-  </div>
+  <div class="page-header"><div class="page-title">Voortgang</div></div>
   <div class="stats-content">
     <div class="pr-row">
-      <div class="pr-card">
-        <div class="pr-label">Hoogste top</div>
-        <div class="pr-grade" id="pr-top">—</div>
-        <div class="pr-date" id="pr-top-date"></div>
-      </div>
-      <div class="pr-card">
-        <div class="pr-label">Hoogste flash</div>
-        <div class="pr-grade flash" id="pr-flash">—</div>
-        <div class="pr-date" id="pr-flash-date"></div>
+      <div class="pr-card"><div class="pr-label">Hoogste top</div><div class="pr-grade" id="pr-top">—</div><div class="pr-date" id="pr-top-date"></div></div>
+      <div class="pr-card"><div class="pr-label">Hoogste flash</div><div class="pr-grade flash" id="pr-flash">—</div><div class="pr-date" id="pr-flash-date"></div></div>
+    </div>
+    <div class="chart-card"><div class="chart-card-title">Max graad per sessie</div><div style="position:relative;height:180px"><canvas id="chart-progress"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Routes per graad (geslaagd)</div><div style="position:relative;height:180px"><canvas id="chart-grades"></canvas></div></div>
+  </div>
+</div>
+
+<!-- GOALS -->
+<div id="page-goals" class="page">
+  <div class="page-header"><div class="page-title">Doelen</div><div class="page-sub">Graad-doelen en herhaling-doelen</div></div>
+  <div class="goals-content">
+    <div class="goal-type-tabs">
+      <button class="goal-tab active" id="gtab-grade" onclick="switchGoalTab('grade')">🧗 Graad</button>
+      <button class="goal-tab" id="gtab-count" onclick="switchGoalTab('count')">📊 Herhaling</button>
+    </div>
+
+    <!-- grade goal: top a grade before date -->
+    <div id="goal-panel-grade">
+      <div id="goals-list-grade"></div>
+      <div class="add-goal-form">
+        <div class="form-section-title">Nieuw graad-doel</div>
+        <div class="add-goal-grid">
+          <div class="field"><label>Graad</label><select id="gg-grade"></select></div>
+          <div class="field"><label>Resultaat</label><select id="gg-result"><option value="top">Top</option><option value="flash">Flash</option></select></div>
+          <div class="field full"><label>Deadline (optioneel)</label><input type="date" id="gg-deadline"></div>
+        </div>
+        <button class="btn-add-goal" onclick="addGradeGoal()">Doel toevoegen</button>
       </div>
     </div>
 
-    <div class="chart-card">
-      <div class="chart-card-title">Max graad per sessie</div>
-      <div class="chart-wrap" style="height: 180px;">
-        <canvas id="chart-progress" role="img" aria-label="Lijndiagram max graad per sessie"></canvas>
-      </div>
-    </div>
-
-    <div class="chart-card">
-      <div class="chart-card-title">Routes per graad (geslaagd)</div>
-      <div class="chart-wrap" style="height: 180px;">
-        <canvas id="chart-grades" role="img" aria-label="Staafdiagram routes per graad"></canvas>
+    <!-- count goal: climb grade X times -->
+    <div id="goal-panel-count" style="display:none">
+      <div id="goals-list-count"></div>
+      <div class="add-goal-form">
+        <div class="form-section-title">Nieuw herhaling-doel</div>
+        <div class="add-goal-grid">
+          <div class="field"><label>Graad</label><select id="gc-grade"></select></div>
+          <div class="field"><label>Resultaat</label><select id="gc-result"><option value="top">Top</option><option value="flash">Flash</option></select></div>
+          <div class="field"><label>Aantal keer</label><input type="number" id="gc-count" value="5" min="1" max="999"></div>
+          <div class="field"><label>Deadline (optioneel)</label><input type="date" id="gc-deadline"></div>
+        </div>
+        <button class="btn-add-goal" onclick="addCountGoal()">Doel toevoegen</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- HANGBOARD -->
+<div id="page-hang" class="page">
+  <div class="page-header"><div class="page-title">Hangboard</div><div class="page-sub">Log je hang-sets en volg je PR's</div></div>
+  <div class="hang-content">
+
+    <!-- PR row -->
+    <div class="form-section-title" style="padding:0 0 10px">PR per grip</div>
+    <div class="hang-pr-scroll" id="hang-pr-row">
+      <div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sets gelogd</div>
+    </div>
+
+    <div class="divider" style="margin:0 0 20px"></div>
+
+    <!-- Timer -->
+    <div class="form-section-title" style="padding:0 0 8px">Hangtimer</div>
+    <div class="chart-card" style="margin-bottom:20px">
+      <div class="timer-display" id="timer-display">0:00</div>
+      <div class="timer-sub" id="timer-sub">Druk start om te beginnen</div>
+      <div class="timer-btns">
+        <button class="btn-timer-start" id="btn-timer" onclick="toggleTimer()">Start</button>
+        <button class="btn-timer-reset" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+
+    <!-- New hang session form -->
+    <div class="form-section-title" style="padding:0 0 10px">Nieuwe hangsessie</div>
+    <div class="input-row"><div class="field"><label>Datum</label><input type="date" id="hang-date"></div></div>
+    <div class="input-row"><div class="field"><label>Notitie (optioneel)</label><textarea id="hang-note" placeholder="Bijv. na bouldering, vermoeid, etc." style="height:64px"></textarea></div></div>
+    <div id="hang-set-cards"></div>
+    <button class="btn-add-route" onclick="addHangSetCard()" style="margin-bottom:16px">+ Set toevoegen</button>
+    <button class="btn-save-hang" onclick="saveHangSession()">Hangsessie opslaan</button>
+
+    <div class="section-title" style="padding:24px 0 10px">Recente hangsessies</div>
+    <div id="hang-feed"></div>
+  </div>
+</div>
+
+<!-- GYMS -->
+<div id="page-gyms" class="page">
+  <div class="page-header"><div class="page-title">Mijn Gyms</div><div class="page-sub">Stel een favoriet in als standaard</div></div>
+  <div class="gyms-content">
+    <div id="gym-list" style="margin-bottom:16px"></div>
+    <div class="form-section-title" style="padding:0 0 10px">Gym toevoegen</div>
+    <div class="add-gym-row">
+      <input type="text" id="inp-new-gym" placeholder="bijv. Monk, ClimbUp, Bjoeks...">
+      <button class="btn-add-gym" onclick="addGym()">Voeg toe</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
 <nav class="bottom-nav">
   <button class="nav-btn active" onclick="showPage('home')" id="nav-home">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-    Feed
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Feed
   </button>
   <button class="nav-btn" onclick="showPage('log')" id="nav-log">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-    Loggen
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Loggen
   </button>
   <button class="nav-btn" onclick="showPage('stats')" id="nav-stats">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-    Stats
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Stats
+  </button>
+  <button class="nav-btn" onclick="showPage('goals')" id="nav-goals">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Doelen
+  </button>
+  <button class="nav-btn" onclick="showPage('hang')" id="nav-hang">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Hang
   </button>
 </nav>
 
 <div class="toast" id="toast"></div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const GRADES = ['4','4+','5','5+','6a','6a+','6b','6b+','6c','6c+','7a','7a+','7b','7b+','7c','7c+','8a','8a+','8b','8b+'];
-const GRADE_COLORS = ['#9FE1CB','#5DCAA5','#1D9E75','#0F6E56','#B5D4F4','#85B7EB','#378ADD','#185FA5','#CECBF6','#AFA9EC','#7F77DD','#534AB7','#F5C4B3','#F0997B','#D85A30','#993C1D','#F4C0D1','#ED93B1','#D4537E','#993356'];
+/* ══════════════════════════════════════════
+   CONSTANTS
+══════════════════════════════════════════ */
+const GRADES=['4','4+','5','5+','6a','6a+','6b','6b+','6c','6c+','7a','7a+','7b','7b+','7c','7c+','8a','8a+','8b','8b+'];
+const GRADE_COLORS=['#9FE1CB','#5DCAA5','#1D9E75','#0F6E56','#B5D4F4','#85B7EB','#378ADD','#185FA5','#CECBF6','#AFA9EC','#7F77DD','#534AB7','#F5C4B3','#F0997B','#D85A30','#993C1D','#F4C0D1','#ED93B1','#D4537E','#993356'];
+const TYPES=['Slab','Verticaal','Overhang','Cave','Dyno','Mantle','Pinch','Crimp','Sloper'];
+const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch','Open hand','Jug'];
 
-let sessions = [];
-let chartP = null, chartG = null;
-let routeCount = 0;
-const STORAGE_KEY = 'flagit_sessions_v1';
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+let sessions=[],gyms=[],goals=[],hangSessions=[];
+let chartP=null,chartG=null;
+let routeCount=0,hangSetCount=0;
 
-function save() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
-  } catch(e) {
-    toast('Opslaan mislukt — opslag vol?');
-  }
+/* ══════════════════════════════════════════
+   STORAGE
+══════════════════════════════════════════ */
+const SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1';
+function save(){try{localStorage.setItem(SK,JSON.stringify(sessions))}catch(e){toast('Opslaan mislukt','#e53935')}}
+function saveGyms(){try{localStorage.setItem(GYK,JSON.stringify(gyms))}catch(e){}}
+function saveGoals(){try{localStorage.setItem(GOK,JSON.stringify(goals))}catch(e){}}
+function saveHang(){try{localStorage.setItem(HSK,JSON.stringify(hangSessions))}catch(e){toast('Opslaan mislukt','#e53935')}}
+function loadArr(k,fb){try{const r=localStorage.getItem(k)||(fb?localStorage.getItem(fb):null);if(r){const p=JSON.parse(r);if(Array.isArray(p))return p}}catch(e){}return[]}
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+const gi=g=>GRADES.indexOf(g);
+function fmtDate(d){if(!d)return'';return new Date(d+'T00:00:00').toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'})}
+function fmtSecs(s){const m=Math.floor(s/60),sec=s%60;return`${m}:${String(sec).padStart(2,'0')}`}
+const allRoutes=()=>sessions.flatMap(s=>s.routes.map(r=>({...r,date:s.date,sid:s.id})));
+function getPR(type){const r=allRoutes().filter(x=>type==='flash'?x.result==='flash':(x.result==='top'||x.result==='flash'));if(!r.length)return null;return r.reduce((b,x)=>gi(x.grade)>gi(b.grade)?x:b,r[0])}
+function maxGrade(routes){const t=routes.filter(r=>r.result!=='poging');if(!t.length)return null;return t.reduce((b,r)=>gi(r.grade)>gi(b.grade)?r:b,t[0])}
+function getResultColor(res){return res==='top'?'var(--success)':res==='flash'?'var(--flash)':'var(--attempt)'}
+
+function calcStreak(){
+  if(!sessions.length)return 0;
+  const wk=d=>{const dt=new Date(d+'T00:00:00'),j=new Date(dt.getFullYear(),0,1);return`${dt.getFullYear()}-${Math.ceil((((dt-j)/86400000)+j.getDay()+1)/7)}`};
+  const weeks=[...new Set(sessions.map(s=>wk(s.date)))].sort().reverse();
+  const now=new Date(),j=new Date(now.getFullYear(),0,1);
+  const cw=`${now.getFullYear()}-${Math.ceil((((now-j)/86400000)+j.getDay()+1)/7)}`;
+  const pa=new Date(now);pa.setDate(now.getDate()-7);
+  const jpa=new Date(pa.getFullYear(),0,1);
+  const pw=`${pa.getFullYear()}-${Math.ceil((((pa-jpa)/86400000)+jpa.getDay()+1)/7)}`;
+  if(weeks[0]!==cw&&weeks[0]!==pw)return 0;
+  let s=1;
+  for(let i=1;i<weeks.length;i++){const[y1,w1]=weeks[i-1].split('-').map(Number),[y2,w2]=weeks[i].split('-').map(Number);if((y1===y2&&w1-w2===1)||(y1===y2+1&&w1===1&&w2>=51))s++;else break}
+  return s;
 }
 
-function loadSessions() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-      || localStorage.getItem('bsessions');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
-    }
-  } catch(e) {}
-  return [];
-}
-
-function gi(g) { return GRADES.indexOf(g); }
-
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.getElementById('nav-'+id).classList.add('active');
-  if (id === 'home') renderFeed();
-  if (id === 'stats') renderStats();
+  if(id==='home')renderFeed();
+  if(id==='stats')renderStats();
+  if(id==='goals')renderGoals();
+  if(id==='hang')renderHangPage();
+  if(id==='gyms')renderGymsPage();
+  if(id==='log')refreshGymSelect();
 }
 
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
+function toast(msg,color){const t=document.getElementById('toast');t.textContent=msg;t.style.background=color||'var(--success)';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 
-function allRoutes() {
-  return sessions.flatMap(s => s.routes.map(r => ({ ...r, date: s.date, gym: s.gym })));
-}
-function getPR(type) {
-  const r = allRoutes().filter(x => type === 'flash' ? x.result === 'flash' : (x.result === 'top' || x.result === 'flash'));
-  if (!r.length) return null;
-  return r.reduce((b, x) => gi(x.grade) > gi(b.grade) ? x : b, r[0]);
-}
-function maxGrade(routes) {
-  const t = routes.filter(r => r.result !== 'poging');
-  if (!t.length) return null;
-  return t.reduce((b, r) => gi(r.grade) > gi(b.grade) ? r : b, t[0]);
-}
-
-/* ---- FEED ---- */
-function renderFeed() {
-  const pt = getPR('top');
-  document.getElementById('hs-sessions').textContent = sessions.length;
-  document.getElementById('hs-routes').textContent = allRoutes().length;
-  document.getElementById('hs-pr').textContent = pt ? pt.grade : '—';
-
-  const feed = document.getElementById('feed');
-  if (!sessions.length) {
-    feed.innerHTML = '<div class="empty-feed"><div class="big">Nog geen sessies</div><div>Log je eerste bouldering sessie!</div></div>';
-    return;
-  }
-  const sorted = [...sessions].reverse();
-  feed.innerHTML = sorted.map((s, i) => {
-    const mg = maxGrade(s.routes);
-    const delay = i * 0.05;
-    const chips = s.routes.map(r =>
-      `<div class="route-chip chip-${r.result}"><div class="dot"></div>${r.grade}${r.type ? ' · '+r.type : ''}${r.color ? ' · '+r.color : ''}</div>`
-    ).join('');
-    return `<div class="activity-card" style="animation-delay:${delay}s" id="card-${s.id}">
+/* ══════════════════════════════════════════
+   FEED
+══════════════════════════════════════════ */
+function renderFeed(){
+  const pt=getPR('top'),streak=calcStreak();
+  document.getElementById('hs-sessions').textContent=sessions.length;
+  document.getElementById('hs-routes').textContent=allRoutes().length;
+  document.getElementById('hs-pr').textContent=pt?pt.grade:'—';
+  const se=document.getElementById('hs-streak');se.textContent=streak;se.className='stat-num'+(streak>=2?' streak-active':'');
+  document.getElementById('streak-banner-area').innerHTML=streak>=2?`<div class="streak-banner"><div class="streak-fire">🔥</div><div><div class="streak-text-main">${streak} weken op rij!</div><div class="streak-text-sub">Blijf zo doorgaan — je bent op de goede weg</div></div></div>`:'';
+  const feed=document.getElementById('feed');
+  if(!sessions.length){feed.innerHTML='<div class="empty-state"><div class="big">Nog geen sessies</div><div>Log je eerste bouldering sessie!</div></div>';return}
+  feed.innerHTML=[...sessions].reverse().map((s,i)=>{
+    const mg=maxGrade(s.routes);
+    const chips=s.routes.map(r=>`<div class="route-chip chip-${r.result}"><div class="dot"></div>${r.grade}${r.type?' · '+r.type:''}${r.color?' · '+r.color:''}</div>`).join('');
+    return`<div class="activity-card" style="animation-delay:${i*.05}s">
       <div class="activity-header">
         <div>
-          <div class="activity-gym">${s.gym || 'Gym'}</div>
-          <div class="activity-date">${formatDate(s.date)} · ${s.routes.length} route${s.routes.length !== 1 ? 's' : ''}</div>
+          <div class="activity-gym">${s.gym||'Gym'}</div>
+          <div class="activity-date">${fmtDate(s.date)} · ${s.routes.length} route${s.routes.length!==1?'s':''}</div>
+          ${s.note?`<div class="activity-note">"${s.note}"</div>`:''}
         </div>
-        <div style="text-align:right; display:flex; align-items:flex-start; gap:12px;">
-          <div>
-            <div class="activity-max">${mg ? mg.grade : '—'}</div>
-            <div class="activity-max-label">max</div>
-          </div>
-          <button class="btn-delete-session" onclick="deleteSession(${s.id})" title="Verwijder sessie">
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div style="text-align:right"><div class="activity-max">${mg?mg.grade:'—'}</div><div class="activity-max-label">max</div></div>
+          <button class="btn-delete-session" onclick="deleteSession(${s.id})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
         </div>
@@ -683,76 +516,61 @@ function renderFeed() {
   }).join('');
 }
 
-function deleteSession(id) {
-  const s = sessions.find(x => x.id === id);
-  if (!s) return;
-  const label = `${s.gym || 'Gym'} — ${formatDate(s.date)}`;
-
-  const overlay = document.createElement('div');
-  overlay.className = 'confirm-overlay';
-  overlay.id = 'confirm-overlay';
-  overlay.innerHTML = `
-    <div class="confirm-box">
-      <div class="confirm-title">Sessie verwijderen?</div>
-      <div class="confirm-sub">${label} · ${s.routes.length} route${s.routes.length !== 1 ? 's' : ''}</div>
-      <div class="confirm-btns">
-        <button class="confirm-cancel" onclick="document.getElementById('confirm-overlay').remove()">Annuleren</button>
-        <button class="confirm-delete" onclick="confirmDelete(${id})">Verwijderen</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+function deleteSession(id){
+  const s=sessions.find(x=>x.id===id);if(!s)return;
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='conf-ov';
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Sessie verwijderen?</div><div class="confirm-sub">${s.gym||'Gym'} — ${fmtDate(s.date)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('conf-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDelete(${id})">Verwijderen</button></div></div>`;
+  document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
 }
+function confirmDelete(id){document.getElementById('conf-ov')?.remove();sessions=sessions.filter(s=>s.id!==id);save();toast('Sessie verwijderd','#e53935');renderFeed()}
 
-function confirmDelete(id) {
-  document.getElementById('confirm-overlay')?.remove();
-  sessions = sessions.filter(s => s.id !== id);
-  save();
-  toast('Sessie verwijderd');
-  renderFeed();
+/* ══════════════════════════════════════════
+   GYMS
+══════════════════════════════════════════ */
+const getFavGym=()=>{const f=gyms.find(g=>g.fav);return f?f.name:(gyms[0]?gyms[0].name:'')};
+function refreshGymSelect(){const sel=document.getElementById('inp-gym-select'),cur=sel.value;sel.innerHTML='<option value="">— Kies een gym —</option>';gyms.forEach(g=>{const o=document.createElement('option');o.value=g.name;o.textContent=g.name+(g.fav?' ★':'');sel.appendChild(o)});const fav=getFavGym();if(cur&&gyms.find(g=>g.name===cur))sel.value=cur;else if(fav)sel.value=fav}
+function addGym(){const inp=document.getElementById('inp-new-gym'),name=inp.value.trim();if(!name)return;if(gyms.find(g=>g.name.toLowerCase()===name.toLowerCase())){toast('Gym bestaat al','#e53935');return}gyms.push({name,fav:gyms.length===0});saveGyms();inp.value='';renderGymsPage();refreshGymSelect();toast('Gym toegevoegd!')}
+function setFav(name){gyms.forEach(g=>g.fav=(g.name===name));saveGyms();renderGymsPage();refreshGymSelect()}
+function deleteGym(name){gyms=gyms.filter(g=>g.name!==name);if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms();renderGymsPage();refreshGymSelect()}
+function renderGymsPage(){
+  const list=document.getElementById('gym-list');
+  if(!gyms.length){list.innerHTML='<div class="empty-state" style="padding:30px 0"><div>Nog geen gyms — voeg er een toe hieronder.</div></div>';return}
+  list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${g.name}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-fav ${g.fav?'active':''}" onclick="setFav('${g.name}')">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-del-gym" onclick="deleteGym('${g.name}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')
 }
-
-function formatDate(d) {
-  if (!d) return '';
-  const dt = new Date(d + 'T00:00:00');
-  return dt.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' });
+function openGymPickerModal(){
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='gym-modal';
+  const lh=gyms.map(g=>`<div class="modal-gym-item" onclick="selectGymFromModal('${g.name}')"><div class="modal-gym-name">${g.name}</div>${g.fav?'<span style="color:var(--accent)">★</span>':''}</div>`).join('')||'<div style="color:var(--muted);font-size:14px;padding:8px 0">Voeg gyms toe via de Gyms tab</div>';
+  ov.innerHTML=`<div class="modal-box"><div class="modal-title">Kies een gym</div><div class="modal-gym-list">${lh}</div><button class="modal-close" onclick="document.getElementById('gym-modal').remove()">Annuleren</button></div>`;
+  document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()})
 }
+function selectGymFromModal(name){document.getElementById('gym-modal')?.remove();document.getElementById('inp-gym-select').value=name}
 
-/* ---- LOG ---- */
-function addRouteCard(grade='6a', color='', attempts=1, result='top', type='') {
-  routeCount++;
-  const id = routeCount;
-  const TYPES = ['Slab','Verticaal','Overhang','Cave','Dyno','Mantle','Pinch','Crimp','Sloper'];
-  const div = document.createElement('div');
-  div.className = 'route-card';
-  div.id = 'rc-' + id;
-  div.innerHTML = `
-    <div class="route-card-header">
+/* ══════════════════════════════════════════
+   ROUTE CARDS
+══════════════════════════════════════════ */
+function addRouteCard(grade='6a',color='',attempts=1,result='top',type=''){
+  routeCount++;const id=routeCount;
+  const div=document.createElement('div');div.className='route-card expanded';div.id='rc-'+id;
+  div.innerHTML=`<div class="route-card-header" onclick="toggleRC(${id})">
+    <div class="rc-left">
       <div class="route-num">Route ${id}</div>
-      <button class="btn-remove-route" onclick="document.getElementById('rc-${id}').remove()">×</button>
+      <div class="route-summary" id="rs-${id}">
+        <div class="rs-dot" style="background:${getResultColor(result)}"></div>
+        <div class="rs-grade">${grade}</div>
+      </div>
     </div>
+    <div class="rc-right">
+      <svg class="route-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="6 9 12 15 18 9"/></svg>
+      <button class="btn-remove-route" onclick="event.stopPropagation();document.getElementById('rc-${id}').remove()">×</button>
+    </div>
+  </div>
+  <div class="route-body">
     <div class="route-fields">
-      <div class="field">
-        <label>Graad</label>
-        <select id="rg-${id}">${GRADES.map(g=>`<option ${g===grade?'selected':''}>${g}</option>`).join('')}</select>
-      </div>
-      <div class="field">
-        <label>Kleur</label>
-        <input type="text" id="rc-color-${id}" value="${color}" placeholder="rood, blauw...">
-      </div>
-      <div class="field">
-        <label>Type</label>
-        <select id="rt-${id}">
-          <option value="">— type —</option>
-          ${TYPES.map(t=>`<option ${t===type?'selected':''}>${t}</option>`).join('')}
-        </select>
-      </div>
-      <div class="field">
-        <label>Pogingen</label>
-        <input type="number" id="ra-${id}" value="${attempts}" min="1" max="99">
-      </div>
-      <div class="field full">
-        <label>Resultaat</label>
+      <div class="field"><label>Graad</label><select id="rg-${id}" onchange="updRS(${id})">${GRADES.map(g=>`<option ${g===grade?'selected':''}>${g}</option>`).join('')}</select></div>
+      <div class="field"><label>Kleur</label><input type="text" id="rcol-${id}" value="${color}" placeholder="rood, blauw..."></div>
+      <div class="field"><label>Type</label><select id="rt-${id}"><option value="">— type —</option>${TYPES.map(t=>`<option ${t===type?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="field"><label>Pogingen</label><input type="number" id="ra-${id}" value="${attempts}" min="1" max="99"></div>
+      <div class="field full"><label>Resultaat</label>
         <div class="result-toggle">
           <button class="result-btn ${result==='top'?'sel-top':''}" onclick="setResult(${id},'top',this)">Top</button>
           <button class="result-btn ${result==='flash'?'sel-flash':''}" onclick="setResult(${id},'flash',this)">Flash</button>
@@ -760,126 +578,211 @@ function addRouteCard(grade='6a', color='', attempts=1, result='top', type='') {
         </div>
       </div>
     </div>
-    <input type="hidden" id="rr-${id}" value="${result}">
-  `;
+  </div>
+  <input type="hidden" id="rr-${id}" value="${result}">`;
   document.getElementById('route-cards').appendChild(div);
 }
+function toggleRC(id){document.getElementById('rc-'+id).classList.toggle('expanded')}
+function updRS(id){const g=document.getElementById('rg-'+id).value,res=document.getElementById('rr-'+id).value,s=document.getElementById('rs-'+id);s.querySelector('.rs-grade').textContent=g;s.querySelector('.rs-dot').style.background=getResultColor(res)}
+function setResult(id,val,btn){document.getElementById('rr-'+id).value=val;btn.parentElement.querySelectorAll('.result-btn').forEach(b=>b.className='result-btn');btn.classList.add('sel-'+val);updRS(id)}
 
-function setResult(id, val, btn) {
-  document.getElementById('rr-' + id).value = val;
-  const btns = btn.parentElement.querySelectorAll('.result-btn');
-  btns.forEach(b => b.className = 'result-btn');
-  btn.classList.add('sel-' + val);
+function saveSession(){
+  const date=document.getElementById('inp-date').value,gym=document.getElementById('inp-gym-select').value,note=document.getElementById('inp-note').value.trim();
+  if(!date){toast('Vul een datum in','#e53935');return}
+  const cards=document.querySelectorAll('.route-card');
+  if(!cards.length){toast('Voeg een route toe','#e53935');return}
+  const routes=[];
+  cards.forEach(c=>{const id=c.id.replace('rc-','');routes.push({grade:document.getElementById('rg-'+id).value,color:document.getElementById('rcol-'+id).value.trim(),type:document.getElementById('rt-'+id).value,attempts:parseInt(document.getElementById('ra-'+id).value)||1,result:document.getElementById('rr-'+id).value})});
+  sessions.push({date,gym,note,routes,id:Date.now()});sessions.sort((a,b)=>a.date.localeCompare(b.date));
+  save();document.getElementById('route-cards').innerHTML='';document.getElementById('inp-note').value='';routeCount=0;addRouteCard();
+  toast('Sessie opgeslagen! 🏴');showPage('home');
 }
 
-function saveSession() {
-  const date = document.getElementById('inp-date').value;
-  const gym = document.getElementById('inp-gym').value.trim();
-  if (!date) { toast('Vul een datum in'); return; }
-  const cards = document.querySelectorAll('.route-card');
-  if (!cards.length) { toast('Voeg een route toe'); return; }
-  const routes = [];
-  cards.forEach(c => {
-    const id = c.id.replace('rc-', '');
-    routes.push({
-      grade: document.getElementById('rg-' + id).value,
-      color: document.getElementById('rc-color-' + id).value.trim(),
-      type: document.getElementById('rt-' + id).value,
-      attempts: parseInt(document.getElementById('ra-' + id).value) || 1,
-      result: document.getElementById('rr-' + id).value
-    });
-  });
-  sessions.push({ date, gym, routes, id: Date.now() });
-  sessions.sort((a, b) => a.date.localeCompare(b.date));
-  save();
-  document.getElementById('route-cards').innerHTML = '';
-  document.getElementById('inp-gym').value = '';
-  routeCount = 0;
-  addRouteCard();
-  toast('Sessie opgeslagen!');
-  showPage('home');
+/* ══════════════════════════════════════════
+   GOALS — two types
+══════════════════════════════════════════ */
+let activeGoalTab='grade';
+function switchGoalTab(tab){
+  activeGoalTab=tab;
+  document.getElementById('gtab-grade').className='goal-tab'+(tab==='grade'?' active':'');
+  document.getElementById('gtab-count').className='goal-tab'+(tab==='count'?' active':'');
+  document.getElementById('goal-panel-grade').style.display=tab==='grade'?'block':'none';
+  document.getElementById('goal-panel-count').style.display=tab==='count'?'block':'none';
 }
 
-/* ---- STATS ---- */
-function renderStats() {
-  const pt = getPR('top'), pf = getPR('flash');
-  document.getElementById('pr-top').textContent = pt ? pt.grade : '—';
-  document.getElementById('pr-top-date').textContent = pt ? formatDate(pt.date) : '';
-  document.getElementById('pr-flash').textContent = pf ? pf.grade : '—';
-  document.getElementById('pr-flash-date').textContent = pf ? formatDate(pf.date) : '';
-
-  // progress line chart
-  const maxPS = sessions.map(s => {
-    const mg = maxGrade(s.routes);
-    return mg ? { date: s.date, idx: gi(mg.grade), grade: mg.grade } : null;
-  }).filter(Boolean);
-
-  if (chartP) chartP.destroy();
-  chartP = new Chart(document.getElementById('chart-progress'), {
-    type: 'line',
-    data: {
-      labels: maxPS.map(s => s.date.slice(5)),
-      datasets: [{
-        data: maxPS.map(s => s.idx),
-        borderColor: '#7f77dd',
-        backgroundColor: 'rgba(127,119,221,0.12)',
-        borderWidth: 2,
-        pointBackgroundColor: '#7f77dd',
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        tension: 0.35,
-        fill: true
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: '#666', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
-        y: {
-          min: 0,
-          max: GRADES.length - 1,
-          ticks: { color: '#666', font: { size: 11 }, callback: v => GRADES[v] || '', stepSize: 2 },
-          grid: { color: 'rgba(255,255,255,0.05)' }
-        }
-      }
-    }
-  });
-
-  // grades bar chart
-  const counts = {};
-  GRADES.forEach(g => counts[g] = 0);
-  allRoutes().filter(r => r.result !== 'poging').forEach(r => counts[r.grade]++);
-  const used = GRADES.filter(g => counts[g] > 0);
-
-  if (chartG) chartG.destroy();
-  chartG = new Chart(document.getElementById('chart-grades'), {
-    type: 'bar',
-    data: {
-      labels: used.length ? used : ['—'],
-      datasets: [{
-        data: used.length ? used.map(g => counts[g]) : [0],
-        backgroundColor: used.map(g => GRADE_COLORS[GRADES.indexOf(g)] || '#444'),
-        borderRadius: 6,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: '#666', font: { size: 11 } }, grid: { display: false } },
-        y: { beginAtZero: true, ticks: { color: '#666', font: { size: 11 }, stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } }
-      }
-    }
-  });
+function gradeGoalAchieved(g){
+  return allRoutes().some(r=>{const gOk=gi(r.grade)>=gi(g.grade),rOk=g.result==='flash'?r.result==='flash':(r.result==='top'||r.result==='flash');return gOk&&rOk});
+}
+function countGoalProgress(g){
+  return allRoutes().filter(r=>{const gOk=gi(r.grade)>=gi(g.grade),rOk=g.result==='flash'?r.result==='flash':(r.result==='top'||r.result==='flash'),dOk=!g.createdAt||r.date>=g.createdAt;return gOk&&rOk&&dOk}).length;
 }
 
-/* INIT */
-sessions = loadSessions();
-document.getElementById('inp-date').value = new Date().toISOString().split('T')[0];
-addRouteCard();
-renderFeed();
+function addGradeGoal(){
+  const grade=document.getElementById('gg-grade').value,result=document.getElementById('gg-result').value,deadline=document.getElementById('gg-deadline').value;
+  goals.push({id:Date.now(),type:'grade',grade,result,deadline,createdAt:new Date().toISOString().split('T')[0]});
+  saveGoals();renderGoals();toast('Doel toegevoegd!');
+}
+function addCountGoal(){
+  const grade=document.getElementById('gc-grade').value,result=document.getElementById('gc-result').value,count=parseInt(document.getElementById('gc-count').value)||5,deadline=document.getElementById('gc-deadline').value;
+  goals.push({id:Date.now(),type:'count',grade,result,count,deadline,createdAt:new Date().toISOString().split('T')[0]});
+  saveGoals();renderGoals();toast('Doel toegevoegd!');
+}
+function deleteGoal(id){goals=goals.filter(g=>g.id!==id);saveGoals();renderGoals()}
+
+function renderGoals(){
+  const gradeGoals=goals.filter(g=>g.type==='grade');
+  const countGoals=goals.filter(g=>g.type==='count');
+
+  // Grade goals
+  const gl=document.getElementById('goals-list-grade');
+  gl.innerHTML=gradeGoals.length?gradeGoals.map(g=>{
+    const done=gradeGoalAchieved(g),rLabel=g.result==='flash'?'Flash':'Top';
+    return`<div class="goal-card ${done?'achieved':''}">
+      <div class="goal-header">
+        <div><div class="goal-grade">${g.grade}</div><div class="goal-meta">${rLabel}${g.deadline?' · Deadline: '+fmtDate(g.deadline):''}</div></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${done?'<div class="goal-achieved-badge">✓ Gehaald!</div>':'<div style="font-size:22px">⏳</div>'}
+          <button class="btn-delete-goal" onclick="deleteGoal(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button>
+        </div>
+      </div>
+      ${done?'<div class="goal-progress-bar"><div class="goal-progress-fill" style="width:100%"></div></div>':''}
+    </div>`;
+  }).join(''):'<div class="empty-state" style="padding:20px 0"><div>Voeg een graad-doel toe hieronder.</div></div>';
+
+  // Count goals
+  const cl=document.getElementById('goals-list-count');
+  cl.innerHTML=countGoals.length?countGoals.map(g=>{
+    const prog=countGoalProgress(g),pct=Math.min(100,Math.round((prog/g.count)*100)),done=prog>=g.count,rLabel=g.result==='flash'?'Flash':'Top';
+    return`<div class="goal-card ${done?'achieved':''}">
+      <div class="goal-header">
+        <div><div class="goal-grade">${g.grade}</div><div class="goal-meta">${rLabel} · ${g.count}×${g.deadline?' · '+fmtDate(g.deadline):''}</div></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${done?'<div class="goal-achieved-badge">✓ Gehaald!</div>':''}
+          <button class="btn-delete-goal" onclick="deleteGoal(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button>
+        </div>
+      </div>
+      <div class="goal-progress-bar"><div class="goal-progress-fill" style="width:${pct}%"></div></div>
+      <div class="goal-progress-label"><span>${prog} / ${g.count} routes</span><span class="goal-progress-pct">${pct}%</span></div>
+    </div>`;
+  }).join(''):'<div class="empty-state" style="padding:20px 0"><div>Voeg een herhaling-doel toe hieronder.</div></div>';
+}
+
+/* ══════════════════════════════════════════
+   HANGBOARD
+══════════════════════════════════════════ */
+
+/* -- Timer -- */
+let timerSecs=0,timerInterval=null,timerRunning=false;
+function toggleTimer(){
+  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('btn-timer').textContent='Hervatten';document.getElementById('btn-timer').className='btn-timer-start';document.getElementById('timer-sub').textContent=`Gepauzeerd op ${fmtSecs(timerSecs)}`}
+  else{timerInterval=setInterval(()=>{timerSecs++;document.getElementById('timer-display').textContent=fmtSecs(timerSecs);document.getElementById('timer-sub').textContent='Hangend...'},1000);timerRunning=true;document.getElementById('btn-timer').textContent='Stop';document.getElementById('btn-timer').className='btn-timer-start running';document.getElementById('timer-sub').textContent='Hangend...'}
+}
+function resetTimer(){clearInterval(timerInterval);timerRunning=false;timerSecs=0;document.getElementById('timer-display').textContent='0:00';document.getElementById('btn-timer').textContent='Start';document.getElementById('btn-timer').className='btn-timer-start';document.getElementById('timer-sub').textContent='Druk start om te beginnen'}
+
+/* -- Hang set cards -- */
+function addHangSetCard(){
+  hangSetCount++;const id=hangSetCount;
+  const div=document.createElement('div');div.className='hang-set-card expanded route-card';div.id='hs-'+id;
+  div.innerHTML=`<div class="route-card-header" onclick="document.getElementById('hs-${id}').classList.toggle('expanded')">
+    <div class="rc-left">
+      <div class="route-num">Set ${id}</div>
+      <div class="route-summary" id="hss-${id}"><div class="rs-grade" id="hsg-${id}">Volgreep</div></div>
+    </div>
+    <div class="rc-right">
+      <svg class="route-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="6 9 12 15 18 9"/></svg>
+      <button class="btn-remove-route" onclick="event.stopPropagation();document.getElementById('hs-${id}').remove()">×</button>
+    </div>
+  </div>
+  <div class="route-body">
+    <div class="hang-set-fields">
+      <div class="field full"><label>Grip</label>
+        <select id="hgrip-${id}" onchange="document.getElementById('hsg-${id}').textContent=this.value">
+          ${GRIPS.map(g=>`<option>${g}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Hangtijd (sec)</label><input type="number" id="htime-${id}" value="10" min="1" max="999"></div>
+      <div class="field"><label>Rust (sec)</label><input type="number" id="hrest-${id}" value="60" min="0" max="999"></div>
+      <div class="field"><label>Herhalingen</label><input type="number" id="hreps-${id}" value="3" min="1" max="99"></div>
+      <div class="field"><label>Gewicht (kg extra)</label><input type="number" id="hwt-${id}" value="0" min="-99" max="200"></div>
+    </div>
+  </div>`;
+  document.getElementById('hang-set-cards').appendChild(div);
+}
+
+function saveHangSession(){
+  const date=document.getElementById('hang-date').value,note=document.getElementById('hang-note').value.trim();
+  if(!date){toast('Vul een datum in','#e53935');return}
+  const cards=document.querySelectorAll('[id^="hs-"]');
+  if(!cards.length){toast('Voeg een set toe','#e53935');return}
+  const sets=[];
+  cards.forEach(c=>{const id=c.id.replace('hs-','');sets.push({grip:document.getElementById('hgrip-'+id).value,time:parseInt(document.getElementById('htime-'+id).value)||10,rest:parseInt(document.getElementById('hrest-'+id).value)||60,reps:parseInt(document.getElementById('hreps-'+id).value)||3,weight:parseFloat(document.getElementById('hwt-'+id).value)||0})});
+  hangSessions.push({date,note,sets,id:Date.now()});hangSessions.sort((a,b)=>a.date.localeCompare(b.date));
+  saveHang();document.getElementById('hang-set-cards').innerHTML='';document.getElementById('hang-note').value='';hangSetCount=0;
+  toast('Hangsessie opgeslagen! 💪',`var(--hang)`);renderHangPage();
+}
+
+function deleteHangSession(id){
+  hangSessions=hangSessions.filter(s=>s.id!==id);saveHang();renderHangPage();toast('Verwijderd','#e53935');
+}
+
+function renderHangPage(){
+  // PR per grip: longest hang time
+  const prRow=document.getElementById('hang-pr-row');
+  const allSets=hangSessions.flatMap(s=>s.sets.map(st=>({...st,date:s.date})));
+  if(!allSets.length){prRow.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sets gelogd</div>';return}
+  const prByGrip={};
+  allSets.forEach(st=>{if(!prByGrip[st.grip]||st.time>prByGrip[st.grip].time)prByGrip[st.grip]=st});
+  prRow.innerHTML=Object.entries(prByGrip).map(([grip,st])=>`<div class="hang-pr-card"><div class="hang-pr-grip">${grip}</div><div class="hang-pr-val">${fmtSecs(st.time)}</div><div class="hang-pr-sub">${st.weight>0?'+'+st.weight+'kg · ':''}${fmtDate(st.date)}</div></div>`).join('');
+
+  // Feed
+  const feed=document.getElementById('hang-feed');
+  if(!hangSessions.length){feed.innerHTML='<div class="empty-state"><div class="big">Nog geen hangsessies</div></div>';return}
+  feed.innerHTML=[...hangSessions].reverse().map((s,i)=>`<div class="hang-card" style="animation-delay:${i*.05}s">
+    <div class="hang-card-header">
+      <div>
+        <div class="hang-card-date">${fmtDate(s.date)}</div>
+        <div class="hang-card-sub">${s.sets.length} set${s.sets.length!==1?'s':''} · ${s.sets.reduce((a,b)=>a+(b.time*b.reps),0)}s totaal</div>
+        ${s.note?`<div class="hang-card-note">"${s.note}"</div>`:''}
+      </div>
+      <button class="btn-delete-session" onclick="deleteHangSession(${s.id})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      </button>
+    </div>
+    <div class="hang-sets">${s.sets.map(st=>`<div class="hang-set-row">
+      <div class="hang-set-grip">${st.grip}</div>
+      <div><div class="hang-set-time">${fmtSecs(st.time)}</div></div>
+      <div class="hang-set-detail">${st.reps}× · ${st.rest}s rust${st.weight!==0?(st.weight>0?' · +':' · ')+st.weight+'kg':''}</div>
+    </div>`).join('')}</div>
+  </div>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   STATS
+══════════════════════════════════════════ */
+function renderStats(){
+  const pt=getPR('top'),pf=getPR('flash');
+  document.getElementById('pr-top').textContent=pt?pt.grade:'—';document.getElementById('pr-top-date').textContent=pt?fmtDate(pt.date):'';
+  document.getElementById('pr-flash').textContent=pf?pf.grade:'—';document.getElementById('pr-flash-date').textContent=pf?fmtDate(pf.date):'';
+  const maxPS=sessions.map(s=>{const mg=maxGrade(s.routes);return mg?{date:s.date,idx:gi(mg.grade)}:null}).filter(Boolean);
+  if(chartP)chartP.destroy();
+  chartP=new Chart(document.getElementById('chart-progress'),{type:'line',data:{labels:maxPS.map(s=>s.date.slice(5)),datasets:[{data:maxPS.map(s=>s.idx),borderColor:'#7f77dd',backgroundColor:'rgba(127,119,221,0.12)',borderWidth:2,pointBackgroundColor:'#7f77dd',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#666',font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{min:0,max:GRADES.length-1,ticks:{color:'#666',font:{size:11},callback:v=>GRADES[v]||'',stepSize:2},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+  const counts={};GRADES.forEach(g=>counts[g]=0);allRoutes().filter(r=>r.result!=='poging').forEach(r=>counts[r.grade]++);const used=GRADES.filter(g=>counts[g]>0);
+  if(chartG)chartG.destroy();
+  chartG=new Chart(document.getElementById('chart-grades'),{type:'bar',data:{labels:used.length?used:['—'],datasets:[{data:used.length?used.map(g=>counts[g]):[0],backgroundColor:used.map(g=>GRADE_COLORS[GRADES.indexOf(g)]||'#444'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#666',font:{size:11}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:'#666',font:{size:11},stepSize:1},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+sessions=loadArr(SK,'bsessions');gyms=loadArr(GYK);goals=loadArr(GOK);hangSessions=loadArr(HSK);
+
+// Populate grade selects
+['gg-grade','gc-grade'].forEach(sid=>{const s=document.getElementById(sid);GRADES.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;s.appendChild(o)});s.value='6c'});
+
+document.getElementById('inp-date').value=new Date().toISOString().split('T')[0];
+document.getElementById('hang-date').value=new Date().toISOString().split('T')[0];
+document.getElementById('inp-new-gym').addEventListener('keydown',e=>{if(e.key==='Enter')addGym()});
+refreshGymSelect();addRouteCard();renderFeed();
 </script>
 </body>
 </html>
