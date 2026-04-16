@@ -679,7 +679,7 @@ function openGymPickerModal(){
   </div>`;
   document.body.appendChild(ov);
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
-  setTimeout(()=>document.getElementById('modal-new-gym')?.focus(),50);
+  document.getElementById('modal-new-gym').addEventListener('keydown',e=>{if(e.key==='Enter')addGymFromModal()});
 }
 function selectGymFromModal(idx){const g=gyms[idx];document.getElementById('gym-modal')?.remove();if(g)document.getElementById('inp-gym-select').value=g.name}
 function addGymFromModal(){
