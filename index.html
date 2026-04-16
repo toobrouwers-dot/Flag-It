@@ -244,6 +244,12 @@ select option{background:#1e1e1e}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 .divider{height:.5px;background:var(--border);margin:0 20px 0}
+
+/* FILTER BAR */
+.filter-bar{padding:10px 16px;display:flex;gap:8px;align-items:center;border-bottom:.5px solid var(--border)}
+.filter-bar select{flex:1;min-width:100px;font-size:13px;padding:8px 10px}
+.btn-filter-clear{background:var(--surface2);border:.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;padding:8px 14px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:color .2s,border-color .2s;text-transform:uppercase;letter-spacing:.5px}
+.btn-filter-clear.active{color:var(--danger);border-color:var(--danger)}
 </style>
 </head>
 <body>
@@ -261,6 +267,11 @@ select option{background:#1e1e1e}
     </div>
   </div>
   <div id="streak-banner-area"></div>
+  <div id="filter-bar" class="filter-bar">
+    <select id="filter-gym" onchange="renderFeed()"><option value="">Alle gyms</option></select>
+    <select id="filter-grade" onchange="renderFeed()"><option value="">Min. graad</option></select>
+    <button class="btn-filter-clear" id="filter-clear-btn" onclick="clearFilters()">Wis</button>
+  </div>
   <div class="section-title">Recente sessies</div>
   <div id="feed"></div>
 </div>
@@ -348,6 +359,14 @@ select option{background:#1e1e1e}
       <div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sets gelogd</div>
     </div>
 
+    <div class="chart-card" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div class="chart-card-title">Hangtijd progressie</div>
+        <select id="hang-chart-grip" onchange="renderHangChart()" style="font-size:12px;padding:6px 10px;background:var(--surface2);border:.5px solid var(--border);border-radius:8px;color:var(--text);font-family:'Barlow',sans-serif;outline:none"><option value="">Alle grips</option></select>
+      </div>
+      <div style="position:relative;height:160px"><canvas id="chart-hang"></canvas></div>
+    </div>
+
     <div class="divider" style="margin:0 0 20px"></div>
 
     <!-- Timer -->
@@ -421,7 +440,7 @@ const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch',
    STATE
 ══════════════════════════════════════════ */
 let sessions=[],gyms=[],goals=[],hangSessions=[];
-let chartP=null,chartG=null;
+let chartP=null,chartG=null,chartH=null;
 let routeCount=0,hangSetCount=0;
 
 /* ══════════════════════════════════════════
@@ -462,6 +481,7 @@ const allRoutes=()=>sessions.flatMap(s=>s.routes.map(r=>({...r,date:s.date,sid:s
 function getPR(type){const r=allRoutes().filter(x=>type==='flash'?x.result==='flash':(x.result==='top'||x.result==='flash'));if(!r.length)return null;return r.reduce((b,x)=>gi(x.grade)>gi(b.grade)?x:b,r[0])}
 function maxGrade(routes){const t=routes.filter(r=>r.result!=='poging');if(!t.length)return null;return t.reduce((b,r)=>gi(r.grade)>gi(b.grade)?r:b,t[0])}
 function getResultColor(res){return res==='top'?'var(--success)':res==='flash'?'var(--flash)':'var(--attempt)'}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 function calcStreak(){
   if(!sessions.length)return 0;
@@ -510,18 +530,39 @@ function renderFeed(){
   document.getElementById('hs-pr').textContent=pt?pt.grade:'—';
   const se=document.getElementById('hs-streak');se.textContent=streak;se.className='stat-num'+(streak>=2?' streak-active':'');
   document.getElementById('streak-banner-area').innerHTML=streak>=2?`<div class="streak-banner"><div class="streak-fire">🔥</div><div><div class="streak-text-main">${streak} weken op rij!</div><div class="streak-text-sub">Blijf zo doorgaan — je bent op de goede weg</div></div></div>`:'';
+
+  // Sync gym filter options with sessions
+  const fgEl=document.getElementById('filter-gym');
+  if(fgEl){
+    const cur=fgEl.value;
+    fgEl.innerHTML='<option value="">Alle gyms</option>';
+    [...new Set(sessions.map(s=>s.gym).filter(Boolean))].sort().forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;fgEl.appendChild(o)});
+    if(cur)fgEl.value=cur;
+  }
+
+  // Apply filters
+  const fg=document.getElementById('filter-gym')?.value||'';
+  const fgr=document.getElementById('filter-grade')?.value||'';
+  const hasFilter=!!(fg||fgr);
+  const clearBtn=document.getElementById('filter-clear-btn');
+  if(clearBtn)clearBtn.className='btn-filter-clear'+(hasFilter?' active':'');
+
+  let visible=[...sessions].reverse();
+  if(fg)visible=visible.filter(s=>s.gym===fg);
+  if(fgr)visible=visible.filter(s=>{const mg=maxGrade(s.routes);return mg&&gi(mg.grade)>=gi(fgr)});
+
   const feed=document.getElementById('feed');
   if(!sessions.length){feed.innerHTML='<div class="empty-state"><div class="big">Nog geen sessies</div><div>Log je eerste bouldering sessie!</div></div>';return}
-  feed.innerHTML=[...sessions].reverse().map((s,i)=>{
+  if(!visible.length){feed.innerHTML='<div class="empty-state"><div class="big">Geen resultaten</div><div>Pas de filters aan.</div></div>';return}
+  feed.innerHTML=visible.map((s,i)=>{
     const mg=maxGrade(s.routes);
-    // Chips tonen graad + type (geen kleur meer)
     const chips=s.routes.map(r=>`<div class="route-chip chip-${r.result}"><div class="dot"></div>${r.grade}${r.type?' · '+r.type:''}</div>`).join('');
     return`<div class="activity-card" style="animation-delay:${i*.05}s">
       <div class="activity-header">
         <div>
-          <div class="activity-gym">${s.gym||'Gym'}</div>
+          <div class="activity-gym">${esc(s.gym||'Gym')}</div>
           <div class="activity-date">${fmtDate(s.date)} · ${s.routes.length} route${s.routes.length!==1?'s':''}</div>
-          ${s.note?`<div class="activity-note">"${s.note}"</div>`:''}
+          ${s.note?`<div class="activity-note">"${esc(s.note)}"</div>`:''}
         </div>
         <div style="display:flex;align-items:flex-start;gap:12px">
           <div style="text-align:right"><div class="activity-max">${mg?mg.grade:'—'}</div><div class="activity-max-label">max</div></div>
@@ -535,10 +576,16 @@ function renderFeed(){
   }).join('');
 }
 
+function clearFilters(){
+  const fg=document.getElementById('filter-gym');const fgr=document.getElementById('filter-grade');
+  if(fg)fg.value='';if(fgr)fgr.value='';
+  renderFeed();
+}
+
 function deleteSession(id){
   const s=sessions.find(x=>x.id===id);if(!s)return;
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='conf-ov';
-  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Sessie verwijderen?</div><div class="confirm-sub">${s.gym||'Gym'} — ${fmtDate(s.date)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('conf-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDelete(${id})">Verwijderen</button></div></div>`;
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Sessie verwijderen?</div><div class="confirm-sub">${esc(s.gym||'Gym')} — ${fmtDate(s.date)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('conf-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDelete(${id})">Verwijderen</button></div></div>`;
   document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
 }
 function confirmDelete(id){document.getElementById('conf-ov')?.remove();sessions=sessions.filter(s=>s.id!==id);save();toast('Sessie verwijderd','#e53935');renderFeed()}
@@ -559,22 +606,22 @@ function addGym(){
   const inp=document.getElementById('inp-new-gym'),name=inp.value.trim();
   if(!name)return;
   if(gyms.find(g=>g.name.toLowerCase()===name.toLowerCase())){toast('Gym bestaat al','#e53935');return}
-  gyms.push({name,fav:gyms.length===0});saveGyms();inp.value='';renderGymsPage();refreshGymSelect();toast('Gym toegevoegd!')
+  gyms.push({id:Date.now(),name,fav:gyms.length===0});saveGyms();inp.value='';renderGymsPage();refreshGymSelect();toast('Gym toegevoegd!')
 }
-function setFav(name){gyms.forEach(g=>g.fav=(g.name===name));saveGyms();renderGymsPage();refreshGymSelect()}
-function deleteGym(name){gyms=gyms.filter(g=>g.name!==name);if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms();renderGymsPage();refreshGymSelect()}
+function setFav(id){gyms.forEach(g=>g.fav=(g.id===id));saveGyms();renderGymsPage();refreshGymSelect()}
+function deleteGym(id){gyms=gyms.filter(g=>g.id!==id);if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms();renderGymsPage();refreshGymSelect()}
 function renderGymsPage(){
   const list=document.getElementById('gym-list');
   if(!gyms.length){list.innerHTML='<div class="empty-state" style="padding:30px 0"><div>Nog geen gyms — voeg er een toe hieronder.</div></div>';return}
-  list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${g.name}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-fav ${g.fav?'active':''}" onclick="setFav('${g.name}')">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-del-gym" onclick="deleteGym('${g.name}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')
+  list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${esc(g.name)}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-fav ${g.fav?'active':''}" onclick="setFav(${g.id})">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-del-gym" onclick="deleteGym(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')
 }
 function openGymPickerModal(){
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='gym-modal';
-  const lh=gyms.map(g=>`<div class="modal-gym-item" onclick="selectGymFromModal('${g.name}')"><div class="modal-gym-name">${g.name}</div>${g.fav?'<span style="color:var(--accent)">★</span>':''}</div>`).join('')||'<div style="color:var(--muted);font-size:14px;padding:8px 0">Voeg gyms toe via de Gyms tab</div>';
+  const lh=gyms.map(g=>`<div class="modal-gym-item" onclick="selectGymFromModal(${g.id})"><div class="modal-gym-name">${esc(g.name)}</div>${g.fav?'<span style="color:var(--accent)">★</span>':''}</div>`).join('')||'<div style="color:var(--muted);font-size:14px;padding:8px 0">Voeg gyms toe via de Gyms tab</div>';
   ov.innerHTML=`<div class="modal-box"><div class="modal-title">Kies een gym</div><div class="modal-gym-list">${lh}</div><button class="modal-close" onclick="document.getElementById('gym-modal').remove()">Annuleren</button></div>`;
   document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()})
 }
-function selectGymFromModal(name){document.getElementById('gym-modal')?.remove();document.getElementById('inp-gym-select').value=name}
+function selectGymFromModal(id){const g=gyms.find(x=>x.id===id);document.getElementById('gym-modal')?.remove();if(g)document.getElementById('inp-gym-select').value=g.name}
 
 /* ══════════════════════════════════════════
    ROUTE CARDS — kleur veld verwijderd
@@ -821,12 +868,13 @@ function renderHangPage(){
   // Feed
   const feed=document.getElementById('hang-feed');
   if(!hangSessions.length){feed.innerHTML='<div class="empty-state"><div class="big">Nog geen hangsessies</div></div>';return}
+  renderHangChart();
   feed.innerHTML=[...hangSessions].reverse().map((s,i)=>`<div class="hang-card" style="animation-delay:${i*.05}s">
     <div class="hang-card-header">
       <div>
         <div class="hang-card-date">${fmtDate(s.date)}</div>
         <div class="hang-card-sub">${s.sets.length} set${s.sets.length!==1?'s':''} · ${s.sets.reduce((a,b)=>a+(b.time*b.reps),0)}s totaal</div>
-        ${s.note?`<div class="hang-card-note">"${s.note}"</div>`:''}
+        ${s.note?`<div class="hang-card-note">"${esc(s.note)}"</div>`:''}
       </div>
       <button class="btn-delete-session" onclick="deleteHangSession(${s.id})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
@@ -838,6 +886,24 @@ function renderHangPage(){
       <div class="hang-set-detail">${st.reps}× · ${st.rest}s rust${st.weight!==0?(st.weight>0?' · +':' · ')+st.weight+'kg':''}</div>
     </div>`).join('')}</div>
   </div>`).join('');
+}
+
+function renderHangChart(){
+  const gripSel=document.getElementById('hang-chart-grip');
+  if(gripSel&&gripSel.options.length<=1){
+    GRIPS.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;gripSel.appendChild(o)});
+  }
+  const selectedGrip=gripSel?gripSel.value:'';
+  const pts=hangSessions.map(s=>{
+    const relevant=selectedGrip?s.sets.filter(st=>st.grip===selectedGrip):s.sets;
+    if(!relevant.length)return null;
+    return{date:s.date,time:Math.max(...relevant.map(st=>st.time))};
+  }).filter(Boolean).sort((a,b)=>a.date.localeCompare(b.date));
+  const canvas=document.getElementById('chart-hang');
+  if(!canvas)return;
+  if(chartH){chartH.destroy();chartH=null;}
+  if(!pts.length)return;
+  chartH=new Chart(canvas,{type:'line',data:{labels:pts.map(p=>p.date.slice(5)),datasets:[{data:pts.map(p=>p.time),borderColor:'#e91e8c',backgroundColor:'rgba(233,30,140,0.1)',borderWidth:2,pointBackgroundColor:'#e91e8c',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#666',font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{beginAtZero:true,ticks:{color:'#666',font:{size:11},callback:v=>fmtSecs(v)},grid:{color:'rgba(255,255,255,0.05)'}}}}});
 }
 
 /* ══════════════════════════════════════════
@@ -862,6 +928,15 @@ sessions=loadArr(SK,'bsessions');
 gyms=loadArr(GYK);
 goals=loadArr(GOK);
 hangSessions=loadArr(HSK);
+
+// Migrate gyms without id
+let _gymsMigrated=false;
+gyms.forEach((g,i)=>{if(!g.id){g.id=Date.now()+i;_gymsMigrated=true}});
+if(_gymsMigrated)saveGyms();
+
+// Populate grade filter dropdown
+const _fgrEl=document.getElementById('filter-grade');
+GRADES.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;_fgrEl.appendChild(o)});
 
 // Vul graad-selects
 ['gg-grade','gc-grade'].forEach(sid=>{
