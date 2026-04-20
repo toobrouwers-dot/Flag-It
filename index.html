@@ -621,7 +621,7 @@ function showPage(id){
 function toast(msg,color){
   const t=document.getElementById('toast');
   t.textContent=msg;t.style.background=color||'var(--success)';
-  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)
 }
 
 /* ══════════════════════════════════════════
@@ -903,10 +903,35 @@ function addCountGoal(){
   goals.push({id:Date.now(),type:'count',grade,result,count,deadline,createdAt:new Date().toISOString().split('T')[0]});
   saveGoals();renderGoals();toast('Doel toegevoegd!');
 }
-function deleteGoal(id){goals=goals.filter(g=>g.id!==id);saveGoals();renderGoals()}
+function deleteGoalConfirm(id){
+  const g=goals.find(x=>x.id===id);if(!g)return;
+  const label=g.type==='grade'?`Graad-doel ${g.grade}`:`Herhaling-doel ${g.grade} ×${g.count}`;
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='conf-goal-ov';
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Doel verwijderen?</div><div class="confirm-sub">${esc(label)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('conf-goal-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDeleteGoal(${id})">Verwijderen</button></div></div>`;
+  document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+function confirmDeleteGoal(id){document.getElementById('conf-goal-ov')?.remove();haptic(8);goals=goals.filter(g=>g.id!==id);saveGoals();renderGoals();toast('Doel verwijderd','#e53935')}
+function editGoal(id){
+  const g=goals.find(x=>x.id===id);if(!g)return;
+  goals=goals.filter(x=>x.id!==id);saveGoals();renderGoals();
+  if(g.type==='grade'){
+    document.getElementById('gg-grade').value=g.grade;
+    document.getElementById('gg-result').value=g.result;
+    document.getElementById('gg-deadline').value=g.deadline||'';
+    document.getElementById('gg-grade').closest('.add-goal-form')?.scrollIntoView({behavior:'smooth'});
+  }else{
+    document.getElementById('gc-grade').value=g.grade;
+    document.getElementById('gc-result').value=g.result;
+    document.getElementById('gc-count').value=g.count;
+    document.getElementById('gc-deadline').value=g.deadline||'';
+    document.getElementById('gc-grade').closest('.add-goal-form')?.scrollIntoView({behavior:'smooth'});
+  }
+  toast('Bewerk doel','#7f77dd');
+}
 
 function renderGoals(){
   const trashSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>`;
+  const editSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
   const today=new Date().toISOString().split('T')[0];
   const sorted=[...goals].sort((a,b)=>a.id-b.id);
   const container=document.getElementById('goals-list-all');
@@ -927,9 +952,10 @@ function renderGoals(){
             <div class="goal-grade">${g.grade}</div>
             <div class="goal-meta">${rLabel}${deadlineFmt}</div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:flex;align-items:center;gap:6px">
             ${done?'<div class="goal-achieved-badge">✓ Gehaald!</div>':overdue?'<div class="goal-overdue-badge">Verlopen</div>':'<div style="font-size:22px">⏳</div>'}
-            <button class="btn-delete-goal" onclick="deleteGoal(${g.id})">${trashSVG}</button>
+            <button class="btn-edit-session" onclick="editGoal(${g.id})">${editSVG}</button>
+            <button class="btn-delete-goal" onclick="deleteGoalConfirm(${g.id})">${trashSVG}</button>
           </div>
         </div>
         ${done?'<div class="goal-progress-bar"><div class="goal-progress-fill" style="width:100%"></div></div>':''}
@@ -945,9 +971,10 @@ function renderGoals(){
             <div class="goal-grade">${g.grade}</div>
             <div class="goal-meta">${rLabel} · ${g.count}×${deadlineFmt}</div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:flex;align-items:center;gap:6px">
             ${done?'<div class="goal-achieved-badge">✓ Gehaald!</div>':overdue?'<div class="goal-overdue-badge">Verlopen</div>':''}
-            <button class="btn-delete-goal" onclick="deleteGoal(${g.id})">${trashSVG}</button>
+            <button class="btn-edit-session" onclick="editGoal(${g.id})">${editSVG}</button>
+            <button class="btn-delete-goal" onclick="deleteGoalConfirm(${g.id})">${trashSVG}</button>
           </div>
         </div>
         <div class="goal-progress-bar"><div class="goal-progress-fill" style="width:${pct}%"></div></div>
