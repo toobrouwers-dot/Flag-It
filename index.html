@@ -1217,11 +1217,6 @@ function dismissStartScreen(){
   if(!el)return;
   el.classList.add('ss-hiding');
   setTimeout(()=>el.remove(),500);
-  localStorage.setItem('flagit_seen_v2','1');
-}
-if(localStorage.getItem('flagit_seen_v2')){
-  const el=document.getElementById('start-screen');
-  if(el)el.remove();
 }
 </script>
 </body>
