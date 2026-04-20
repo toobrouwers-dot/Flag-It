@@ -327,6 +327,8 @@ select option{background:#1e1e1e}
 .ps-card-arrow{margin-left:auto;color:var(--muted);flex-shrink:0}
 .btn-new-profile{width:100%;max-width:360px;padding:16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:16px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:background .15s,border-color .15s;animation:ssUp .4s .25s ease both}
 .btn-new-profile:active{background:rgba(127,119,221,.1);border-color:var(--accent)}
+.btn-ps-import{width:100%;max-width:360px;padding:14px;background:none;border:.5px solid rgba(127,119,221,.3);border-radius:16px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;margin-top:8px;text-align:center;display:block}
+.btn-ps-import:active{background:rgba(127,119,221,.1);border-color:var(--accent);color:var(--accent)}
 .ps-new-form{width:100%;max-width:360px;background:var(--surface);border:.5px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;animation:slideUp .25s ease both}
 .ps-emoji-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .ps-emoji-opt{width:42px;height:42px;font-size:22px;background:var(--surface2);border:.5px solid var(--border);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s,background .15s;-webkit-tap-highlight-color:transparent}
@@ -349,6 +351,9 @@ select option{background:#1e1e1e}
   <div class="ps-section-label">Profielen</div>
   <div class="ps-profiles" id="ps-profile-list"></div>
   <button class="btn-new-profile" id="btn-new-profile" onclick="showNewProfileForm()">+ Nieuw profiel</button>
+  <div class="ps-section-label" style="margin-top:20px">Of importeer een back-up</div>
+  <label class="btn-ps-import" for="ps-import-input">↑ Back-up importeren</label>
+  <input type="file" id="ps-import-input" accept=".json" style="display:none" onchange="importFromProfileScreen(event)">
 </div>
 
 <!-- START SCREEN -->
@@ -655,6 +660,32 @@ function psSelectEmoji(el){
 function cancelNewProfile(){
   document.getElementById('ps-new-form')?.remove();
 }
+function importFromProfileScreen(e){
+  const file=e.target.files[0];if(!file)return;
+  e.target.value='';
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!Array.isArray(data.sessions)||!Array.isArray(data.gyms)){toast('Ongeldig back-upbestand','#e53935');return}
+      const profileName=(data.profile&&data.profile.name)?data.profile.name:'Geïmporteerd profiel';
+      const emoji=(data.profile&&data.profile.emoji)?data.profile.emoji:PROFILE_EMOJIS[0];
+      const id='p_'+Date.now();
+      const profiles=loadProfiles();
+      profiles.push({id,name:profileName,emoji,created:new Date().toISOString().split('T')[0]});
+      saveProfiles(profiles);
+      selectProfile(id);
+      sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];
+      let migrated=false;gyms.forEach((g,i)=>{if(!g.id){g.id=Date.now()+i;migrated=true}});
+      save();saveGyms();saveGoals();saveHang();if(migrated)saveGyms();
+      const heroName=document.getElementById('hero-profile-name');
+      if(heroName)heroName.textContent=emoji+' '+profileName;
+      refreshGymSelect();renderFeed();renderGymsPage();
+      toast('Profiel geïmporteerd!');
+    }catch(err){toast('Import mislukt — ongeldig JSON','#e53935')}
+  };
+  reader.readAsText(file);
+}
 function createProfile(){
   const inp=document.getElementById('ps-name-inp');
   const name=inp?inp.value.trim():'';
@@ -710,7 +741,10 @@ function switchProfile(){
     </div>
     <div class="ps-section-label">Profielen</div>
     <div class="ps-profiles" id="ps-profile-list"></div>
-    <button class="btn-new-profile" id="btn-new-profile" onclick="showNewProfileForm()">+ Nieuw profiel</button>`;
+    <button class="btn-new-profile" id="btn-new-profile" onclick="showNewProfileForm()">+ Nieuw profiel</button>
+    <div class="ps-section-label" style="margin-top:20px">Of importeer een back-up</div>
+    <label class="btn-ps-import" for="ps-import-input">↑ Back-up importeren</label>
+    <input type="file" id="ps-import-input" accept=".json" style="display:none" onchange="importFromProfileScreen(event)">`;
   document.body.appendChild(ps);
   renderProfileScreen();
 }
@@ -1457,7 +1491,9 @@ function renderStats(){
    EXPORT / IMPORT
 ══════════════════════════════════════════ */
 function exportData(){
-  const data={sessions,gyms,goals,hangSessions,exportedAt:new Date().toISOString(),version:2};
+  const _profiles=loadProfiles();
+  const _active=_profiles.find(p=>p.id===activeProfileId);
+  const data={sessions,gyms,goals,hangSessions,profile:_active?{name:_active.name,emoji:_active.emoji}:null,exportedAt:new Date().toISOString(),version:2};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='flagit-backup-'+new Date().toISOString().split('T')[0]+'.json';
@@ -1495,7 +1531,14 @@ function confirmImport(btn){
   sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];
   let migrated=false;gyms.forEach((g,i)=>{if(!g.id){g.id=Date.now()+i;migrated=true}});
   save();saveGyms();saveGoals();saveHang();if(migrated)saveGyms();
-  refreshGymSelect();renderFeed();renderGymsPage();
+  if(data.profile&&data.profile.name&&activeProfileId){
+    const _profs=loadProfiles();
+    const _idx=_profs.findIndex(p=>p.id===activeProfileId);
+    if(_idx!==-1){_profs[_idx].name=data.profile.name;if(data.profile.emoji)_profs[_idx].emoji=data.profile.emoji;saveProfiles(_profs)}
+    const heroName=document.getElementById('hero-profile-name');
+    if(heroName)heroName.textContent=(data.profile.emoji||'')+' '+data.profile.name;
+  }
+  refreshGymSelect();renderFeed();renderGymsPage();renderProfileMgmt();
   toast('Data geïmporteerd!');
 }
 
