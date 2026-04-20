@@ -307,9 +307,49 @@ select option{background:#1e1e1e}
 .ss-feat-text{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 .ss-btn{margin-top:36px;width:100%;max-width:290px;padding:18px;background:var(--accent);border:none;border-radius:16px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:transform .1s,opacity .15s;animation:ssUp .5s .45s ease both;-webkit-tap-highlight-color:transparent}
 .ss-btn:active{transform:scale(.97);opacity:.85}
+
+/* PROFILE SCREEN */
+#profile-screen{position:fixed;inset:0;background:var(--bg);z-index:600;display:flex;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 48px) 24px calc(env(safe-area-inset-bottom,0px) + 24px);overflow-y:auto}
+#profile-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 100% 40% at 50% 0%,rgba(127,119,221,.18) 0%,transparent 65%);pointer-events:none}
+#profile-screen.ps-hiding{opacity:0;transform:scale(.96);transition:opacity .4s ease,transform .4s ease}
+.ps-header{text-align:center;margin-bottom:32px;animation:ssUp .4s .05s ease both}
+.ps-logo{width:60px;height:60px;border-radius:16px;margin-bottom:12px}
+.ps-title{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:800;text-transform:uppercase;letter-spacing:1px;line-height:.9}
+.ps-title span{color:var(--accent)}
+.ps-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:8px}
+.ps-section-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;align-self:flex-start;margin-bottom:8px;width:100%;max-width:360px}
+.ps-profiles{width:100%;max-width:360px;display:flex;flex-direction:column;gap:8px;margin-bottom:16px;animation:ssUp .4s .15s ease both}
+.ps-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:.5px solid var(--border);border-radius:16px;padding:16px 18px;cursor:pointer;transition:border-color .15s,background .15s;-webkit-tap-highlight-color:transparent}
+.ps-card:active{background:rgba(127,119,221,.1);border-color:var(--accent)}
+.ps-avatar{font-size:28px;line-height:1;flex-shrink:0;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--surface2);border-radius:12px}
+.ps-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.ps-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.ps-card-arrow{margin-left:auto;color:var(--muted);flex-shrink:0}
+.btn-new-profile{width:100%;max-width:360px;padding:16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:16px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:background .15s,border-color .15s;animation:ssUp .4s .25s ease both}
+.btn-new-profile:active{background:rgba(127,119,221,.1);border-color:var(--accent)}
+.ps-new-form{width:100%;max-width:360px;background:var(--surface);border:.5px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;animation:slideUp .25s ease both}
+.ps-emoji-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ps-emoji-opt{width:42px;height:42px;font-size:22px;background:var(--surface2);border:.5px solid var(--border);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s,background .15s;-webkit-tap-highlight-color:transparent}
+.ps-emoji-opt.selected{border-color:var(--accent);background:rgba(127,119,221,.15)}
+.ps-form-btns{display:flex;gap:8px;margin-top:14px}
+.btn-ps-create{flex:2;padding:14px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:opacity .15s}
+.btn-ps-create:active{opacity:.8}
+.btn-ps-cancel{flex:1;padding:14px;background:var(--surface2);border:.5px solid var(--border);border-radius:12px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer}
 </style>
 </head>
 <body>
+
+<!-- PROFILE SCREEN -->
+<div id="profile-screen">
+  <div class="ps-header">
+    <img src="./icons/icon-192.png" alt="Flag It" class="ps-logo">
+    <div class="ps-title">Flag<span>it</span></div>
+    <div class="ps-sub">Kies jouw profiel</div>
+  </div>
+  <div class="ps-section-label">Profielen</div>
+  <div class="ps-profiles" id="ps-profile-list"></div>
+  <button class="btn-new-profile" id="btn-new-profile" onclick="showNewProfileForm()">+ Nieuw profiel</button>
+</div>
 
 <!-- START SCREEN -->
 <div id="start-screen">
@@ -330,7 +370,7 @@ select option{background:#1e1e1e}
 <div id="page-home" class="page active">
   <div class="hero-stats">
     <div class="hero-greeting">Jouw stats</div>
-    <div class="hero-name"><span>Flag it</span><img src="./icons/icon-192.png" alt="" class="hero-logo"></div>
+    <div class="hero-name"><span id="hero-profile-name">Flag it</span><img src="./icons/icon-192.png" alt="" class="hero-logo"></div>
     <div class="stats-row">
       <div class="stat-box"><div class="stat-num" id="hs-sessions">0</div><div class="stat-label">Sessies</div></div>
       <div class="stat-box"><div class="stat-num" id="hs-routes">0</div><div class="stat-label">Routes</div></div>
@@ -489,6 +529,8 @@ select option{background:#1e1e1e}
       <label class="btn-import-label" for="import-file-input">↑ Importeer</label>
       <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="importFile(event)">
     </div>
+    <div class="form-section-title" style="padding:20px 0 10px">Profiel</div>
+    <div id="profile-mgmt-section"></div>
   </div>
 </div>
 
@@ -534,10 +576,207 @@ let routeCount=0,hangSetCount=0;
 let editMode=false,editSessionId=null;
 
 /* ══════════════════════════════════════════
+   PROFILES
+══════════════════════════════════════════ */
+const PFK='flagit_profiles_v1';
+const PROFILE_EMOJIS=['🧗','🏔️','💪','⚡','🎯','🏆','🌟','🔥'];
+let activeProfileId=null;
+
+function loadProfiles(){
+  try{const r=localStorage.getItem(PFK);if(r){const p=JSON.parse(r);if(Array.isArray(p))return p}}catch(e){}
+  return[];
+}
+function saveProfiles(profiles){
+  try{localStorage.setItem(PFK,JSON.stringify(profiles))}catch(e){}
+}
+function profileStorageKeys(id){
+  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id};
+}
+function maybeRunMigration(){
+  const profiles=loadProfiles();
+  if(profiles.length>0)return profiles;
+  const hasOld=localStorage.getItem('flagit_sessions_v2')||localStorage.getItem('flagit_gyms_v1')||localStorage.getItem('flagit_goals_v2')||localStorage.getItem('flagit_hang_v1');
+  if(!hasOld)return profiles;
+  const id='p_'+Date.now();
+  const keys=profileStorageKeys(id);
+  ['flagit_sessions_v2','flagit_gyms_v1','flagit_goals_v2','flagit_hang_v1'].forEach((oldKey,i)=>{
+    const val=localStorage.getItem(oldKey);
+    const newKey=[keys.sk,keys.gyk,keys.gok,keys.hsk][i];
+    if(val)localStorage.setItem(newKey,val);
+  });
+  const migrated=[{id,name:'Mijn Profiel',emoji:'🧗',created:new Date().toISOString().split('T')[0]}];
+  saveProfiles(migrated);
+  return migrated;
+}
+function renderProfileScreen(){
+  const profiles=loadProfiles();
+  const list=document.getElementById('ps-profile-list');
+  if(!list)return;
+  if(!profiles.length){
+    list.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:8px 0">Nog geen profielen</div>';
+    return;
+  }
+  list.innerHTML=profiles.map(p=>`
+    <div class="ps-card" onclick="selectProfile(${JSON.stringify(p.id)})">
+      <div class="ps-avatar">${p.emoji}</div>
+      <div>
+        <div class="ps-name">${esc(p.name)}</div>
+        <div class="ps-meta">Aangemaakt ${esc(p.created||'')}</div>
+      </div>
+      <svg class="ps-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`).join('');
+}
+function showNewProfileForm(){
+  document.getElementById('ps-new-form')?.remove();
+  const btn=document.getElementById('btn-new-profile');
+  if(!btn)return;
+  const form=document.createElement('div');
+  form.className='ps-new-form';form.id='ps-new-form';
+  form.innerHTML=`
+    <div class="form-section-title" style="padding:0 0 10px">Naam</div>
+    <input type="text" id="ps-name-inp" placeholder="bijv. jouw naam" maxlength="30" style="margin-bottom:14px">
+    <div class="form-section-title" style="padding:0 0 10px">Avatar</div>
+    <div class="ps-emoji-row">
+      ${PROFILE_EMOJIS.map((em,i)=>`<button class="ps-emoji-opt${i===0?' selected':''}" data-emoji="${em}" onclick="psSelectEmoji(this)">${em}</button>`).join('')}
+    </div>
+    <div class="ps-form-btns">
+      <button class="btn-ps-cancel" onclick="cancelNewProfile()">Annuleren</button>
+      <button class="btn-ps-create" onclick="createProfile()">Aanmaken</button>
+    </div>`;
+  btn.parentNode.insertBefore(form,btn);
+  const inp=document.getElementById('ps-name-inp');
+  inp.focus();
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')createProfile()});
+}
+function psSelectEmoji(el){
+  document.querySelectorAll('.ps-emoji-opt').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function cancelNewProfile(){
+  document.getElementById('ps-new-form')?.remove();
+}
+function createProfile(){
+  const inp=document.getElementById('ps-name-inp');
+  const name=inp?inp.value.trim():'';
+  if(!name){if(inp)inp.style.borderColor='var(--danger)';return}
+  const selectedBtn=document.querySelector('.ps-emoji-opt.selected');
+  const emoji=selectedBtn?selectedBtn.dataset.emoji:PROFILE_EMOJIS[0];
+  const id='p_'+Date.now();
+  const profiles=loadProfiles();
+  profiles.push({id,name,emoji,created:new Date().toISOString().split('T')[0]});
+  saveProfiles(profiles);
+  cancelNewProfile();
+  selectProfile(id);
+}
+function selectProfile(id){
+  activeProfileId=id;
+  const ps=document.getElementById('profile-screen');
+  if(ps){ps.classList.add('ps-hiding');setTimeout(()=>ps.remove(),400)}
+  initApp(id);
+}
+function renderProfileMgmt(){
+  const el=document.getElementById('profile-mgmt-section');
+  if(!el)return;
+  const profiles=loadProfiles();
+  const active=profiles.find(p=>p.id===activeProfileId);
+  el.innerHTML=`
+    <div class="gym-item" style="margin-bottom:8px;background:rgba(127,119,221,.07);border-color:rgba(127,119,221,.3)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="font-size:26px">${active?active.emoji:'🧗'}</div>
+        <div>
+          <div class="gym-item-name">${esc(active?active.name:'—')}</div>
+          <div class="gym-item-fav-badge">Actief profiel</div>
+        </div>
+      </div>
+      <button class="btn-fav" onclick="promptRenameProfile()">Wijzig</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button class="btn-export" style="border-color:var(--accent);color:var(--accent)" onclick="switchProfile()">↩ Wisselen</button>
+      <button class="btn-export" onclick="promptNewProfileFromGyms()">+ Nieuw</button>
+    </div>
+    ${profiles.length>1?`<button class="btn-export" style="width:100%;margin-bottom:0;color:var(--danger);border-color:var(--danger)" onclick="promptDeleteProfile()">Profiel verwijderen</button>`:''}
+  `;
+}
+function switchProfile(){
+  if(document.getElementById('profile-screen'))return;
+  const ps=document.createElement('div');
+  ps.id='profile-screen';
+  ps.innerHTML=`
+    <div class="ps-header">
+      <img src="./icons/icon-192.png" alt="Flag It" class="ps-logo">
+      <div class="ps-title">Flag<span>it</span></div>
+      <div class="ps-sub">Kies jouw profiel</div>
+    </div>
+    <div class="ps-section-label">Profielen</div>
+    <div class="ps-profiles" id="ps-profile-list"></div>
+    <button class="btn-new-profile" id="btn-new-profile" onclick="showNewProfileForm()">+ Nieuw profiel</button>`;
+  document.body.appendChild(ps);
+  renderProfileScreen();
+}
+function promptRenameProfile(){
+  const profiles=loadProfiles();
+  const active=profiles.find(p=>p.id===activeProfileId);
+  if(!active)return;
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='rename-ov';
+  ov.innerHTML=`<div class="confirm-box">
+    <div class="confirm-title">Profiel hernoemen</div>
+    <input type="text" id="rename-inp" value="${esc(active.name)}" maxlength="30" style="margin:12px 0 16px">
+    <div class="confirm-btns">
+      <button class="confirm-cancel" onclick="document.getElementById('rename-ov').remove()">Annuleren</button>
+      <button class="confirm-delete" style="background:rgba(127,119,221,.15);border-color:var(--accent);color:var(--accent)" onclick="confirmRenameProfile()">Opslaan</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+  document.getElementById('rename-inp').select();
+}
+function confirmRenameProfile(){
+  const inp=document.getElementById('rename-inp');
+  const name=inp?inp.value.trim():'';
+  if(!name)return;
+  const profiles=loadProfiles();
+  const idx=profiles.findIndex(p=>p.id===activeProfileId);
+  if(idx!==-1){profiles[idx].name=name;saveProfiles(profiles)}
+  document.getElementById('rename-ov')?.remove();
+  renderProfileMgmt();
+  toast('Profiel bijgewerkt!');
+}
+function promptDeleteProfile(){
+  const profiles=loadProfiles();
+  const active=profiles.find(p=>p.id===activeProfileId);
+  if(!active||profiles.length<=1)return;
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-prof-ov';
+  ov.innerHTML=`<div class="confirm-box">
+    <div class="confirm-title">Profiel verwijderen?</div>
+    <div class="confirm-sub">${esc(active.emoji+' '+active.name)}<br><span style="color:var(--danger);font-size:12px">Alle sessies, gyms en doelen van dit profiel worden permanent verwijderd.</span></div>
+    <div class="confirm-btns">
+      <button class="confirm-cancel" onclick="document.getElementById('del-prof-ov').remove()">Annuleren</button>
+      <button class="confirm-delete" onclick="confirmDeleteProfile()">Verwijderen</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+function confirmDeleteProfile(){
+  document.getElementById('del-prof-ov')?.remove();
+  const keys=profileStorageKeys(activeProfileId);
+  [keys.sk,keys.gyk,keys.gok,keys.hsk].forEach(k=>localStorage.removeItem(k));
+  const profiles=loadProfiles().filter(p=>p.id!==activeProfileId);
+  saveProfiles(profiles);
+  toast('Profiel verwijderd','#e53935');
+  activeProfileId=null;
+  switchProfile();
+}
+function promptNewProfileFromGyms(){
+  switchProfile();
+  setTimeout(()=>showNewProfileForm(),50);
+}
+
+/* ══════════════════════════════════════════
    STORAGE
    — sessies en hangsessies worden elk apart opgeslagen
 ══════════════════════════════════════════ */
-const SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1';
+let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1';
 
 function save(){
   try{localStorage.setItem(SK,JSON.stringify(sessions))}
@@ -616,7 +855,7 @@ function showPage(id){
   if(id==='stats')renderStats();
   if(id==='goals')renderGoals();
   if(id==='hang')renderHangPage();
-  if(id==='gyms')renderGymsPage();
+  if(id==='gyms'){renderGymsPage();renderProfileMgmt();}
   if(id==='log')refreshGymSelect();
 }
 
@@ -1262,45 +1501,89 @@ function confirmImport(btn){
 /* ══════════════════════════════════════════
    INIT
 ══════════════════════════════════════════ */
-sessions=loadArr(SK,'bsessions');
-gyms=loadArr(GYK);
-goals=loadArr(GOK);
-hangSessions=loadArr(HSK);
+function initApp(profileId){
+  // Destroy existing charts if switching profiles
+  if(chartP){chartP.destroy();chartP=null}
+  if(chartG){chartG.destroy();chartG=null}
+  if(chartH){chartH.destroy();chartH=null}
+  // Reset timer
+  if(typeof timerRunning!=='undefined'&&timerRunning){clearInterval(timerInterval);timerRunning=false;timerSecs=0}
+  // Reset route and hang-set cards
+  routeCount=0;document.getElementById('route-cards').innerHTML='';
+  hangSetCount=0;document.getElementById('hang-set-cards').innerHTML='';
 
-// Migrate gyms without id
-let _gymsMigrated=false;
-gyms.forEach((g,i)=>{if(!g.id){g.id=Date.now()+i;_gymsMigrated=true}});
-if(_gymsMigrated)saveGyms();
+  // Point storage keys at this profile's namespace
+  const keys=profileStorageKeys(profileId);
+  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;
 
-// Populate grade filter dropdown
-const _fgrEl=document.getElementById('filter-grade');
-GRADES.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;_fgrEl.appendChild(o)});
+  // Load data
+  sessions=loadArr(SK,'bsessions');
+  gyms=loadArr(GYK);
+  goals=loadArr(GOK);
+  hangSessions=loadArr(HSK);
 
-// Vul graad-selects
-['gg-grade','gc-grade'].forEach(sid=>{
-  const s=document.getElementById(sid);
-  GRADES.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;s.appendChild(o)});
-  s.value='6c'
-});
+  // Migrate gyms without id
+  let _gymsMigrated=false;
+  gyms.forEach((g,i)=>{if(!g.id){g.id=Date.now()+i;_gymsMigrated=true}});
+  if(_gymsMigrated)saveGyms();
 
-document.getElementById('inp-date').value=new Date().toISOString().split('T')[0];
-document.getElementById('hang-date').value=new Date().toISOString().split('T')[0];
-document.getElementById('inp-new-gym').addEventListener('keydown',e=>{if(e.key==='Enter')addGym()});
-refreshGymSelect();addRouteCard();renderFeed();
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  // Populate grade filter dropdown (clear first to avoid duplicates on profile switch)
+  const _fgrEl=document.getElementById('filter-grade');
+  _fgrEl.innerHTML='<option value="">Min. graad</option>';
+  GRADES.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;_fgrEl.appendChild(o)});
 
-/* ── START SCREEN ── */
-function dismissStartScreen(){
-  const el=document.getElementById('start-screen');
-  if(!el)return;
-  el.classList.add('ss-hiding');
-  setTimeout(()=>el.remove(),500);
-  localStorage.setItem('flagit_seen_v1','1');
+  // Populate goal grade selects
+  ['gg-grade','gc-grade'].forEach(sid=>{
+    const s=document.getElementById(sid);
+    s.innerHTML='';
+    GRADES.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;s.appendChild(o)});
+    s.value='6c';
+  });
+
+  // Set date inputs
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('inp-date').value=today;
+  document.getElementById('hang-date').value=today;
+
+  // Gym input enter key (add once — use a flag to avoid duplicating listener)
+  if(!document.getElementById('inp-new-gym')._kl){
+    document.getElementById('inp-new-gym').addEventListener('keydown',e=>{if(e.key==='Enter')addGym()});
+    document.getElementById('inp-new-gym')._kl=true;
+  }
+
+  // Show profile name in hero
+  const activeProfile=loadProfiles().find(p=>p.id===profileId);
+  const heroName=document.getElementById('hero-profile-name');
+  if(heroName&&activeProfile)heroName.textContent=activeProfile.emoji+' '+activeProfile.name;
+
+  refreshGymSelect();addRouteCard();
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+  // Start screen — use profile-scoped seen key
+  const seenKey='flagit_seen_v1_'+profileId;
+  function dismissStartScreen(){
+    const el=document.getElementById('start-screen');
+    if(!el)return;
+    el.classList.add('ss-hiding');
+    setTimeout(()=>el.remove(),500);
+    localStorage.setItem(seenKey,'1');
+  }
+  window.dismissStartScreen=dismissStartScreen;
+  if(localStorage.getItem(seenKey)){
+    const el=document.getElementById('start-screen');
+    if(el)el.remove();
+  }
+
+  renderFeed();
 }
-if(localStorage.getItem('flagit_seen_v1')){
-  const el=document.getElementById('start-screen');
-  if(el)el.remove();
-}
+
+/* ── Bootstrap: show profile screen before anything else ── */
+(function bootstrap(){
+  maybeRunMigration();
+  renderProfileScreen();
+  // Auto-open new-profile form when there are no profiles yet
+  if(!loadProfiles().length)setTimeout(()=>showNewProfileForm(),200);
+})();
 </script>
 </body>
 </html>
