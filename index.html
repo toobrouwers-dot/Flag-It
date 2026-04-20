@@ -87,6 +87,12 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .feed-date-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.8px;padding:16px 20px 4px}
 .feed-date-label:first-child{padding-top:6px}
 
+/* MILESTONE CARDS */
+.milestone-card{margin:0 16px 10px;background:linear-gradient(135deg,rgba(127,119,221,.12),rgba(127,119,221,.04));border:.5px solid rgba(127,119,221,.3);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:13px;animation:slideUp .3s ease both}
+.milestone-emoji{font-size:26px;flex-shrink:0;line-height:1}
+.milestone-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--accent2);text-transform:uppercase;letter-spacing:.5px}
+.milestone-sub{font-size:12px;color:var(--muted);margin-top:1px}
+
 /* OVERLAYS */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(5px);z-index:300;display:flex;align-items:flex-end;justify-content:center;padding-bottom:calc(20px + var(--safe-bot))}
 .confirm-box,.modal-box{background:var(--surface2);border-radius:20px;padding:24px 20px 20px;width:calc(100% - 32px);max-width:400px;border:.5px solid var(--border)}
@@ -621,6 +627,63 @@ function toast(msg,color){
 }
 
 /* ══════════════════════════════════════════
+   MILESTONES
+══════════════════════════════════════════ */
+function getMilestones(){
+  const ms=[];
+  const sorted=[...sessions].sort((a,b)=>a.date.localeCompare(b.date));
+
+  // Session count milestones
+  [1,10,25,50,100,200,500].forEach(n=>{
+    if(sorted.length>=n){
+      ms.push({date:sorted[n-1].date,emoji:n===1?'🧗':'🏆',
+        title:n===1?'Eerste sessie!':n+' sessies!',
+        sub:n===1?'Welkom bij Flag it!':'Al '+n+' sessies gelogd — top bezig!'});
+    }
+  });
+
+  // Route count milestones
+  let runRoutes=0;
+  for(const s of sorted){
+    const prev=runRoutes;
+    runRoutes+=s.routes.length;
+    for(const n of[100,250,500,1000]){
+      if(prev<n&&runRoutes>=n)ms.push({date:s.date,emoji:'📈',title:n+' routes!',sub:'Indrukwekkend klimbewijs.'});
+    }
+  }
+
+  // First sends and first flashes by grade
+  const firstSend={},firstFlash={};
+  for(const s of sorted){
+    for(const r of s.routes){
+      if((r.result==='top'||r.result==='flash')&&!(r.grade in firstSend))firstSend[r.grade]={date:s.date,wasFlash:r.result==='flash'};
+      if(r.result==='flash'&&!(r.grade in firstFlash))firstFlash[r.grade]=s.date;
+    }
+  }
+
+  // Grade milestones from 6a upward
+  ['6a','6b','6c','7a','7a+','7b','7b+','7c','7c+','8a','8a+','8b','8b+'].forEach(grade=>{
+    const ev=firstSend[grade];
+    if(!ev)return;
+    if(ev.wasFlash){
+      ms.push({date:ev.date,emoji:'⚡',title:'Eerste '+grade+' geflasht!',sub:'Direct gestuurd!'});
+    }else{
+      ms.push({date:ev.date,emoji:'🎯',title:'Eerste '+grade+'!',sub:'Nieuw persoonlijk record!'});
+    }
+  });
+
+  // Flash milestones for 6b+ (only when flash came after first top)
+  ['6b','6b+','6c','6c+','7a','7a+','7b','7b+','7c','7c+','8a','8a+'].forEach(grade=>{
+    const sendEv=firstSend[grade],flashDate=firstFlash[grade];
+    if(sendEv&&!sendEv.wasFlash&&flashDate&&flashDate!==sendEv.date){
+      ms.push({date:flashDate,emoji:'⚡',title:'Eerste '+grade+' geflasht!',sub:'Direct gestuurd!'});
+    }
+  });
+
+  return ms;
+}
+
+/* ══════════════════════════════════════════
    FEED
 ══════════════════════════════════════════ */
 function renderFeed(){
@@ -660,11 +723,26 @@ function renderFeed(){
     feed.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">Geen resultaten</div><div class="empty-sub">Geen sessies gevonden met de huidige filters.</div><button class="btn-empty-cta" onclick="clearFilters()">Filters wissen</button></div>';
     return;
   }
+  // Build interleaved items; milestones only when no filters active
+  const items=[];
+  visible.forEach(s=>items.push({type:'session',date:s.date,s}));
+  if(!hasFilter)getMilestones().forEach(m=>items.push({type:'milestone',date:m.date,m}));
+  // Newest first; on same date sessions before milestones
+  items.sort((a,b)=>{const dc=b.date.localeCompare(a.date);return dc!==0?dc:a.type==='session'?-1:1});
+
   let lastBucket='',cardIdx=0;
-  feed.innerHTML=visible.map(s=>{
-    const bucket=dateBucket(s.date);
+  feed.innerHTML=items.map(item=>{
+    const bucket=dateBucket(item.date);
     const header=bucket!==lastBucket?`<div class="feed-date-label">${bucket}</div>`:'';
     lastBucket=bucket;
+    if(item.type==='milestone'){
+      const m=item.m;
+      return`${header}<div class="milestone-card" style="animation-delay:${cardIdx++*.04}s">
+        <div class="milestone-emoji">${m.emoji}</div>
+        <div><div class="milestone-title">${esc(m.title)}</div><div class="milestone-sub">${esc(m.sub)}</div></div>
+      </div>`;
+    }
+    const s=item.s;
     const idx=cardIdx++;
     const mg=maxGrade(s.routes);
     const chips=s.routes.map(r=>`<div class="route-chip chip-${r.result}"><div class="dot"></div>${r.grade}${r.type?' · '+r.type:''}</div>`).join('');
