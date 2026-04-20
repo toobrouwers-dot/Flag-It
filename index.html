@@ -633,7 +633,7 @@ function renderProfileScreen(){
     return;
   }
   list.innerHTML=profiles.map(p=>`
-    <div class="ps-card" onclick="selectProfile(${JSON.stringify(p.id)})">
+    <div class="ps-card" onclick="selectProfile('${p.id}')">
       <div class="ps-avatar">${p.emoji}</div>
       <div>
         <div class="ps-name">${esc(p.name)}</div>
