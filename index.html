@@ -265,6 +265,41 @@ select option{background:#1e1e1e}
 
 .divider{height:.5px;background:var(--border);margin:0 20px 0}
 
+/* HEATMAP */
+.heatmap-wrap{overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+.heatmap-wrap::-webkit-scrollbar{display:none}
+.hm-grid{display:grid;grid-template-rows:repeat(7,11px);grid-auto-flow:column;grid-auto-columns:11px;gap:2px}
+.hm-cell{width:11px;height:11px;border-radius:2px;background:var(--surface2);cursor:default;transition:transform .1s}
+.hm-cell.l1{background:rgba(127,119,221,.3)}
+.hm-cell.l2{background:rgba(127,119,221,.6)}
+.hm-cell.l3{background:var(--accent)}
+
+/* PYRAMID */
+.pyramid-filter{display:flex;gap:6px;margin-bottom:14px}
+.pyramid-filter-btn{flex:1;padding:8px 4px;border-radius:8px;border:.5px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;cursor:pointer;transition:all .15s;letter-spacing:.5px}
+.pyramid-filter-btn.active{background:rgba(127,119,221,.2);border-color:var(--accent);color:var(--accent)}
+.pyramid-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.pyramid-grade-lbl{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;width:34px;text-align:right;flex-shrink:0;letter-spacing:.3px}
+.pyramid-bar-wrap{flex:1}
+.pyramid-bar{height:16px;border-radius:3px;min-width:3px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.pyramid-cnt{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--muted);width:26px;flex-shrink:0;text-align:left}
+
+/* INSIGHTS */
+.insights-list{display:flex;flex-direction:column;gap:8px}
+.insight-card{display:flex;align-items:flex-start;gap:12px;background:var(--surface2);border-radius:12px;padding:12px 14px;border:.5px solid var(--border)}
+.insight-icon{font-size:18px;flex-shrink:0;line-height:1;margin-top:1px}
+.insight-text{font-size:13px;color:var(--muted);line-height:1.4;flex:1}
+.insight-text strong{color:var(--text);font-weight:600}
+
+/* FEEL RATING */
+.feel-section{margin-top:4px}
+.feel-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.feel-row{display:flex;gap:6px}
+.feel-btn{flex:1;padding:8px 4px;border-radius:10px;border:.5px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Barlow',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.3px}
+.feel-btn.selected{border-color:var(--accent);background:rgba(127,119,221,.15);color:var(--text)}
+.feel-emoji{font-size:18px;line-height:1}
+.feed-feel{font-size:12px;vertical-align:middle}
+
 /* FILTER BAR */
 .filter-bar{padding:10px 16px;display:flex;gap:8px;align-items:center;border-bottom:.5px solid var(--border)}
 .filter-bar select{flex:1;min-width:100px;font-size:13px;padding:8px 10px}
@@ -416,7 +451,16 @@ select option{background:#1e1e1e}
           </div>
         </div>
       </div>
-      <div class="input-row"><div class="field"><label>Notitie (optioneel)</label><textarea id="inp-note" placeholder="Hoe voelde de sessie? Wat werkte goed?"></textarea></div></div>
+      <div class="input-row"><div class="field"><label>Notitie (optioneel)</label><textarea id="inp-note" placeholder="Uitdagingen, tips voor jezelf, bijzonderheden..."></textarea></div></div>
+      <div class="feel-section">
+        <div class="feel-label">Hoe voelde de sessie?</div>
+        <div class="feel-row">
+          <button class="feel-btn" onclick="setFeel(0)"><span class="feel-emoji">😓</span>Zwaar</button>
+          <button class="feel-btn" onclick="setFeel(1)"><span class="feel-emoji">😐</span>Oké</button>
+          <button class="feel-btn" onclick="setFeel(2)"><span class="feel-emoji">💪</span>Goed</button>
+          <button class="feel-btn" onclick="setFeel(3)"><span class="feel-emoji">🔥</span>Top</button>
+        </div>
+      </div>
     </div>
     <div class="form-section">
       <div class="form-section-title">Routes</div>
@@ -435,19 +479,24 @@ select option{background:#1e1e1e}
 <div id="page-stats" class="page">
   <div class="page-header"><div class="page-title">Voortgang</div></div>
   <div class="stats-content">
+    <div id="insights-section"></div>
     <div class="pr-row">
       <div class="pr-card"><div class="pr-label">Hoogste top</div><div class="pr-grade" id="pr-top">—</div><div class="pr-date" id="pr-top-date"></div></div>
       <div class="pr-card"><div class="pr-label">Hoogste flash</div><div class="pr-grade flash" id="pr-flash">—</div><div class="pr-date" id="pr-flash-date"></div></div>
     </div>
-    <div class="pr-card" style="margin-bottom:20px;display:flex;justify-content:space-around;align-items:center">
+    <div class="pr-card" style="margin-bottom:12px;display:flex;justify-content:space-around;align-items:center">
       <div style="text-align:center"><div class="pr-label">Slagingspercentage</div><div class="pr-grade" id="pr-rate">—</div></div>
       <div style="width:.5px;height:40px;background:var(--border)"></div>
       <div style="text-align:center"><div class="pr-label">Totaal routes</div><div class="pr-grade" style="color:var(--text)" id="pr-total">—</div></div>
       <div style="width:.5px;height:40px;background:var(--border)"></div>
       <div style="text-align:center"><div class="pr-label">Gem. per sessie</div><div class="pr-grade" style="color:var(--text)" id="pr-avg">—</div></div>
     </div>
+    <div id="feel-stat-row"></div>
+    <div id="heatmap-section"></div>
     <div class="chart-card"><div class="chart-card-title">Max graad per sessie</div><div style="position:relative;height:180px"><canvas id="chart-progress"></canvas></div></div>
+    <div id="tli-section"></div>
     <div class="chart-card"><div class="chart-card-title">Routes per graad (geslaagd)</div><div style="position:relative;height:180px"><canvas id="chart-grades"></canvas></div></div>
+    <div id="pyramid-section"></div>
     <div class="chart-card"><div class="chart-card-title">Per gym</div><div id="stats-gyms"><div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sessies</div></div></div>
   </div>
 </div>
@@ -588,10 +637,12 @@ const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch',
    STATE
 ══════════════════════════════════════════ */
 let sessions=[],gyms=[],goals=[],hangSessions=[];
-let chartP=null,chartG=null,chartH=null;
+let chartP=null,chartG=null,chartH=null,tliChart=null;
 let routeCount=0,hangSetCount=0;
 let editMode=false,editSessionId=null;
 let sessionTimerStart=null,sessionTimerTick=null;
+let pyramidFilter='all';
+let currentFeel=null;
 
 /* ══════════════════════════════════════════
    PROFILES
@@ -1096,11 +1147,13 @@ function renderFeed(){
     const idx=cardIdx++;
     const mg=maxGrade(s.routes);
     const chips=s.routes.map(r=>`<div class="route-chip chip-${r.result}"><div class="dot"></div>${r.grade}${r.type?' · '+r.type:''}</div>`).join('');
+    const feelEmojis=['😓','😐','💪','🔥'];
+    const feelStr=s.feel!=null?` · <span class="feed-feel">${feelEmojis[s.feel]}</span>`:'';
     return`${header}<div class="activity-card" style="animation-delay:${idx*.04}s">
       <div class="activity-header">
         <div>
           <div class="activity-gym">${esc(s.gym||'Gym')}</div>
-          <div class="activity-date">${fmtDate(s.date)} · ${s.routes.length} route${s.routes.length!==1?'s':''}${(s.sessionStart&&s.sessionEnd)?' · ⏱ '+fmtSecs(Math.floor((s.sessionEnd-s.sessionStart)/1000)):''}</div>
+          <div class="activity-date">${fmtDate(s.date)} · ${s.routes.length} route${s.routes.length!==1?'s':''}${(s.sessionStart&&s.sessionEnd)?' · ⏱ '+fmtSecs(Math.floor((s.sessionEnd-s.sessionStart)/1000)):''}${feelStr}</div>
           ${s.note?`<div class="activity-note">"${esc(s.note)}"</div>`:''}
         </div>
         <div style="display:flex;align-items:flex-start;gap:4px">
@@ -1162,6 +1215,8 @@ function editSession(id){
   editMode=true;editSessionId=id;
   document.getElementById('inp-date').value=s.date;
   document.getElementById('inp-note').value=s.note||'';
+  currentFeel=s.feel!=null?s.feel:null;
+  document.querySelectorAll('.feel-btn').forEach((b,i)=>b.classList.toggle('selected',i===currentFeel));
   document.getElementById('route-cards').innerHTML='';routeCount=0;
   s.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type));
   document.querySelector('#page-log .page-title').textContent='Sessie bewerken';
@@ -1286,12 +1341,14 @@ function saveSession(){
   const wasEdit=editMode;
   if(wasEdit){
     const idx=sessions.findIndex(s=>s.id===editSessionId);
-    if(idx!==-1)sessions[idx]={...sessions[idx],date,gym,note,routes};
+    if(idx!==-1)sessions[idx]={...sessions[idx],date,gym,note,routes,feel:currentFeel};
   }else{
     const sessionEnd=Date.now();
-    sessions.push({date,gym,note,routes,id:sessionEnd,sessionStart:sessionTimerStart,sessionEnd:sessionTimerStart?sessionEnd:null});
+    sessions.push({date,gym,note,routes,feel:currentFeel,id:sessionEnd,sessionStart:sessionTimerStart,sessionEnd:sessionTimerStart?sessionEnd:null});
   }
   editMode=false;editSessionId=null;
+  currentFeel=null;
+  document.querySelectorAll('.feel-btn').forEach(b=>b.classList.remove('selected'));
   document.querySelector('#page-log .page-title').textContent='Nieuwe sessie';
   document.querySelector('#page-log .btn-save').textContent='Sessie opslaan';
   sessions.sort((a,b)=>a.date.localeCompare(b.date));
@@ -1546,9 +1603,248 @@ function renderHangChart(){
 }
 
 /* ══════════════════════════════════════════
+   FEEL RATING
+══════════════════════════════════════════ */
+function setFeel(val){
+  currentFeel=currentFeel===val?null:val;
+  document.querySelectorAll('.feel-btn').forEach((b,i)=>b.classList.toggle('selected',i===currentFeel));
+  haptic(6);
+}
+
+/* ══════════════════════════════════════════
+   HEATMAP CALENDAR
+══════════════════════════════════════════ */
+function renderHeatmap(){
+  const el=document.getElementById('heatmap-section');
+  if(!el)return;
+  const dm={};
+  sessions.forEach(s=>{
+    if(!dm[s.date])dm[s.date]={count:0,maxG:null};
+    dm[s.date].count+=s.routes.length;
+    const mg=maxGrade(s.routes);
+    if(mg&&(!dm[s.date].maxG||gi(mg.grade)>gi(dm[s.date].maxG)))dm[s.date].maxG=mg.grade;
+  });
+  const today=new Date();today.setHours(0,0,0,0);
+  const mondayOff=(today.getDay()+6)%7;
+  const start=new Date(today);
+  start.setDate(today.getDate()-mondayOff-51*7);
+  const cols=[];
+  const cur=new Date(start);
+  while(cur<=today){
+    const week=[];
+    for(let d=0;d<7;d++){
+      const dt=new Date(cur);dt.setDate(cur.getDate()+d);
+      if(dt>today){week.push(null)}
+      else{const k=dt.toISOString().split('T')[0];week.push({date:k,...(dm[k]||{count:0,maxG:null})})}
+    }
+    cols.push(week);
+    cur.setDate(cur.getDate()+7);
+  }
+  let lastMonth=-1;
+  const mLabels=cols.map(week=>{
+    const first=week.find(d=>d!==null);
+    if(!first)return'';
+    const dt=new Date(first.date+'T00:00:00');
+    const m=dt.getMonth();
+    if(m!==lastMonth){lastMonth=m;return dt.toLocaleDateString('nl-NL',{month:'short'})}
+    return'';
+  });
+  let mHtml='';
+  mLabels.forEach(lbl=>{mHtml+=`<div style="min-width:13px;font-size:9px;color:var(--muted);white-space:nowrap;overflow:visible">${lbl}</div>`});
+  let grid='';
+  cols.forEach(week=>{
+    week.forEach(day=>{
+      if(!day){grid+='<div style="width:11px;height:11px;border-radius:2px"></div>';return;}
+      const c=day.count;
+      const lvl=c===0?'':c>=6?'l3':c>=3?'l2':'l1';
+      const tip=c?`${day.date}: ${c} route${c!==1?'s':''}${day.maxG?' · max '+day.maxG:''}`:day.date;
+      grid+=`<div class="hm-cell${lvl?' '+lvl:''}" title="${esc(tip)}"></div>`;
+    });
+  });
+  el.innerHTML=`<div class="chart-card" style="margin-bottom:16px"><div class="chart-card-title">Activiteitskalender</div>
+    <div class="heatmap-wrap">
+      <div style="display:flex;margin-bottom:4px">${mHtml}</div>
+      <div class="hm-grid">${grid}</div>
+    </div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   DIFFICULTY PYRAMID
+══════════════════════════════════════════ */
+function renderPyramid(){
+  const el=document.getElementById('pyramid-section');
+  if(!el)return;
+  const counts={};GRADES.forEach(g=>counts[g]=0);
+  allRoutes().forEach(r=>{
+    if(r.result==='poging')return;
+    if(pyramidFilter==='flash'&&r.result!=='flash')return;
+    counts[r.grade]++;
+  });
+  const gradeData=GRADES.map((g,i)=>({grade:g,count:counts[g],color:GRADE_COLORS[i]})).filter(d=>d.count>0);
+  const filterBtns=`<div class="pyramid-filter">
+    ${[['all','Alles'],['top','Tops'],['flash','Flashes']].map(([f,lbl])=>`<button class="pyramid-filter-btn${pyramidFilter===f?' active':''}" onclick="pyramidFilter='${f}';renderPyramid()">${lbl}</button>`).join('')}
+  </div>`;
+  if(!gradeData.length){
+    el.innerHTML=`<div class="chart-card" style="margin-bottom:16px"><div class="chart-card-title">Klimpiramide</div>${filterBtns}<div style="color:var(--muted);font-size:13px;padding:4px 0">Nog geen geslaagde routes</div></div>`;
+    return;
+  }
+  const maxC=Math.max(...gradeData.map(d=>d.count));
+  const bars=[...gradeData].reverse().map(d=>{
+    const pct=Math.round((d.count/maxC)*100);
+    return`<div class="pyramid-row">
+      <div class="pyramid-grade-lbl" style="color:${d.color}">${d.grade}</div>
+      <div class="pyramid-bar-wrap"><div class="pyramid-bar" style="width:${pct}%;background:${d.color};opacity:.85"></div></div>
+      <div class="pyramid-cnt">${d.count}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div class="chart-card" style="margin-bottom:16px"><div class="chart-card-title">Klimpiramide</div>${filterBtns}${bars}</div>`;
+}
+
+/* ══════════════════════════════════════════
+   SMART AUTO-INSIGHTS
+══════════════════════════════════════════ */
+function computeInsights(){
+  if(sessions.length<3)return[];
+  const ar=allRoutes();
+  const today=new Date().toISOString().split('T')[0];
+  const thisMonth=today.slice(0,7);
+  const lmDate=new Date();lmDate.setMonth(lmDate.getMonth()-1);
+  const lastMonth=lmDate.toISOString().slice(0,7);
+  const insights=[];
+
+  // Best day of week
+  const dayS={},dayT={};
+  sessions.forEach(s=>{
+    const dow=new Date(s.date+'T00:00:00').toLocaleDateString('nl-NL',{weekday:'long'});
+    s.routes.forEach(r=>{dayT[dow]=(dayT[dow]||0)+1;if(r.result!=='poging')dayS[dow]=(dayS[dow]||0)+1});
+  });
+  const dayKeys=Object.keys(dayT).filter(d=>dayT[d]>=5);
+  if(dayKeys.length>=2){
+    const best=dayKeys.reduce((a,b)=>((dayS[b]||0)/dayT[b])>((dayS[a]||0)/dayT[a])?b:a);
+    insights.push({icon:'📅',text:`Je klimt het beste op <strong>${best}</strong> (${Math.round(((dayS[best]||0)/dayT[best])*100)}% slagingspercentage)`});
+  }
+
+  // Best gym
+  const gymS={},gymT={};
+  sessions.forEach(s=>{if(!s.gym)return;s.routes.forEach(r=>{gymT[s.gym]=(gymT[s.gym]||0)+1;if(r.result!=='poging')gymS[s.gym]=(gymS[s.gym]||0)+1})});
+  const gymKeys=Object.keys(gymT).filter(g=>gymT[g]>=5);
+  if(gymKeys.length>=2){
+    const bGym=gymKeys.reduce((a,b)=>((gymS[b]||0)/gymT[b])>((gymS[a]||0)/gymT[a])?b:a);
+    insights.push({icon:'🏟',text:`Je slaagt het vaakst bij <strong>${esc(bGym)}</strong> (${Math.round(((gymS[bGym]||0)/gymT[bGym])*100)}% slagingspercentage)`});
+  }
+
+  // Plateau detection — PR unchanged 4+ weeks
+  const sentR=ar.filter(r=>r.result==='top'||r.result==='flash');
+  if(sentR.length){
+    const prGrade=sentR.reduce((b,r)=>gi(r.grade)>gi(b.grade)?r:b,sentR[0]).grade;
+    const prDate=sentR.filter(r=>gi(r.grade)>=gi(prGrade)).map(r=>r.date).sort().reverse()[0];
+    if(prDate){
+      const daysSince=Math.floor((new Date(today)-new Date(prDate+'T00:00:00'))/86400000);
+      if(daysSince>=28){insights.push({icon:'📊',text:`Je topscore (<strong>${prGrade}</strong>) staat al <strong>${Math.floor(daysSince/7)} weken</strong> stil — tijd om te pushen!`})}
+    }
+  }
+
+  // Strength and weakness by route type
+  const typeS={},typeT={};
+  ar.forEach(r=>{if(!r.type)return;typeT[r.type]=(typeT[r.type]||0)+1;if(r.result!=='poging')typeS[r.type]=(typeS[r.type]||0)+1});
+  const typeKeys=Object.keys(typeT).filter(t=>typeT[t]>=5);
+  if(typeKeys.length>=2){
+    const bType=typeKeys.reduce((a,b)=>((typeS[b]||0)/typeT[b])>((typeS[a]||0)/typeT[a])?b:a);
+    const wType=typeKeys.reduce((a,b)=>((typeS[b]||0)/typeT[b])<((typeS[a]||0)/typeT[a])?b:a);
+    if(bType!==wType)insights.push({icon:'💪',text:`Sterkte: <strong>${bType}</strong> (${Math.round(((typeS[bType]||0)/typeT[bType])*100)}%) · Zwakste: <strong>${wType}</strong> (${Math.round(((typeS[wType]||0)/typeT[wType])*100)}%)`});
+  }
+
+  // Flash rate trend this month vs last
+  const tmR=ar.filter(r=>r.date.startsWith(thisMonth));
+  const lmR=ar.filter(r=>r.date.startsWith(lastMonth));
+  if(tmR.length>=3&&lmR.length>=3){
+    const tmFlash=tmR.filter(r=>r.result==='flash').length/tmR.length;
+    const lmFlash=lmR.filter(r=>r.result==='flash').length/lmR.length;
+    const diff=Math.round((tmFlash-lmFlash)*100);
+    if(Math.abs(diff)>=3){
+      insights.push({icon:'⚡',text:`Flash-percentage: <strong>${Math.round(tmFlash*100)}%</strong> deze maand (${diff>0?'↑+':'↓'}${Math.abs(diff)}% vs vorige maand)`});
+    }
+  }
+
+  // Session frequency trend
+  const tmSess=sessions.filter(s=>s.date.startsWith(thisMonth)).length;
+  const lmSess=sessions.filter(s=>s.date.startsWith(lastMonth)).length;
+  if(lmSess>0){
+    if(tmSess>lmSess)insights.push({icon:'📈',text:`Je klimt <strong>vaker</strong> dan vorige maand (${tmSess} vs ${lmSess} sessies)`});
+    else if(tmSess<lmSess)insights.push({icon:'📉',text:`Je klimt <strong>minder</strong> dan vorige maand (${tmSess} vs ${lmSess} sessies)`});
+  }
+
+  return insights.slice(0,5);
+}
+
+function renderInsights(){
+  const el=document.getElementById('insights-section');
+  if(!el)return;
+  const list=computeInsights();
+  if(!list.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="chart-card" style="margin-bottom:16px"><div class="chart-card-title">Slimme inzichten</div>
+    <div class="insights-list">${list.map(ins=>`<div class="insight-card"><div class="insight-icon">${ins.icon}</div><div class="insight-text">${ins.text}</div></div>`).join('')}</div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   TRAINING LOAD INDEX (TLI)
+══════════════════════════════════════════ */
+function isoWeekKey(dateStr){
+  const d=new Date(dateStr+'T00:00:00');
+  const thu=new Date(d);thu.setDate(d.getDate()+(4-(d.getDay()||7)));
+  const jan1=new Date(thu.getFullYear(),0,1);
+  const wn=Math.ceil((((thu-jan1)/86400000)+1)/7);
+  return{key:`${thu.getFullYear()}-W${String(wn).padStart(2,'0')}`,wn,year:thu.getFullYear()};
+}
+
+function computeWeeklyTLI(){
+  const wkTLI={};
+  allRoutes().forEach(r=>{
+    const{key}=isoWeekKey(r.date);
+    const tli=(gi(r.grade)+1)*(r.result==='flash'?1.5:r.result==='top'?1.0:0.2);
+    wkTLI[key]=(wkTLI[key]||0)+tli;
+  });
+  const today=new Date();today.setHours(0,0,0,0);
+  const res=[];
+  for(let i=9;i>=0;i--){
+    const d=new Date(today);d.setDate(today.getDate()-i*7);
+    const{key,wn}=isoWeekKey(d.toISOString().split('T')[0]);
+    res.push({key,label:`W${wn}`,tli:Math.round(wkTLI[key]||0)});
+  }
+  return res;
+}
+
+function renderTLI(){
+  const el=document.getElementById('tli-section');
+  if(!el)return;
+  const data=computeWeeklyTLI();
+  const curTLI=data[data.length-1].tli;
+  const prev4=data.slice(-5,-1);
+  const avg4=prev4.length?Math.round(prev4.reduce((a,b)=>a+b.tli,0)/prev4.length):0;
+  const trend=curTLI>avg4?'↑':curTLI<avg4?'↓':'→';
+  const trendColor=curTLI>avg4?'var(--success)':curTLI<avg4?'var(--danger)':'var(--muted)';
+  el.innerHTML=`<div class="chart-card" style="margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div><div class="chart-card-title">Trainingsbelasting</div><div style="font-size:11px;color:var(--muted);margin-top:2px">4-wk gem. ${avg4}</div></div>
+      <div style="text-align:right"><div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:var(--accent);line-height:1">${curTLI} <span style="color:${trendColor};font-size:20px">${trend}</span></div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Deze week</div></div>
+    </div>
+    <div style="position:relative;height:100px"><canvas id="chart-tli"></canvas></div>
+  </div>`;
+  const canvas=document.getElementById('chart-tli');
+  if(!canvas)return;
+  if(tliChart){tliChart.destroy();tliChart=null}
+  tliChart=new Chart(canvas,{type:'bar',data:{labels:data.map(d=>d.label),datasets:[{data:data.map(d=>d.tli),backgroundColor:data.map((_,i)=>i===data.length-1?'rgba(127,119,221,.85)':'rgba(127,119,221,.3)'),borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#666',font:{size:10}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+}
+
+/* ══════════════════════════════════════════
    STATS
 ══════════════════════════════════════════ */
 function renderStats(){
+  renderInsights();
+  renderHeatmap();
+
   const pt=getPR('top'),pf=getPR('flash');
   document.getElementById('pr-top').textContent=pt?pt.grade:'—';document.getElementById('pr-top-date').textContent=pt?fmtDate(pt.date):'';
   document.getElementById('pr-flash').textContent=pf?pf.grade:'—';document.getElementById('pr-flash-date').textContent=pf?fmtDate(pf.date):'';
@@ -1559,13 +1855,29 @@ function renderStats(){
   document.getElementById('pr-total').textContent=total||'—';
   document.getElementById('pr-avg').textContent=sessions.length?Math.round(total/sessions.length*10)/10:'—';
 
+  // Feel stat
+  const feelEmojis=['😓','😐','💪','🔥'];
+  const feelSessions=sessions.filter(s=>s.feel!=null);
+  const feelEl=document.getElementById('feel-stat-row');
+  if(feelEl){
+    if(feelSessions.length){
+      const avg=feelSessions.reduce((a,s)=>a+s.feel,0)/feelSessions.length;
+      const idx=Math.min(3,Math.round(avg));
+      feelEl.innerHTML=`<div class="pr-card" style="margin-bottom:12px;display:flex;align-items:center;gap:16px;padding:14px 20px"><div style="font-size:36px;line-height:1">${feelEmojis[idx]}</div><div><div class="pr-label">Gemiddeld sessiegevoel</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-top:3px">${['Zwaar','Oké','Goed','Top'][idx]} · ${feelSessions.length} sessie${feelSessions.length!==1?'s':''} beoordeeld</div></div></div>`;
+    }else feelEl.innerHTML='';
+  }
+
   const maxPS=[],chartSessions=[];
   sessions.forEach(s=>{const mg=maxGrade(s.routes);if(mg){maxPS.push({date:s.date,idx:gi(mg.grade)});chartSessions.push(s);}});
   if(chartP)chartP.destroy();
   chartP=new Chart(document.getElementById('chart-progress'),{type:'line',data:{labels:maxPS.map(s=>s.date.slice(5)),datasets:[{data:maxPS.map(s=>s.idx),borderColor:'#7f77dd',backgroundColor:'rgba(127,119,221,0.12)',borderWidth:2,pointBackgroundColor:'#7f77dd',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,items)=>{if(items.length>0)showSessionDetailModal(chartSessions[items[0].index]);},plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#666',font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{min:0,max:GRADES.length-1,ticks:{color:'#666',font:{size:11},callback:v=>GRADES[v]||'',stepSize:2},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+  renderTLI();
+
   const counts={};GRADES.forEach(g=>counts[g]=0);allR.filter(r=>r.result!=='poging').forEach(r=>counts[r.grade]++);const used=GRADES.filter(g=>counts[g]>0);
   if(chartG)chartG.destroy();
   chartG=new Chart(document.getElementById('chart-grades'),{type:'bar',data:{labels:used.length?used:['—'],datasets:[{data:used.length?used.map(g=>counts[g]):[0],backgroundColor:used.map(g=>GRADE_COLORS[GRADES.indexOf(g)]||'#444'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#666',font:{size:11}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:'#666',font:{size:11},stepSize:1},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+
+  renderPyramid();
 
   // Per-gym breakdown
   const gymStats={};
@@ -1667,6 +1979,9 @@ function initApp(profileId){
   if(chartP){chartP.destroy();chartP=null}
   if(chartG){chartG.destroy();chartG=null}
   if(chartH){chartH.destroy();chartH=null}
+  if(tliChart){tliChart.destroy();tliChart=null}
+  currentFeel=null;
+  pyramidFilter='all';
   // Reset timer
   if(typeof timerRunning!=='undefined'&&timerRunning){clearInterval(timerInterval);timerRunning=false;timerSecs=0}
   // Reset route and hang-set cards
