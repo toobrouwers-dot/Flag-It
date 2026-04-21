@@ -418,6 +418,19 @@ select option{background:#1e1e1e}
 .status-btn.sel-retired{background:rgba(136,136,136,.2);border-color:#888;color:#ccc}
 .project-section-label{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
 .project-section-label:first-child{margin-top:0}
+
+/* COACH */
+.coach-content{padding:16px 20px}
+.coach-status-card{border:.5px solid;border-radius:16px;padding:20px;margin-bottom:4px;display:flex;align-items:flex-start;gap:16px}
+.coach-status-icon{font-size:32px;line-height:1;flex-shrink:0;margin-top:2px}
+.coach-status-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.coach-status-sub{font-size:13px;color:var(--muted);line-height:1.4}
+.coach-advice-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;animation:slideUp .25s ease both}
+.coach-advice-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.coach-advice-icon{font-size:20px;line-height:1}
+.coach-advice-tag{font-size:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.8px;border:.5px solid;border-radius:20px;padding:3px 10px}
+.coach-advice-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px}
+.coach-advice-body{font-size:13px;color:var(--muted);line-height:1.5}
 </style>
 </head>
 <body>
@@ -647,6 +660,12 @@ select option{background:#1e1e1e}
   </div>
 </div>
 
+<!-- COACH -->
+<div id="page-coach" class="page">
+  <div class="page-header"><div class="page-title">Coach</div><div class="page-sub">Persoonlijk trainingsadvies</div></div>
+  <div class="coach-content" id="coach-content"></div>
+</div>
+
 <!-- NAV -->
 <nav class="bottom-nav">
   <button class="nav-btn active" onclick="showPage('home')" id="nav-home">
@@ -669,6 +688,9 @@ select option{background:#1e1e1e}
   </button>
   <button class="nav-btn" onclick="showPage('gyms')" id="nav-gyms">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/><line x1="9" y1="12" x2="15" y2="12"/></svg>Gyms
+  </button>
+  <button class="nav-btn" onclick="showPage('coach')" id="nav-coach">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 1 0 0 10A5 5 0 0 0 12 2z"/><path d="M12 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z"/><path d="M17 8l2 2 4-4"/></svg>Coach
   </button>
 </nav>
 
@@ -1044,6 +1066,7 @@ function showPage(id){
   if(id==='hang')renderHangPage();
   if(id==='gyms'){renderGymsPage();renderProfileMgmt();}
   if(id==='log')refreshGymSelect();
+  if(id==='coach')renderCoach();
 }
 
 function toast(msg,color){
@@ -2192,6 +2215,174 @@ function confirmImport(btn){
   }
   refreshGymSelect();renderFeed();renderGymsPage();renderProfileMgmt();
   toast('Data geïmporteerd!');
+}
+
+/* ══════════════════════════════════════════
+   AI TRAININGSCOACH
+══════════════════════════════════════════ */
+function computeCoachAdvice(){
+  const today=new Date().toISOString().split('T')[0];
+  const ar=allRoutes();
+  const advice=[];
+
+  // TLI-based overtraining check
+  if(sessions.length>=3){
+    const tliData=computeWeeklyTLI();
+    const curTLI=tliData[tliData.length-1].tli;
+    const prev4=tliData.slice(-5,-1).filter(w=>w.tli>0);
+    const avg4=prev4.length?prev4.reduce((a,b)=>a+b.tli,0)/prev4.length:0;
+    if(avg4>0){
+      if(curTLI>avg4*1.8){
+        advice.push({tag:'Herstel',icon:'🚨',color:'var(--danger)',title:'Overtraining risico',body:`Je trainingsbelasting deze week (${curTLI}) is ${Math.round(curTLI/avg4*100-100)}% hoger dan je 4-weeksgemiddelde (${Math.round(avg4)}). Plan een rustdag of lichte sessie.`});
+      }else if(curTLI>avg4*1.35){
+        advice.push({tag:'Let Op',icon:'⚠️',color:'#ff9800',title:'Hoge belasting deze week',body:`Je trainingsindex is ${Math.round(curTLI/avg4*100-100)}% boven gemiddeld. Goed dat je hard klimt — zorg voor voldoende slaap en eiwitten.`});
+      }
+    }
+  }
+
+  // 3+ sessions in 4 days
+  if(sessions.length>=3){
+    const sorted=[...sessions].sort((a,b)=>b.date.localeCompare(a.date));
+    const daysSinceThird=Math.round((new Date(today+'T00:00:00')-new Date(sorted[2].date+'T00:00:00'))/86400000);
+    if(daysSinceThird<=4){
+      advice.push({tag:'Herstel',icon:'😴',color:'var(--hang)',title:'3 sessies in 4 dagen',body:'Je vingers herstellen in 48 uur — plan een rustdag voor optimale progressie. Mobiliteit of lichte cardio mag wel.'});
+    }
+  }
+
+  // Heavy + bad-feel session very recent
+  if(sessions.length>=1){
+    const last=[...sessions].sort((a,b)=>b.date.localeCompare(a.date))[0];
+    const daysSince=Math.round((new Date(today+'T00:00:00')-new Date(last.date+'T00:00:00'))/86400000);
+    if(daysSince<=1&&last.feel===0&&last.routes.length>=12){
+      advice.push({tag:'Herstel',icon:'🛌',color:'var(--danger)',title:'Herstelsessie aanbevolen',body:`Jouw laatste sessie (${last.routes.length} routes, gevoel 😓) was ${daysSince===0?'vandaag':'gisteren'}. Neem rust of doe een mobiliteitsroutine.`});
+    }
+  }
+
+  // Plateau breakthrough
+  if(sessions.length>=5){
+    const sentR=ar.filter(r=>r.result==='top'||r.result==='flash');
+    if(sentR.length){
+      const prGrade=sentR.reduce((b,r)=>gi(r.grade)>gi(b.grade)?r:b,sentR[0]).grade;
+      const prDate=sentR.filter(r=>gi(r.grade)>=gi(prGrade)).map(r=>r.date).sort().reverse()[0];
+      if(prDate){
+        const daysSince=Math.floor((new Date(today)-new Date(prDate+'T00:00:00'))/86400000);
+        if(daysSince>=28){
+          const nextGrade=GRADES[Math.min(gi(prGrade)+1,GRADES.length-1)];
+          advice.push({tag:'Doorbraak',icon:'🚀',color:'var(--accent)',title:`Plateau bij ${prGrade} (${Math.floor(daysSince/7)} weken)`,body:`Kies bewust 2–3 routes op ${nextGrade}, analyseer de moves en plan gerichte projectsessies. Wissel ook van gym of sector voor nieuwe stimuli.`});
+        }
+      }
+    }
+  }
+
+  // Weakness by type
+  if(sessions.length>=5&&ar.length>=20){
+    const typeS={},typeT={};
+    ar.forEach(r=>{if(!r.type)return;typeT[r.type]=(typeT[r.type]||0)+1;if(r.result!=='poging')typeS[r.type]=(typeS[r.type]||0)+1});
+    const typeKeys=Object.keys(typeT).filter(t=>typeT[t]>=5);
+    if(typeKeys.length>=2){
+      const wType=typeKeys.reduce((a,b)=>((typeS[b]||0)/typeT[b])<((typeS[a]||0)/typeT[a])?b:a);
+      const bType=typeKeys.reduce((a,b)=>((typeS[b]||0)/typeT[b])>((typeS[a]||0)/typeT[a])?b:a);
+      const wPct=Math.round(((typeS[wType]||0)/typeT[wType])*100);
+      const bPct=Math.round(((typeS[bType]||0)/typeT[bType])*100);
+      if(bPct-wPct>=20){
+        advice.push({tag:'Techniek',icon:'🎯',color:'var(--success)',title:`Werk aan ${wType} (${wPct}% slaagkans)`,body:`${bType} lukken goed (${bPct}%), maar ${wType} is een zwakke plek. Kies in je volgende sessie bewust ${wType}-routes om dit te trainen.`});
+      }
+    }
+  }
+
+  // Flash rate dropping
+  if(ar.length>=15){
+    const thisMonth=today.slice(0,7);
+    const lmDate=new Date();lmDate.setMonth(lmDate.getMonth()-1);
+    const lastMonth=lmDate.toISOString().slice(0,7);
+    const tmR=ar.filter(r=>r.date.startsWith(thisMonth));
+    const lmR=ar.filter(r=>r.date.startsWith(lastMonth));
+    if(tmR.length>=5&&lmR.length>=5){
+      const tmF=tmR.filter(r=>r.result==='flash').length/tmR.length;
+      const lmF=lmR.filter(r=>r.result==='flash').length/lmR.length;
+      if(lmF-tmF>0.1){
+        advice.push({tag:'Techniek',icon:'⚡',color:'var(--flash)',title:'Flash-percentage daalt',body:`${Math.round(lmF*100)}% vorige maand → ${Math.round(tmF*100)}% nu. Warm beter op en focus op lees-techniek: lees routes 30 seconden voor je pakt.`});
+      }
+    }
+  }
+
+  // No hangboard yet
+  if(sessions.length>=8&&hangSessions.length===0){
+    advice.push({tag:'Kracht',icon:'💪',color:'var(--hang)',title:'Start met hangboard training',body:`Na ${sessions.length} sessies is vingersterkte jouw grootste groeikans. Begin met 2× per week 5 sets max hangs — 10 minuten is genoeg.`});
+  }
+
+  // Hangboard protocol based on max hang time
+  if(hangSessions.length>=3){
+    const allSets=hangSessions.flatMap(h=>h.sets||[]);
+    const maxHang=allSets.length?Math.max(...allSets.map(s=>Number(s.time)||0)):0;
+    if(maxHang>0&&maxHang<10){
+      advice.push({tag:'Kracht',icon:'🏋️',color:'var(--hang)',title:'Bouw naar 10 seconden hangtijd',body:`Max hang: ${maxHang}s. Plan 3× per week 5 sets max hangs tot falen. Bouw per week ~1s op. Op 10s switch je naar repeaters.`});
+    }else if(maxHang>=10&&maxHang<20){
+      advice.push({tag:'Kracht',icon:'🏋️',color:'var(--hang)',title:'Repeater protocol aanbevolen',body:`${maxHang}s max hang — klaar voor repeaters! 7s hang / 3s rust × 6 reps, 2–3 sets per grip. Bouwt kracht én uithoudingsvermogen.`});
+    }else if(maxHang>=20){
+      advice.push({tag:'Kracht',icon:'🏋️',color:'var(--hang)',title:'Max hangs met extra gewicht',body:`${maxHang}s — indrukwekkend! Voeg 5–10% lichaamsgewicht toe en hang 5–7s, 5 sets per grip. Dit is de snelste doorbraakstrategie.`});
+    }
+  }
+
+  // Consistency reward (only if no rest warnings)
+  const streak=calcStreak();
+  if(streak>=4&&!advice.some(a=>a.tag==='Herstel')){
+    advice.push({tag:'Motivatie',icon:'🔥',color:'#ff7043',title:`${streak} weken op rij actief!`,body:'Consistentie is de #1 voorspeller van progressie. Hou dit tempo vast — plan komende week je sessies alvast in je agenda.'});
+  }
+
+  // Only 1 gym for 20+ sessions
+  if(sessions.length>=20){
+    const gymsUsed=new Set(sessions.map(s=>s.gym).filter(Boolean));
+    if(gymsUsed.size===1){
+      advice.push({tag:'Variatie',icon:'🏟',color:'#26c6da',title:'Andere gym proberen?',body:`Al ${sessions.length} sessies bij dezelfde gym. Een andere locatie = andere setters, stijlen en graden. Heel goed voor brede ontwikkeling.`});
+    }
+  }
+
+  // Derive status
+  let status;
+  if(!sessions.length){
+    status={level:'start',color:'var(--accent)',icon:'🧗',title:'Welkom bij Coach!',sub:'Log je eerste sessies — na 3 sessies geeft de coach persoonlijk advies.'};
+  }else if(advice.some(a=>a.tag==='Herstel')){
+    status={level:'rest',color:'var(--danger)',icon:'🛌',title:'Jouw lijf vraagt rust',sub:'Een geplande hersteldag zorgt voor betere prestaties morgen.'};
+  }else if(advice.some(a=>a.tag==='Doorbraak')){
+    status={level:'push',color:'var(--accent)',icon:'🚀',title:'Klaar voor de volgende stap',sub:'Je bent consistent — tijd om bewust harder te pushen.'};
+  }else if(advice.some(a=>a.tag==='Kracht')){
+    status={level:'strength',color:'var(--hang)',icon:'💪',title:'Versterk je fundament',sub:'Gerichte krachttraining versnelt jouw graadprogressie.'};
+  }else{
+    status={level:'good',color:'var(--success)',icon:'✅',title:'Training op schema',sub:'Geen urgente aandachtspunten — blijf zo doorgaan!'};
+  }
+  return{status,advice};
+}
+
+function renderCoach(){
+  const el=document.getElementById('coach-content');
+  if(!el)return;
+  const{status,advice}=computeCoachAdvice();
+  const gradients={
+    good:'linear-gradient(135deg,rgba(76,175,80,.18),rgba(76,175,80,.05))',
+    rest:'linear-gradient(135deg,rgba(229,57,53,.18),rgba(229,57,53,.05))',
+    push:'linear-gradient(135deg,rgba(127,119,221,.18),rgba(127,119,221,.05))',
+    strength:'linear-gradient(135deg,rgba(233,30,140,.18),rgba(233,30,140,.05))',
+    start:'linear-gradient(135deg,rgba(127,119,221,.15),rgba(127,119,221,.04))',
+    warning:'linear-gradient(135deg,rgba(255,152,0,.18),rgba(255,152,0,.05))'
+  };
+  const borders={
+    good:'rgba(76,175,80,.4)',rest:'rgba(229,57,53,.4)',push:'rgba(127,119,221,.4)',
+    strength:'rgba(233,30,140,.4)',start:'rgba(127,119,221,.3)',warning:'rgba(255,152,0,.4)'
+  };
+  const statusHtml=`<div class="coach-status-card" style="background:${gradients[status.level]||gradients.good};border-color:${borders[status.level]||borders.good}">
+    <div class="coach-status-icon">${status.icon}</div>
+    <div><div class="coach-status-title" style="color:${status.color}">${status.title}</div><div class="coach-status-sub">${status.sub}</div></div>
+  </div>`;
+  const adviceHtml=advice.map(a=>`<div class="coach-advice-card">
+    <div class="coach-advice-header">
+      <span class="coach-advice-icon">${a.icon}</span>
+      <span class="coach-advice-tag" style="color:${a.color};background:${a.color}1a;border-color:${a.color}55">${a.tag}</span>
+    </div>
+    <div class="coach-advice-title">${a.title}</div>
+    <div class="coach-advice-body">${a.body}</div>
+  </div>`).join('');
+  el.innerHTML=statusHtml+(advice.length?`<div class="section-title" style="padding:16px 0 10px">Advies voor jou</div>${adviceHtml}`:'');
 }
 
 /* ══════════════════════════════════════════
