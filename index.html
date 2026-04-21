@@ -419,8 +419,28 @@ select option{background:#1e1e1e}
 .project-section-label{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
 .project-section-label:first-child{margin-top:0}
 
-/* COACH */
-.coach-content{padding:16px 20px}
+/* FINGER HEALTH */
+.fh-risk-card{border-radius:16px;padding:18px 20px;margin-bottom:4px;border:.5px solid}
+.fh-risk-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.fh-risk-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.fh-risk-score{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:800;line-height:1}
+.fh-risk-status{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.fh-risk-bar-wrap{height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:14px}
+.fh-risk-bar{height:100%;border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.fh-factors{display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.fh-factor{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.fh-factor span{color:var(--text);font-weight:500}
+.injury-card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;animation:slideUp .2s ease both}
+.injury-card.inj-active{border-color:rgba(229,57,53,.35);background:rgba(229,57,53,.03)}
+.injury-body{flex:1}
+.injury-part{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.injury-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.injury-badge{font-size:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-radius:20px;padding:2px 9px;display:inline-block;margin-top:5px}
+.injury-sev{display:flex;gap:3px;margin-top:6px}
+.injury-sev-dot{width:7px;height:7px;border-radius:50%}
+.btn-add-injury{width:100%;padding:12px;background:none;border:.5px dashed rgba(229,57,53,.4);border-radius:12px;color:var(--danger);font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:background .15s;margin-bottom:20px}
+.btn-add-injury:active{background:rgba(229,57,53,.08)}
+</style>.coach-content{padding:16px 20px}
 .coach-status-card{border:.5px solid;border-radius:16px;padding:20px;margin-bottom:4px;display:flex;align-items:flex-start;gap:16px}
 .coach-status-icon{font-size:32px;line-height:1;flex-shrink:0;margin-top:2px}
 .coach-status-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
@@ -591,6 +611,9 @@ select option{background:#1e1e1e}
   <div class="page-header"><div class="page-title">Hangboard</div><div class="page-sub">Log je hang-sets en volg je PR's</div></div>
   <div class="hang-content">
 
+    <div class="form-section-title" style="padding:0 0 10px">Vinger Gezondheid</div>
+    <div id="finger-health-section"></div>
+
     <div class="form-section-title" style="padding:0 0 10px">PR per grip</div>
     <div class="hang-pr-scroll" id="hang-pr-row">
       <div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sets gelogd</div>
@@ -708,7 +731,7 @@ const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch',
 /* ══════════════════════════════════════════
    STATE
 ══════════════════════════════════════════ */
-let sessions=[],gyms=[],goals=[],hangSessions=[],projects=[];
+let sessions=[],gyms=[],goals=[],hangSessions=[],projects=[],injuries=[];
 let chartP=null,chartG=null,chartH=null,tliChart=null;
 let routeCount=0,hangSetCount=0;
 let editMode=false,editSessionId=null;
@@ -731,7 +754,7 @@ function saveProfiles(profiles){
   try{localStorage.setItem(PFK,JSON.stringify(profiles))}catch(e){}
 }
 function profileStorageKeys(id){
-  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id,prk:'flagit_projects_v1_'+id};
+  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id,prk:'flagit_projects_v1_'+id,ijk:'flagit_injuries_v1_'+id};
 }
 function maybeRunMigration(){
   const profiles=loadProfiles();
@@ -818,9 +841,9 @@ function importFromProfileScreen(e){
       profiles.push({id,name:profileName,emoji,created:new Date().toISOString().split('T')[0]});
       saveProfiles(profiles);
       selectProfile(id);
-      sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];projects=data.projects||[];
+      sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];projects=data.projects||[];injuries=data.injuries||[];
       let migrated=false;gyms.forEach((g,i)=>{if(!g.id){g.id=Date.now()+i;migrated=true}});
-      save();saveGyms();saveGoals();saveHang();saveProjects();if(migrated)saveGyms();
+      save();saveGyms();saveGoals();saveHang();saveProjects();saveInjuries();if(migrated)saveGyms();
       const heroName=document.getElementById('hero-profile-name');
       if(heroName)heroName.textContent=emoji+' '+profileName;
       refreshGymSelect();renderFeed();renderGymsPage();
@@ -981,7 +1004,7 @@ function promptNewProfileFromGyms(){
    STORAGE
    — sessies en hangsessies worden elk apart opgeslagen
 ══════════════════════════════════════════ */
-let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1',PRK='flagit_projects_v1';
+let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1',PRK='flagit_projects_v1',IJK='flagit_injuries_v1';
 
 function save(){
   try{localStorage.setItem(SK,JSON.stringify(sessions))}
@@ -996,6 +1019,9 @@ function saveGoals(){
 function saveHang(){
   try{localStorage.setItem(HSK,JSON.stringify(hangSessions))}
   catch(e){toast('Opslaan mislukt','#e53935')}
+}
+function saveInjuries(){
+  try{localStorage.setItem(IJK,JSON.stringify(injuries))}catch(e){}
 }
 function saveProjects(){
   try{localStorage.setItem(PRK,JSON.stringify(projects))}catch(e){}
@@ -1642,6 +1668,7 @@ function deleteHangSession(id){
 }
 
 function renderHangPage(){
+  renderFingerHealth();
   // PR per grip: langste hangtijd
   const prRow=document.getElementById('hang-pr-row');
   const allSets=hangSessions.flatMap(s=>s.sets.map(st=>({...st,date:s.date})));
@@ -2168,7 +2195,7 @@ function saveProjectFromModal(id){
 function exportData(){
   const _profiles=loadProfiles();
   const _active=_profiles.find(p=>p.id===activeProfileId);
-  const data={sessions,gyms,goals,hangSessions,projects,profile:_active?{name:_active.name,emoji:_active.emoji}:null,exportedAt:new Date().toISOString(),version:2};
+  const data={sessions,gyms,goals,hangSessions,projects,injuries,profile:_active?{name:_active.name,emoji:_active.emoji}:null,exportedAt:new Date().toISOString(),version:2};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='flagit-backup-'+new Date().toISOString().split('T')[0]+'.json';
@@ -2203,9 +2230,9 @@ function importFile(e){
 function confirmImport(btn){
   const ov=document.getElementById('import-ov');if(!ov)return;
   const data=ov._importData;ov.remove();
-  sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];projects=data.projects||[];
+  sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];projects=data.projects||[];injuries=data.injuries||[];
   let migrated=false;gyms.forEach((g,i)=>{if(!g.id){g.id=Date.now()+i;migrated=true}});
-  save();saveGyms();saveGoals();saveHang();saveProjects();if(migrated)saveGyms();
+  save();saveGyms();saveGoals();saveHang();saveProjects();saveInjuries();if(migrated)saveGyms();
   if(data.profile&&data.profile.name&&activeProfileId){
     const _profs=loadProfiles();
     const _idx=_profs.findIndex(p=>p.id===activeProfileId);
@@ -2215,6 +2242,164 @@ function confirmImport(btn){
   }
   refreshGymSelect();renderFeed();renderGymsPage();renderProfileMgmt();
   toast('Data geïmporteerd!');
+}
+
+/* ══════════════════════════════════════════
+   VINGER GEZONDHEIDS-MONITOR
+══════════════════════════════════════════ */
+const BODY_PARTS=['A2 pulley (ringvinger)','A2 pulley (middelvinger)','A2 pulley (wijsvinger)','A4 pulley','Teres/lat','Biceps pees','Pols','Elleboog (mediaal)','Elleboog (lateraal)','Schouder','Rug/kern','Anders'];
+const SEV_LABELS=['','Licht — voelbaar na klimmen','Matig — pijn tijdens klimmen','Fors — beperkt klimmen','Ernstig — niet kunnen klimmen','Zwaar — volledige rust'];
+
+function computeInjuryRisk(){
+  const today=new Date().toISOString().split('T')[0];
+  let score=0;const factors=[];
+
+  // Volume spike via TLI
+  if(sessions.length>=3){
+    const tliData=computeWeeklyTLI();
+    const curTLI=tliData[tliData.length-1].tli;
+    const prev4=tliData.slice(-5,-1).filter(w=>w.tli>0);
+    const avg4=prev4.length?prev4.reduce((a,b)=>a+b.tli,0)/prev4.length:0;
+    if(avg4>0){
+      if(curTLI>avg4*1.8){score+=40;factors.push({icon:'📈',label:'Volume spike',detail:`+${Math.round(curTLI/avg4*100-100)}% boven gemiddeld`});}
+      else if(curTLI>avg4*1.3){score+=20;factors.push({icon:'📈',label:'Hoge belasting',detail:`+${Math.round(curTLI/avg4*100-100)}% boven gemiddeld`});}
+    }
+  }
+
+  // Short recovery between sessions
+  if(sessions.length>=2){
+    const sorted=[...sessions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,4);
+    const gaps=[];
+    for(let i=0;i<sorted.length-1;i++){
+      gaps.push(Math.round((new Date(sorted[i].date+'T00:00:00')-new Date(sorted[i+1].date+'T00:00:00'))/86400000));
+    }
+    const avgGap=gaps.reduce((a,b)=>a+b,0)/gaps.length;
+    if(avgGap<2){score+=30;factors.push({icon:'⚡',label:'Weinig herstel',detail:`Gem. ${avgGap.toFixed(1)} dag tussen sessies`});}
+    else if(avgGap<3){score+=15;factors.push({icon:'⚡',label:'Korte hersteltijd',detail:`Gem. ${avgGap.toFixed(1)} dag tussen sessies`});}
+  }
+
+  // Bad feel sessions
+  if(sessions.length>=2){
+    const recent=[...sessions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3);
+    const heavyCnt=recent.filter(s=>s.feel===0).length;
+    if(heavyCnt>=2){score+=20;factors.push({icon:'😓',label:'Vermoeid klimmen',detail:`${heavyCnt} van laatste 3 sessies als 'Zwaar' beoordeeld`});}
+  }
+
+  // Heavy hangboard loading
+  if(hangSessions.length>=1){
+    const recentSets=hangSessions.sort((a,b)=>b.date.localeCompare(a.date)).slice(0,2).flatMap(s=>s.sets||[]);
+    const maxWeight=recentSets.length?Math.max(...recentSets.map(s=>Number(s.weight)||0)):0;
+    if(maxWeight>=15){score+=15;factors.push({icon:'🏋️',label:'Zwaar hangboard',detail:`+${maxWeight}kg extra gewicht recent`});}
+    else if(maxWeight>=5){score+=5;}
+  }
+
+  // Active injuries
+  const active=injuries.filter(i=>i.status==='active');
+  if(active.length>0){score+=25;factors.push({icon:'🩹',label:`${active.length} actieve blessure${active.length!==1?'s':''}`,detail:'Verhoogd herletselrisico'});}
+
+  score=Math.min(100,Math.round(score));
+  const level=score>=67?'danger':score>=34?'warning':'safe';
+  const colors={danger:'var(--danger)',warning:'#ff9800',safe:'var(--success)'};
+  const labels={danger:'Hoog risico',warning:'Matig risico',safe:'Laag risico'};
+  return{score,level,color:colors[level],label:labels[level],factors};
+}
+
+function renderFingerHealth(){
+  const el=document.getElementById('finger-health-section');
+  if(!el)return;
+  const{score,color,label,factors}=computeInjuryRisk();
+  const activeInj=injuries.filter(i=>i.status==='active');
+  const recoveredInj=injuries.filter(i=>i.status==='recovered');
+
+  const factorsHtml=factors.length
+    ?factors.map(f=>`<div class="fh-factor">${f.icon} <span>${f.label}</span>${f.detail?` — ${f.detail}`:''}</div>`).join('')
+    :'<div class="fh-factor">Geen risicofactoren gevonden</div>';
+
+  const injHtml=(activeInj.length||recoveredInj.length)
+    ?[...activeInj,...recoveredInj].map(inj=>{
+        const sevColor=inj.severity>=4?'var(--danger)':inj.severity>=3?'#ff9800':'var(--flash)';
+        const dots=Array.from({length:5},(_,i)=>`<div class="injury-sev-dot" style="background:${i<inj.severity?sevColor:'rgba(255,255,255,.12)'}"></div>`).join('');
+        return`<div class="injury-card${inj.status==='active'?' inj-active':''}">
+          <div class="injury-body">
+            <div class="injury-part">${esc(inj.part)}</div>
+            <div class="injury-meta">${fmtDate(inj.date)}${inj.note?` · ${esc(inj.note)}`:''}${SEV_LABELS[inj.severity]?` · ${SEV_LABELS[inj.severity].split(' — ')[0]}`:''}</div>
+            <div class="injury-sev">${dots}</div>
+            <div class="injury-badge" style="color:${inj.status==='active'?'var(--danger)':'var(--success)'};background:${inj.status==='active'?'rgba(229,57,53,.12)':'rgba(76,175,80,.12)'}">${inj.status==='active'?'Actief':'Hersteld'}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+            ${inj.status==='active'?`<button onclick="toggleInjuryStatus(${inj.id})" style="background:rgba(76,175,80,.12);border:.5px solid rgba(76,175,80,.4);border-radius:8px;color:var(--success);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;padding:5px 10px;cursor:pointer;text-transform:uppercase">Hersteld</button>`:''}
+            <button onclick="deleteInjury(${inj.id})" class="btn-delete-session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+          </div>
+        </div>`;
+      }).join('')
+    :'';
+
+  el.innerHTML=`
+    <div class="fh-risk-card" style="background:linear-gradient(135deg,${color}22,${color}08);border-color:${color}55">
+      <div class="fh-risk-top">
+        <div>
+          <div class="fh-risk-label">Blessurerisico deze week</div>
+          <div class="fh-risk-score" style="color:${color}">${score}</div>
+          <div class="fh-risk-status" style="color:${color}">${label}</div>
+        </div>
+        <div style="text-align:right;font-size:36px;line-height:1;margin-top:4px">${score>=67?'🚨':score>=34?'⚠️':'✅'}</div>
+      </div>
+      <div class="fh-risk-bar-wrap"><div class="fh-risk-bar" style="width:${score}%;background:${color}"></div></div>
+      <div class="fh-factors" style="margin-top:12px">${factorsHtml}</div>
+    </div>
+    ${injHtml?`<div class="form-section-title" style="padding:12px 0 8px">Blessurelog</div>${injHtml}`:''}
+    <button class="btn-add-injury" onclick="openInjuryModal()">+ Blessure toevoegen</button>`;
+}
+
+function openInjuryModal(){
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='injury-modal';
+  ov.innerHTML=`<div class="confirm-box" style="max-width:400px">
+    <div class="confirm-title">Blessure registreren</div>
+    <div class="field" style="margin-bottom:10px"><label style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Lichaamsdeel</label>
+      <select id="inj-part" style="width:100%;background:var(--surface);border:.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:11px 14px;-webkit-appearance:none;appearance:none;outline:none">
+        ${BODY_PARTS.map(p=>`<option>${p}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field" style="margin-bottom:10px"><label style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Ernst (1 = licht, 5 = zwaar)</label>
+      <select id="inj-sev" style="width:100%;background:var(--surface);border:.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:11px 14px;-webkit-appearance:none;appearance:none;outline:none">
+        ${[1,2,3,4,5].map(n=>`<option value="${n}">${n} — ${SEV_LABELS[n].split(' — ')[1]}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field" style="margin-bottom:10px"><label style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Datum</label>
+      <input type="date" id="inj-date" value="${new Date().toISOString().split('T')[0]}" style="width:100%;background:var(--surface);border:.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:11px 14px;-webkit-appearance:none;outline:none">
+    </div>
+    <div class="field" style="margin-bottom:16px"><label style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Notitie (optioneel)</label>
+      <textarea id="inj-note" placeholder="bijv. training na boulder, gevoel in koud weer..." style="width:100%;height:64px;background:var(--surface);border:.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:11px 14px;resize:none;outline:none"></textarea>
+    </div>
+    <div class="confirm-btns">
+      <button class="confirm-cancel" onclick="document.getElementById('injury-modal').remove()">Annuleren</button>
+      <button class="confirm-delete" style="background:rgba(229,57,53,.15);border-color:var(--danger);color:var(--danger)" onclick="saveInjuryFromModal()">Opslaan</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+
+function saveInjuryFromModal(){
+  const part=document.getElementById('inj-part').value;
+  const sev=parseInt(document.getElementById('inj-sev').value)||1;
+  const date=document.getElementById('inj-date').value||new Date().toISOString().split('T')[0];
+  const note=document.getElementById('inj-note').value.trim();
+  injuries.push({id:Date.now(),part,severity:sev,date,note,status:'active'});
+  saveInjuries();
+  document.getElementById('injury-modal')?.remove();
+  renderFingerHealth();
+  toast('Blessure geregistreerd');
+}
+
+function toggleInjuryStatus(id){
+  const inj=injuries.find(i=>i.id===id);
+  if(inj){inj.status=inj.status==='active'?'recovered':'active';saveInjuries();renderFingerHealth();}
+}
+
+function deleteInjury(id){
+  injuries=injuries.filter(i=>i.id!==id);
+  saveInjuries();renderFingerHealth();
 }
 
 /* ══════════════════════════════════════════
@@ -2404,7 +2589,7 @@ function initApp(profileId){
 
   // Point storage keys at this profile's namespace
   const keys=profileStorageKeys(profileId);
-  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;PRK=keys.prk;
+  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;PRK=keys.prk;IJK=keys.ijk;
 
   // Load data
   sessions=loadArr(SK,'bsessions');
@@ -2412,6 +2597,7 @@ function initApp(profileId){
   goals=loadArr(GOK);
   hangSessions=loadArr(HSK);
   projects=loadArr(PRK);
+  injuries=loadArr(IJK);
 
   // Migrate gyms without id
   let _gymsMigrated=false;
