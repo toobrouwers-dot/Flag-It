@@ -380,6 +380,42 @@ select option{background:#1e1e1e}
 .btn-ps-create{flex:2;padding:14px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:opacity .15s}
 .btn-ps-create:active{opacity:.8}
 .btn-ps-cancel{flex:1;padding:14px;background:var(--surface2);border:.5px solid var(--border);border-radius:12px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer}
+
+/* PROJECTS */
+.projects-content{padding:16px 20px}
+.project-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;animation:slideUp .25s ease both}
+.project-card.completed{border-color:rgba(76,175,80,.4);background:rgba(76,175,80,.04)}
+.project-card.retired{border-color:rgba(136,136,136,.25);opacity:.65}
+.project-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.project-grade{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:800;color:var(--accent);line-height:1}
+.project-card.completed .project-grade{color:var(--success)}
+.project-name{font-size:14px;font-weight:600;margin-top:2px}
+.project-gym{font-size:12px;color:var(--muted);margin-top:1px}
+.proj-status-badge{display:inline-block;font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-radius:20px;padding:3px 10px}
+.proj-status-badge.s-project{color:var(--accent);background:rgba(127,119,221,.15)}
+.proj-status-badge.s-completed{color:var(--success);background:rgba(76,175,80,.15)}
+.proj-status-badge.s-retired{color:var(--muted);background:rgba(136,136,136,.15)}
+.project-meta-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.project-attempts{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:var(--text);line-height:1}
+.project-attempts-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:1px}
+.btn-attempt{background:rgba(127,119,221,.12);border:.5px solid rgba(127,119,221,.35);border-radius:20px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;padding:5px 14px;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:.3px}
+.btn-attempt:active{background:rgba(127,119,221,.25)}
+.project-note-preview{font-size:12px;color:var(--muted);font-style:italic;margin-top:6px;line-height:1.4}
+.project-beta-preview{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
+.project-card-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:.5px solid var(--border)}
+.btn-edit-project{flex:1;padding:9px;background:none;border:.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;cursor:pointer;transition:color .15s,border-color .15s}
+.btn-edit-project:active{color:var(--accent);border-color:var(--accent)}
+.btn-delete-project{padding:9px 12px;background:none;border:.5px solid var(--border);border-radius:10px;color:var(--muted);cursor:pointer;display:flex;align-items:center;transition:color .15s,border-color .15s}
+.btn-delete-project:active{color:var(--danger);border-color:var(--danger)}
+.btn-add-project{width:100%;padding:14px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:14px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:background .15s,border-color .15s;margin-top:4px}
+.btn-add-project:active{background:rgba(127,119,221,.08);border-color:var(--accent)}
+.status-toggle{display:flex;gap:6px;margin-top:4px}
+.status-btn{flex:1;padding:9px 4px;border-radius:8px;border:.5px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'Barlow',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
+.status-btn.sel-project{background:rgba(127,119,221,.2);border-color:var(--accent);color:var(--accent)}
+.status-btn.sel-completed{background:rgba(76,175,80,.2);border-color:var(--success);color:var(--success)}
+.status-btn.sel-retired{background:rgba(136,136,136,.2);border-color:#888;color:#ccc}
+.project-section-label{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.project-section-label:first-child{margin-top:0}
 </style>
 </head>
 <body>
@@ -600,6 +636,15 @@ select option{background:#1e1e1e}
   </div>
 </div>
 
+<!-- PROJECTS -->
+<div id="page-projects" class="page">
+  <div class="page-header"><div class="page-title">Projecten</div><div class="page-sub">Routes die je aan het werken bent</div></div>
+  <div class="projects-content">
+    <div id="projects-list"></div>
+    <button class="btn-add-project" onclick="openProjectModal()">+ Project toevoegen</button>
+  </div>
+</div>
+
 <!-- NAV -->
 <nav class="bottom-nav">
   <button class="nav-btn active" onclick="showPage('home')" id="nav-home">
@@ -613,6 +658,9 @@ select option{background:#1e1e1e}
   </button>
   <button class="nav-btn" onclick="showPage('goals')" id="nav-goals">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Doelen
+  </button>
+  <button class="nav-btn" onclick="showPage('projects')" id="nav-projects">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>Project
   </button>
   <button class="nav-btn" onclick="showPage('hang')" id="nav-hang">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Hang
@@ -636,7 +684,7 @@ const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch',
 /* ══════════════════════════════════════════
    STATE
 ══════════════════════════════════════════ */
-let sessions=[],gyms=[],goals=[],hangSessions=[];
+let sessions=[],gyms=[],goals=[],hangSessions=[],projects=[];
 let chartP=null,chartG=null,chartH=null,tliChart=null;
 let routeCount=0,hangSetCount=0;
 let editMode=false,editSessionId=null;
@@ -659,7 +707,7 @@ function saveProfiles(profiles){
   try{localStorage.setItem(PFK,JSON.stringify(profiles))}catch(e){}
 }
 function profileStorageKeys(id){
-  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id};
+  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id,prk:'flagit_projects_v1_'+id};
 }
 function maybeRunMigration(){
   const profiles=loadProfiles();
@@ -746,9 +794,9 @@ function importFromProfileScreen(e){
       profiles.push({id,name:profileName,emoji,created:new Date().toISOString().split('T')[0]});
       saveProfiles(profiles);
       selectProfile(id);
-      sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];
+      sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];projects=data.projects||[];
       let migrated=false;gyms.forEach((g,i)=>{if(!g.id){g.id=Date.now()+i;migrated=true}});
-      save();saveGyms();saveGoals();saveHang();if(migrated)saveGyms();
+      save();saveGyms();saveGoals();saveHang();saveProjects();if(migrated)saveGyms();
       const heroName=document.getElementById('hero-profile-name');
       if(heroName)heroName.textContent=emoji+' '+profileName;
       refreshGymSelect();renderFeed();renderGymsPage();
@@ -866,7 +914,7 @@ function promptDeleteProfile(){
 function confirmDeleteProfile(){
   document.getElementById('del-prof-ov')?.remove();
   const keys=profileStorageKeys(activeProfileId);
-  [keys.sk,keys.gyk,keys.gok,keys.hsk].forEach(k=>localStorage.removeItem(k));
+  [keys.sk,keys.gyk,keys.gok,keys.hsk,keys.prk].forEach(k=>localStorage.removeItem(k));
   const profiles=loadProfiles().filter(p=>p.id!==activeProfileId);
   saveProfiles(profiles);
   toast('Profiel verwijderd','#e53935');
@@ -892,7 +940,7 @@ function promptDeleteProfileById(id){
 function confirmDeleteProfileById(id){
   document.getElementById('del-prof-ov')?.remove();
   const keys=profileStorageKeys(id);
-  [keys.sk,keys.gyk,keys.gok,keys.hsk].forEach(k=>localStorage.removeItem(k));
+  [keys.sk,keys.gyk,keys.gok,keys.hsk,keys.prk].forEach(k=>localStorage.removeItem(k));
   const profiles=loadProfiles().filter(p=>p.id!==id);
   saveProfiles(profiles);
   if(activeProfileId===id)activeProfileId=null;
@@ -909,7 +957,7 @@ function promptNewProfileFromGyms(){
    STORAGE
    — sessies en hangsessies worden elk apart opgeslagen
 ══════════════════════════════════════════ */
-let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1';
+let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1',PRK='flagit_projects_v1';
 
 function save(){
   try{localStorage.setItem(SK,JSON.stringify(sessions))}
@@ -924,6 +972,9 @@ function saveGoals(){
 function saveHang(){
   try{localStorage.setItem(HSK,JSON.stringify(hangSessions))}
   catch(e){toast('Opslaan mislukt','#e53935')}
+}
+function saveProjects(){
+  try{localStorage.setItem(PRK,JSON.stringify(projects))}catch(e){}
 }
 function loadArr(k,fb){
   try{
@@ -987,6 +1038,7 @@ function showPage(id){
   if(id==='home')renderFeed();
   if(id==='stats')renderStats();
   if(id==='goals')renderGoals();
+  if(id==='projects')renderProjects();
   if(id==='hang')renderHangPage();
   if(id==='gyms'){renderGymsPage();renderProfileMgmt();}
   if(id==='log')refreshGymSelect();
@@ -1917,12 +1969,166 @@ function showSessionDetailModal(s){
 }
 
 /* ══════════════════════════════════════════
+   PROJECTS
+══════════════════════════════════════════ */
+function renderProjects(){
+  const trashSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>`;
+  const container=document.getElementById('projects-list');
+  if(!projects.length){
+    container.innerHTML='<div class="empty-state" style="padding:16px 0 24px"><div class="empty-icon">🏔️</div><div class="empty-title">Geen projecten</div><div class="empty-sub">Voeg je eerste project toe en houd bij hoe ver je komt op jouw droute.</div></div>';
+    return;
+  }
+  const order={project:0,completed:1,retired:2};
+  const sorted=[...projects].sort((a,b)=>order[a.status]-order[b.status]||b.id-a.id);
+  const sections=[
+    {key:'project',label:'🎯 Actieve projecten'},
+    {key:'completed',label:'✓ Voltooid'},
+    {key:'retired',label:'💤 Teruggetrokken'}
+  ];
+  let html='';
+  sections.forEach(sec=>{
+    const items=sorted.filter(p=>p.status===sec.key);
+    if(!items.length)return;
+    html+=`<div class="project-section-label">${sec.label}</div>`;
+    items.forEach((p,i)=>{
+      const statusClass=sec.key;
+      const badgeClass='s-'+sec.key;
+      const badgeLabel=sec.key==='project'?'Project':sec.key==='completed'?'Voltooid':'Teruggetrokken';
+      const gradeColor=GRADE_COLORS[GRADES.indexOf(p.grade)]||'var(--accent)';
+      html+=`<div class="project-card ${statusClass}" style="animation-delay:${i*.04}s">
+        <div class="project-card-header">
+          <div>
+            <div class="project-grade" style="${statusClass==='project'?'color:'+gradeColor:''}">${esc(p.grade)}</div>
+            ${p.name?`<div class="project-name">${esc(p.name)}</div>`:''}
+            ${p.gym?`<div class="project-gym">${esc(p.gym)}</div>`:''}
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+            <span class="proj-status-badge ${badgeClass}">${badgeLabel}</span>
+          </div>
+        </div>
+        <div class="project-meta-row">
+          <div style="text-align:center">
+            <div class="project-attempts">${p.attempts}</div>
+            <div class="project-attempts-label">Pogingen</div>
+          </div>
+          ${statusClass==='project'?`<button class="btn-attempt" onclick="logAttempt(${p.id})">+ Poging</button>`:''}
+        </div>
+        ${p.highpoint?`<div class="project-note-preview">📍 Highpoint: ${esc(p.highpoint)}</div>`:''}
+        ${p.betaNotes?`<div class="project-beta-preview">📝 ${esc(p.betaNotes)}</div>`:''}
+        <div class="project-card-actions">
+          <button class="btn-edit-project" onclick="openProjectModal(${p.id})">Bewerken</button>
+          <button class="btn-delete-project" onclick="deleteProject(${p.id})" title="Verwijderen">${trashSVG}</button>
+        </div>
+      </div>`;
+    });
+  });
+  container.innerHTML=html;
+}
+
+function logAttempt(id){
+  const p=projects.find(x=>x.id===id);if(!p)return;
+  p.attempts++;
+  saveProjects();
+  haptic(8);
+  toast(p.attempts+' pogingen');
+  renderProjects();
+}
+
+function deleteProject(id){
+  const p=projects.find(x=>x.id===id);if(!p)return;
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-proj-ov';
+  ov.innerHTML=`<div class="confirm-box">
+    <div class="confirm-title">Project verwijderen?</div>
+    <div class="confirm-sub">${esc(p.grade+(p.name?' · '+p.name:'')+(p.gym?' @ '+p.gym:''))}</div>
+    <div class="confirm-btns">
+      <button class="confirm-cancel" onclick="document.getElementById('del-proj-ov').remove()">Annuleren</button>
+      <button class="confirm-delete" onclick="confirmDeleteProject(${id})">Verwijderen</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+function confirmDeleteProject(id){
+  document.getElementById('del-proj-ov')?.remove();
+  projects=projects.filter(p=>p.id!==id);
+  saveProjects();renderProjects();toast('Project verwijderd','#e53935');
+}
+
+function openProjectModal(id){
+  document.getElementById('proj-modal-ov')?.remove();
+  const existing=id?projects.find(p=>p.id===id):null;
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='proj-modal-ov';
+  const gradeOpts=GRADES.map(g=>`<option ${(existing?existing.grade:GRADES[10])===g?'selected':''}>${g}</option>`).join('');
+  const gymOpts=gyms.map(g=>`<option ${existing&&existing.gym===g.name?'selected':''}>${esc(g.name)}</option>`).join('');
+  const s=existing?existing.status:'project';
+  ov.innerHTML=`<div class="modal-box" style="max-height:88dvh">
+    <div class="modal-title">${existing?'Project bewerken':'Nieuw project'}</div>
+    <div style="overflow-y:auto;flex:1;padding-right:2px">
+      <div class="field" style="margin-bottom:10px"><label>Naam (optioneel)</label><input type="text" id="pj-name" value="${existing?esc(existing.name):''}" placeholder="bijv. De Spleet, Sector A links…" maxlength="60"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div class="field"><label>Graad</label><select id="pj-grade">${gradeOpts}</select></div>
+        <div class="field"><label>Gym</label><select id="pj-gym"><option value="">— geen —</option>${gymOpts}</select></div>
+      </div>
+      <div class="field" style="margin-bottom:10px"><label>Status</label>
+        <div class="status-toggle">
+          <button class="status-btn ${s==='project'?'sel-project':''}" data-sv="project" onclick="setProjStatus(this)">Project</button>
+          <button class="status-btn ${s==='completed'?'sel-completed':''}" data-sv="completed" onclick="setProjStatus(this)">Voltooid</button>
+          <button class="status-btn ${s==='retired'?'sel-retired':''}" data-sv="retired" onclick="setProjStatus(this)">Teruggetr.</button>
+        </div>
+        <input type="hidden" id="pj-status" value="${s}">
+      </div>
+      <div class="field" style="margin-bottom:10px"><label>Pogingen</label><input type="number" id="pj-attempts" value="${existing?existing.attempts:0}" min="0" max="9999"></div>
+      <div class="field" style="margin-bottom:10px"><label>Highpoint</label><textarea id="pj-highpoint" placeholder="bijv. tot 3e greep voor de eindgreep, of: de crux move lukt niet">${existing?esc(existing.highpoint):''}</textarea></div>
+      <div class="field" style="margin-bottom:16px"><label>Beta-notities</label><textarea id="pj-beta" placeholder="bijv. Linkervoet op de reglette, dan dynamisch naar de slooper boven">${existing?esc(existing.betaNotes):''}</textarea></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="confirm-cancel" onclick="document.getElementById('proj-modal-ov').remove()">Annuleren</button>
+      <button class="btn-save" style="flex:2;padding:14px;font-size:17px" onclick="saveProjectFromModal(${id||0})">Opslaan</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+
+function setProjStatus(btn){
+  const val=btn.dataset.sv;
+  document.getElementById('pj-status').value=val;
+  btn.parentElement.querySelectorAll('.status-btn').forEach(b=>{b.className='status-btn'});
+  btn.classList.add('sel-'+val);
+}
+
+function saveProjectFromModal(id){
+  const name=document.getElementById('pj-name').value.trim();
+  const grade=document.getElementById('pj-grade').value;
+  const gym=document.getElementById('pj-gym').value;
+  const status=document.getElementById('pj-status').value||'project';
+  const attempts=Math.max(0,parseInt(document.getElementById('pj-attempts').value)||0);
+  const highpoint=document.getElementById('pj-highpoint').value.trim();
+  const betaNotes=document.getElementById('pj-beta').value.trim();
+  document.getElementById('proj-modal-ov')?.remove();
+  const today=new Date().toISOString().split('T')[0];
+  if(id){
+    const idx=projects.findIndex(p=>p.id===id);
+    if(idx!==-1){
+      const wasCompleted=projects[idx].status==='completed';
+      projects[idx]={...projects[idx],name,grade,gym,status,attempts,highpoint,betaNotes,
+        completedAt:status==='completed'&&!wasCompleted?today:projects[idx].completedAt||''};
+    }
+  }else{
+    projects.push({id:Date.now(),name,grade,gym,status,attempts,highpoint,betaNotes,createdAt:today,completedAt:status==='completed'?today:''});
+  }
+  saveProjects();renderProjects();
+  haptic(15);
+  toast(id?'Project bijgewerkt!':'Project toegevoegd!');
+}
+
+/* ══════════════════════════════════════════
    EXPORT / IMPORT
 ══════════════════════════════════════════ */
 function exportData(){
   const _profiles=loadProfiles();
   const _active=_profiles.find(p=>p.id===activeProfileId);
-  const data={sessions,gyms,goals,hangSessions,profile:_active?{name:_active.name,emoji:_active.emoji}:null,exportedAt:new Date().toISOString(),version:2};
+  const data={sessions,gyms,goals,hangSessions,projects,profile:_active?{name:_active.name,emoji:_active.emoji}:null,exportedAt:new Date().toISOString(),version:2};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='flagit-backup-'+new Date().toISOString().split('T')[0]+'.json';
@@ -1957,9 +2163,9 @@ function importFile(e){
 function confirmImport(btn){
   const ov=document.getElementById('import-ov');if(!ov)return;
   const data=ov._importData;ov.remove();
-  sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];
+  sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];projects=data.projects||[];
   let migrated=false;gyms.forEach((g,i)=>{if(!g.id){g.id=Date.now()+i;migrated=true}});
-  save();saveGyms();saveGoals();saveHang();if(migrated)saveGyms();
+  save();saveGyms();saveGoals();saveHang();saveProjects();if(migrated)saveGyms();
   if(data.profile&&data.profile.name&&activeProfileId){
     const _profs=loadProfiles();
     const _idx=_profs.findIndex(p=>p.id===activeProfileId);
@@ -1990,13 +2196,14 @@ function initApp(profileId){
 
   // Point storage keys at this profile's namespace
   const keys=profileStorageKeys(profileId);
-  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;
+  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;PRK=keys.prk;
 
   // Load data
   sessions=loadArr(SK,'bsessions');
   gyms=loadArr(GYK);
   goals=loadArr(GOK);
   hangSessions=loadArr(HSK);
+  projects=loadArr(PRK);
 
   // Migrate gyms without id
   let _gymsMigrated=false;
