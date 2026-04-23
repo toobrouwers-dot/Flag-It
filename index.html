@@ -419,6 +419,28 @@ select option{background:#1e1e1e}
 .project-section-label{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
 .project-section-label:first-child{margin-top:0}
 
+/* COMPETITIONS */
+.comp-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;animation:slideUp .25s ease both}
+.comp-card.comp-upcoming{border-color:rgba(127,119,221,.4)}
+.comp-card.comp-past{opacity:.6}
+.comp-countdown-widget{margin:0 16px 12px;background:linear-gradient(135deg,rgba(127,119,221,.18),rgba(127,119,221,.05));border:.5px solid rgba(127,119,221,.35);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;animation:slideUp .3s ease both}
+.comp-cd-days{font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:800;color:var(--accent);line-height:1;flex-shrink:0;min-width:56px;text-align:center}
+.comp-cd-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px}
+.comp-cd-name{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+.comp-cd-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.comp-add-form{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px}
+.btn-add-comp{width:100%;padding:13px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:opacity .15s;margin-top:4px}
+.btn-add-comp:active{opacity:.8}
+
+/* RESET TRACKER */
+.reset-gym-row{background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.reset-gym-info{flex:1;min-width:0}
+.reset-gym-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase}
+.reset-gym-since{font-size:12px;color:var(--muted);margin-top:2px}
+.reset-gym-nudge{font-size:11px;color:var(--flash);margin-top:3px;font-weight:600}
+.btn-log-reset{background:rgba(127,119,221,.12);border:.5px solid rgba(127,119,221,.35);border-radius:8px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;padding:7px 12px;cursor:pointer;transition:all .15s;text-transform:uppercase;flex-shrink:0}
+.btn-log-reset:active{background:rgba(127,119,221,.25)}
+
 /* TRAINING PLANS */
 .plan-option{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:8px;display:flex;align-items:center;gap:14px;-webkit-tap-highlight-color:transparent}
 .plan-option:active{border-color:var(--accent);background:rgba(127,119,221,.08)}
@@ -534,6 +556,7 @@ select option{background:#1e1e1e}
     </div>
   </div>
   <div id="streak-banner-area"></div>
+  <div id="comp-countdown-area"></div>
   <div id="otd-section"></div>
   <div class="feed-toggle">
     <button class="feed-toggle-btn active" id="tab-feed" onclick="switchFeedTab('feed')">Sessies</button>
@@ -653,6 +676,10 @@ select option{background:#1e1e1e}
     <div class="goal-section-header">📋 Trainingsplan</div>
     <div id="plan-section"></div>
 
+    <!-- Competities -->
+    <div class="goal-section-header">🏆 Competities</div>
+    <div id="comp-section"></div>
+
   </div>
 </div>
 
@@ -713,7 +740,9 @@ select option{background:#1e1e1e}
       <input type="text" id="inp-new-gym" placeholder="bijv. Monk, ClimbUp, Bjoeks...">
       <button class="btn-add-gym" onclick="addGym()">Voeg toe</button>
     </div>
-    <div class="form-section-title" style="padding:20px 0 10px">Back-up</div>
+    <div class="form-section-title" style="padding:16px 0 10px">Gym Resets</div>
+    <div id="reset-section"></div>
+    <div class="form-section-title" style="padding:8px 0 10px">Back-up</div>
     <div style="display:flex;gap:8px">
       <button class="btn-export" onclick="exportData()">↓ Exporteer</button>
       <label class="btn-import-label" for="import-file-input">↑ Importeer</label>
@@ -781,7 +810,7 @@ const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch',
 /* ══════════════════════════════════════════
    STATE
 ══════════════════════════════════════════ */
-let sessions=[],gyms=[],goals=[],hangSessions=[],projects=[],injuries=[];
+let sessions=[],gyms=[],goals=[],hangSessions=[],projects=[],injuries=[],competitions=[],gymResets=[];
 let activePlan=null;
 let feedTab='feed';
 let chartP=null,chartG=null,chartH=null,tliChart=null;
@@ -806,7 +835,7 @@ function saveProfiles(profiles){
   try{localStorage.setItem(PFK,JSON.stringify(profiles))}catch(e){}
 }
 function profileStorageKeys(id){
-  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id,prk:'flagit_projects_v1_'+id,ijk:'flagit_injuries_v1_'+id,plk:'flagit_plan_v1_'+id};
+  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id,prk:'flagit_projects_v1_'+id,ijk:'flagit_injuries_v1_'+id,plk:'flagit_plan_v1_'+id,cmpk:'flagit_comp_v1_'+id,rstk:'flagit_resets_v1_'+id};
 }
 function maybeRunMigration(){
   const profiles=loadProfiles();
@@ -893,7 +922,7 @@ function importFromProfileScreen(e){
       profiles.push({id,name:profileName,emoji,created:new Date().toISOString().split('T')[0]});
       saveProfiles(profiles);
       selectProfile(id);
-      sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];projects=data.projects||[];injuries=data.injuries||[];
+      sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];projects=data.projects||[];injuries=data.injuries||[];competitions=data.competitions||[];gymResets=data.gymResets||[];
       let migrated=false;gyms.forEach((g,i)=>{if(!g.id){g.id=Date.now()+i;migrated=true}});
       save();saveGyms();saveGoals();saveHang();saveProjects();saveInjuries();if(migrated)saveGyms();
       const heroName=document.getElementById('hero-profile-name');
@@ -1056,7 +1085,7 @@ function promptNewProfileFromGyms(){
    STORAGE
    — sessies en hangsessies worden elk apart opgeslagen
 ══════════════════════════════════════════ */
-let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1',PRK='flagit_projects_v1',IJK='flagit_injuries_v1',PLK='flagit_plan_v1';
+let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1',PRK='flagit_projects_v1',IJK='flagit_injuries_v1',PLK='flagit_plan_v1',CMPK='flagit_comp_v1',RSTK='flagit_resets_v1';
 
 function save(){
   try{localStorage.setItem(SK,JSON.stringify(sessions))}
@@ -1078,6 +1107,8 @@ function saveInjuries(){
 function saveActivePlan(){
   try{localStorage.setItem(PLK,activePlan?JSON.stringify(activePlan):'null')}catch(e){}
 }
+function saveCompetitions(){try{localStorage.setItem(CMPK,JSON.stringify(competitions))}catch(e){}}
+function saveResets(){try{localStorage.setItem(RSTK,JSON.stringify(gymResets))}catch(e){}}
 function saveProjects(){
   try{localStorage.setItem(PRK,JSON.stringify(projects))}catch(e){}
 }
@@ -1252,6 +1283,7 @@ function renderFeed(){
   document.getElementById('hs-pr').textContent=pt?pt.grade:'—';
   const se=document.getElementById('hs-streak');se.textContent=streak;se.className='stat-num'+(streak>=2?' streak-active':'');
   document.getElementById('streak-banner-area').innerHTML=streak>=2?`<div class="streak-banner"><div class="streak-fire">🔥</div><div><div class="streak-text-main">${streak} weken op rij!</div><div class="streak-text-sub">Blijf zo doorgaan — je bent op de goede weg</div></div></div>`:'';
+  renderCompCountdown();
   renderOnThisDay();
 
   // Sync gym filter options with sessions
@@ -1407,8 +1439,9 @@ function setFav(id){gyms.forEach(g=>g.fav=(g.id===id));saveGyms();renderGymsPage
 function deleteGym(id){gyms=gyms.filter(g=>g.id!==id);if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms();renderGymsPage();refreshGymSelect()}
 function renderGymsPage(){
   const list=document.getElementById('gym-list');
-  if(!gyms.length){list.innerHTML='<div class="empty-state" style="padding:30px 0"><div>Nog geen gyms — voeg er een toe hieronder.</div></div>';return}
-  list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${esc(g.name)}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-fav ${g.fav?'active':''}" onclick="setFav(${g.id})">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-del-gym" onclick="deleteGym(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')
+  if(!gyms.length){list.innerHTML='<div class="empty-state" style="padding:30px 0"><div>Nog geen gyms — voeg er een toe hieronder.</div></div>';}
+  else{list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${esc(g.name)}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-fav ${g.fav?'active':''}" onclick="setFav(${g.id})">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-del-gym" onclick="deleteGym(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')}
+  renderResetSection();
 }
 function openGymPickerModal(){
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='gym-modal';
@@ -1592,6 +1625,7 @@ function renderGoals(){
     }
   }).join('');
   renderPlanSection();
+  renderCompSection();
 }
 
 /* ══════════════════════════════════════════
@@ -2252,7 +2286,7 @@ function saveProjectFromModal(id){
 function exportData(){
   const _profiles=loadProfiles();
   const _active=_profiles.find(p=>p.id===activeProfileId);
-  const data={sessions,gyms,goals,hangSessions,projects,injuries,profile:_active?{name:_active.name,emoji:_active.emoji}:null,exportedAt:new Date().toISOString(),version:2};
+  const data={sessions,gyms,goals,hangSessions,projects,injuries,competitions,gymResets,profile:_active?{name:_active.name,emoji:_active.emoji}:null,exportedAt:new Date().toISOString(),version:2};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='flagit-backup-'+new Date().toISOString().split('T')[0]+'.json';
@@ -2287,7 +2321,7 @@ function importFile(e){
 function confirmImport(btn){
   const ov=document.getElementById('import-ov');if(!ov)return;
   const data=ov._importData;ov.remove();
-  sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];projects=data.projects||[];injuries=data.injuries||[];
+  sessions=data.sessions||[];gyms=data.gyms||[];goals=data.goals||[];hangSessions=data.hangSessions||[];projects=data.projects||[];injuries=data.injuries||[];competitions=data.competitions||[];gymResets=data.gymResets||[];
   let migrated=false;gyms.forEach((g,i)=>{if(!g.id){g.id=Date.now()+i;migrated=true}});
   save();saveGyms();saveGoals();saveHang();saveProjects();saveInjuries();if(migrated)saveGyms();
   if(data.profile&&data.profile.name&&activeProfileId){
@@ -2299,6 +2333,145 @@ function confirmImport(btn){
   }
   refreshGymSelect();renderFeed();renderGymsPage();renderProfileMgmt();
   toast('Data geïmporteerd!');
+}
+
+/* ══════════════════════════════════════════
+   COMPETITIE MODUS
+══════════════════════════════════════════ */
+function renderCompCountdown(){
+  const el=document.getElementById('comp-countdown-area');
+  if(!el)return;
+  const today=new Date().toISOString().split('T')[0];
+  const next=competitions.filter(c=>c.date>=today).sort((a,b)=>a.date.localeCompare(b.date))[0];
+  if(!next){el.innerHTML='';return;}
+  const days=Math.round((new Date(next.date+'T00:00:00')-new Date(today+'T00:00:00'))/86400000);
+  const taper=days<=14;
+  el.innerHTML=`<div class="comp-countdown-widget">
+    <div class="comp-cd-days">${days===0?'🏆':days}</div>
+    <div>
+      <div class="comp-cd-label">${days===0?'Comp dag!':taper?'Tapering week':'Countdown'}</div>
+      <div class="comp-cd-name">${esc(next.name)}</div>
+      <div class="comp-cd-sub">${fmtDate(next.date)}${next.location?' · '+esc(next.location):''}</div>
+      ${taper&&days>0?`<div style="font-size:11px;color:var(--flash);margin-top:4px;font-weight:600">⚡ Verlaag volume, behoud intensiteit</div>`:''}
+    </div>
+  </div>`;
+}
+
+function renderCompSection(){
+  const el=document.getElementById('comp-section');
+  if(!el)return;
+  const today=new Date().toISOString().split('T')[0];
+  const trashSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>`;
+  const upcoming=competitions.filter(c=>c.date>=today).sort((a,b)=>a.date.localeCompare(b.date));
+  const past=competitions.filter(c=>c.date<today).sort((a,b)=>b.date.localeCompare(a.date));
+  const compCard=c=>{
+    const days=Math.round((new Date(c.date+'T00:00:00')-new Date(today+'T00:00:00'))/86400000);
+    const up=days>=0;
+    const dLbl=days===0?'Vandaag!':days>0?`Over ${days} dag${days!==1?'en':''}`:`${Math.abs(days)} dag${Math.abs(days)!==1?'en':''} geleden`;
+    const taper=up&&days<=14&&days>0;
+    return`<div class="comp-card ${up?'comp-upcoming':'comp-past'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">🏆 Competitie</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:.3px">${esc(c.name)}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${fmtDate(c.date)}${c.location?' · '+esc(c.location):''}</div>
+          <div style="font-size:13px;color:${up?'var(--accent)':'var(--muted)'};margin-top:5px;font-weight:600">${dLbl}</div>
+          ${taper?`<div style="font-size:12px;color:var(--flash);margin-top:3px">⚡ Taper: volume −30%, intensiteit behouden</div>`:''}
+        </div>
+        <button class="btn-delete-goal" onclick="deleteComp(${c.id})" style="flex-shrink:0;margin-top:2px">${trashSVG}</button>
+      </div>
+    </div>`;
+  };
+  el.innerHTML=`<div class="comp-add-form">
+    <div class="add-goal-grid">
+      <div class="field full"><label>Naam</label><input type="text" id="comp-name" placeholder="bijv. Klimmuur Open, IFSC Kwalificatie..."></div>
+      <div class="field"><label>Datum</label><input type="date" id="comp-date" value="${today}"></div>
+      <div class="field"><label>Locatie (opt.)</label><input type="text" id="comp-location" placeholder="bijv. Amsterdam"></div>
+    </div>
+    <button class="btn-add-comp" onclick="addComp()">Competitie toevoegen</button>
+  </div>
+  ${upcoming.map(compCard).join('')}
+  ${past.length?`<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:4px 0 8px">Afgelopen</div>${past.slice(0,3).map(compCard).join('')}`:''}`;
+}
+
+function addComp(){
+  const name=document.getElementById('comp-name')?.value.trim();
+  const date=document.getElementById('comp-date')?.value;
+  const location=document.getElementById('comp-location')?.value.trim();
+  if(!name){toast('Vul een naam in','#e53935');return;}
+  if(!date){toast('Kies een datum','#e53935');return;}
+  competitions.push({id:Date.now(),name,date,location:location||''});
+  saveCompetitions();renderCompSection();renderCompCountdown();
+  document.getElementById('comp-name').value='';
+  document.getElementById('comp-location').value='';
+  toast('Competitie toegevoegd!');
+}
+
+function deleteComp(id){
+  competitions=competitions.filter(c=>c.id!==id);
+  saveCompetitions();renderCompSection();renderCompCountdown();
+}
+
+/* ══════════════════════════════════════════
+   GYM RESET TRACKER
+══════════════════════════════════════════ */
+function renderResetSection(){
+  const el=document.getElementById('reset-section');
+  if(!el)return;
+  if(!gyms.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:4px 0 12px">Voeg eerst een gym toe</div>';return;}
+  const today=new Date().toISOString().split('T')[0];
+  el.innerHTML=gyms.map(g=>{
+    const gResets=gymResets.filter(r=>r.gymId===g.id).sort((a,b)=>b.date.localeCompare(a.date));
+    const last=gResets[0];
+    let sinceHtml='<span style="color:var(--muted)">Nooit gelogd</span>';
+    let nudge='';
+    if(last){
+      const days=Math.round((new Date(today+'T00:00:00')-new Date(last.date+'T00:00:00'))/86400000);
+      sinceHtml=`${days===0?'Vandaag gereset':days===1?'Gisteren gereset':`${days} dagen geleden gereset`}`;
+      if(gResets.length>=2){
+        const intervals=[];
+        for(let i=0;i<gResets.length-1;i++)intervals.push(Math.round((new Date(gResets[i].date+'T00:00:00')-new Date(gResets[i+1].date+'T00:00:00'))/86400000));
+        const avg=Math.round(intervals.reduce((a,b)=>a+b,0)/intervals.length);
+        if(days>=Math.round(avg*0.85))nudge=`🔄 Gem. elke ${avg} dagen reset — waarschijnlijk nieuwe routes!`;
+      }
+    }
+    return`<div class="reset-gym-row">
+      <div class="reset-gym-info">
+        <div class="reset-gym-name">${esc(g.name)}</div>
+        <div class="reset-gym-since">${sinceHtml}</div>
+        ${nudge?`<div class="reset-gym-nudge">${nudge}</div>`:''}
+      </div>
+      <button class="btn-log-reset" onclick="openResetModal(${g.id},'${esc(g.name)}')">Reset loggen</button>
+    </div>`;
+  }).join('');
+}
+
+function openResetModal(gymId,gymName){
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='reset-modal';
+  const today=new Date().toISOString().split('T')[0];
+  ov.innerHTML=`<div class="confirm-box">
+    <div class="confirm-title">Reset loggen</div>
+    <div class="confirm-sub" style="margin-bottom:12px">Gym: <strong>${gymName}</strong></div>
+    <div class="field" style="margin-bottom:16px">
+      <label style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Datum van reset</label>
+      <input type="date" id="reset-date" value="${today}" style="width:100%;background:var(--surface);border:.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:11px 14px;-webkit-appearance:none;outline:none">
+    </div>
+    <div class="confirm-btns">
+      <button class="confirm-cancel" onclick="document.getElementById('reset-modal').remove()">Annuleren</button>
+      <button class="confirm-delete" style="background:rgba(127,119,221,.15);border-color:var(--accent);color:var(--accent)" onclick="saveReset(${gymId})">Opslaan</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+
+function saveReset(gymId){
+  const date=document.getElementById('reset-date')?.value||new Date().toISOString().split('T')[0];
+  gymResets.push({id:Date.now(),gymId,date});
+  saveResets();
+  document.getElementById('reset-modal')?.remove();
+  renderResetSection();
+  toast('Reset gelogd! 🆕');
 }
 
 /* ══════════════════════════════════════════
@@ -2792,7 +2965,7 @@ function initApp(profileId){
 
   // Point storage keys at this profile's namespace
   const keys=profileStorageKeys(profileId);
-  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;PRK=keys.prk;IJK=keys.ijk;PLK=keys.plk;
+  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;PRK=keys.prk;IJK=keys.ijk;PLK=keys.plk;CMPK=keys.cmpk;RSTK=keys.rstk;
 
   // Load data
   sessions=loadArr(SK,'bsessions');
@@ -2801,6 +2974,8 @@ function initApp(profileId){
   hangSessions=loadArr(HSK);
   projects=loadArr(PRK);
   injuries=loadArr(IJK);
+  competitions=loadArr(CMPK);
+  gymResets=loadArr(RSTK);
   try{const _p=localStorage.getItem(PLK);activePlan=_p&&_p!=='null'?JSON.parse(_p):null;}catch(e){activePlan=null;}
   feedTab='feed';
 
