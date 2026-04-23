@@ -1043,7 +1043,7 @@ function promptDeleteProfile(){
 function confirmDeleteProfile(){
   document.getElementById('del-prof-ov')?.remove();
   const keys=profileStorageKeys(activeProfileId);
-  [keys.sk,keys.gyk,keys.gok,keys.hsk,keys.prk].forEach(k=>localStorage.removeItem(k));
+  [keys.sk,keys.gyk,keys.gok,keys.hsk,keys.prk,keys.ijk,keys.plk,keys.cmpk,keys.rstk].forEach(k=>localStorage.removeItem(k));
   const profiles=loadProfiles().filter(p=>p.id!==activeProfileId);
   saveProfiles(profiles);
   toast('Profiel verwijderd','#e53935');
@@ -1069,7 +1069,7 @@ function promptDeleteProfileById(id){
 function confirmDeleteProfileById(id){
   document.getElementById('del-prof-ov')?.remove();
   const keys=profileStorageKeys(id);
-  [keys.sk,keys.gyk,keys.gok,keys.hsk,keys.prk].forEach(k=>localStorage.removeItem(k));
+  [keys.sk,keys.gyk,keys.gok,keys.hsk,keys.prk,keys.ijk,keys.plk,keys.cmpk,keys.rstk].forEach(k=>localStorage.removeItem(k));
   const profiles=loadProfiles().filter(p=>p.id!==id);
   saveProfiles(profiles);
   if(activeProfileId===id)activeProfileId=null;
@@ -1338,7 +1338,7 @@ function renderFeed(){
     const s=item.s;
     const idx=cardIdx++;
     const mg=maxGrade(s.routes);
-    const chips=s.routes.map(r=>`<div class="route-chip chip-${r.result}"><div class="dot"></div>${r.grade}${r.type?' · '+r.type:''}</div>`).join('');
+    const chips=s.routes.map(r=>`<div class="route-chip chip-${r.result}"><div class="dot"></div>${esc(r.grade)}${r.type?' · '+esc(r.type):''}</div>`).join('');
     const feelEmojis=['😓','😐','💪','🔥'];
     const feelStr=s.feel!=null?` · <span class="feed-feel">${feelEmojis[s.feel]}</span>`:'';
     return`${header}<div class="activity-card" style="animation-delay:${idx*.04}s">
@@ -2034,9 +2034,8 @@ function renderTLI(){
   const el=document.getElementById('tli-section');
   if(!el)return;
   const data=computeWeeklyTLI();
-  const curTLI=data[data.length-1].tli;
-  const prev4=data.slice(-5,-1);
-  const avg4=prev4.length?Math.round(prev4.reduce((a,b)=>a+b.tli,0)/prev4.length):0;
+  const{cur:curTLI,avg:avg4raw}=computeTLIRatio();
+  const avg4=Math.round(avg4raw);
   const trend=curTLI>avg4?'↑':curTLI<avg4?'↓':'→';
   const trendColor=curTLI>avg4?'var(--success)':curTLI<avg4?'var(--danger)':'var(--muted)';
   el.innerHTML=`<div class="chart-card" style="margin-bottom:16px">
@@ -2507,17 +2506,18 @@ function renderResetSection(){
         <div class="reset-gym-since">${sinceHtml}</div>
         ${nudge?`<div class="reset-gym-nudge">${nudge}</div>`:''}
       </div>
-      <button class="btn-log-reset" onclick="openResetModal(${g.id},'${esc(g.name)}')">Reset loggen</button>
+      <button class="btn-log-reset" onclick="openResetModal(${g.id})">Reset loggen</button>
     </div>`;
   }).join('');
 }
 
-function openResetModal(gymId,gymName){
+function openResetModal(gymId){
+  const gymName=gyms.find(g=>g.id===gymId)?.name||'';
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='reset-modal';
   const today=new Date().toISOString().split('T')[0];
   ov.innerHTML=`<div class="confirm-box">
     <div class="confirm-title">Reset loggen</div>
-    <div class="confirm-sub" style="margin-bottom:12px">Gym: <strong>${gymName}</strong></div>
+    <div class="confirm-sub" style="margin-bottom:12px">Gym: <strong>${esc(gymName)}</strong></div>
     <div class="field" style="margin-bottom:16px">
       <label style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Datum van reset</label>
       <input type="date" id="reset-date" value="${today}" style="width:100%;background:var(--surface);border:.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:11px 14px;-webkit-appearance:none;outline:none">
@@ -2635,7 +2635,6 @@ function renderOnThisDay(){
   if(!sessions.length){el.innerHTML='';return;}
   const today=new Date();
   const yearAgo=new Date(today);yearAgo.setFullYear(today.getFullYear()-1);
-  const targetDate=yearAgo.toISOString().split('T')[0];
   const matches=sessions.filter(s=>{
     const diff=Math.abs(new Date(s.date+'T00:00:00')-yearAgo);
     return diff<=3*86400000;
@@ -2648,7 +2647,7 @@ function renderOnThisDay(){
     <div class="otd-icon">📅</div>
     <div>
       <div class="otd-title">Op deze dag vorig jaar</div>
-      <div class="otd-body">${esc(s.gym||'Onbekende gym')} · ${s.routes.length} routes${mg?' · max <strong style="color:var(--accent)">${mg.grade}</strong>':''}${s.feel!=null?' · '+feelEmojis[s.feel]:''}${s.note?'<br><em>"'+esc(s.note)+'"</em>':''}</div>
+      <div class="otd-body">${esc(s.gym||'Onbekende gym')} · ${s.routes.length} routes${mg?` · max <strong style="color:var(--accent)">${esc(mg.grade)}</strong>`:''}${s.feel!=null?' · '+feelEmojis[s.feel]:''}${s.note?'<br><em>"'+esc(s.note)+'"</em>':''}</div>
     </div>
   </div>`;
 }
@@ -2692,16 +2691,21 @@ function renderDagboek(){
 const BODY_PARTS=['A2 pulley (ringvinger)','A2 pulley (middelvinger)','A2 pulley (wijsvinger)','A4 pulley','Teres/lat','Biceps pees','Pols','Elleboog (mediaal)','Elleboog (lateraal)','Schouder','Rug/kern','Anders'];
 const SEV_LABELS=['','Licht — voelbaar na klimmen','Matig — pijn tijdens klimmen','Fors — beperkt klimmen','Ernstig — niet kunnen klimmen','Zwaar — volledige rust'];
 
+function computeTLIRatio(){
+  const data=computeWeeklyTLI();
+  const cur=data[data.length-1].tli;
+  const prev=data.slice(-5,-1).filter(w=>w.tli>0);
+  const avg=prev.length?prev.reduce((a,b)=>a+b.tli,0)/prev.length:0;
+  return{cur,avg};
+}
+
 function computeInjuryRisk(){
   const today=new Date().toISOString().split('T')[0];
   let score=0;const factors=[];
 
   // Volume spike via TLI
   if(sessions.length>=3){
-    const tliData=computeWeeklyTLI();
-    const curTLI=tliData[tliData.length-1].tli;
-    const prev4=tliData.slice(-5,-1).filter(w=>w.tli>0);
-    const avg4=prev4.length?prev4.reduce((a,b)=>a+b.tli,0)/prev4.length:0;
+    const{cur:curTLI,avg:avg4}=computeTLIRatio();
     if(avg4>0){
       if(curTLI>avg4*1.8){score+=40;factors.push({icon:'📈',label:'Volume spike',detail:`+${Math.round(curTLI/avg4*100-100)}% boven gemiddeld`});}
       else if(curTLI>avg4*1.3){score+=20;factors.push({icon:'📈',label:'Hoge belasting',detail:`+${Math.round(curTLI/avg4*100-100)}% boven gemiddeld`});}
@@ -2729,7 +2733,7 @@ function computeInjuryRisk(){
 
   // Heavy hangboard loading
   if(hangSessions.length>=1){
-    const recentSets=hangSessions.sort((a,b)=>b.date.localeCompare(a.date)).slice(0,2).flatMap(s=>s.sets||[]);
+    const recentSets=[...hangSessions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,2).flatMap(s=>s.sets||[]);
     const maxWeight=recentSets.length?Math.max(...recentSets.map(s=>Number(s.weight)||0)):0;
     if(maxWeight>=15){score+=15;factors.push({icon:'🏋️',label:'Zwaar hangboard',detail:`+${maxWeight}kg extra gewicht recent`});}
     else if(maxWeight>=5){score+=5;}
@@ -2854,10 +2858,7 @@ function computeCoachAdvice(){
 
   // TLI-based overtraining check
   if(sessions.length>=3){
-    const tliData=computeWeeklyTLI();
-    const curTLI=tliData[tliData.length-1].tli;
-    const prev4=tliData.slice(-5,-1).filter(w=>w.tli>0);
-    const avg4=prev4.length?prev4.reduce((a,b)=>a+b.tli,0)/prev4.length:0;
+    const{cur:curTLI,avg:avg4}=computeTLIRatio();
     if(avg4>0){
       if(curTLI>avg4*1.8){
         advice.push({tag:'Herstel',icon:'🚨',color:'var(--danger)',title:'Overtraining risico',body:`Je trainingsbelasting deze week (${curTLI}) is ${Math.round(curTLI/avg4*100-100)}% hoger dan je 4-weeksgemiddelde (${Math.round(avg4)}). Plan een rustdag of lichte sessie.`});
