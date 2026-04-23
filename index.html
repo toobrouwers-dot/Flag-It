@@ -419,6 +419,42 @@ select option{background:#1e1e1e}
 .project-section-label{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
 .project-section-label:first-child{margin-top:0}
 
+/* TRAINING PLANS */
+.plan-option{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:8px;display:flex;align-items:center;gap:14px;-webkit-tap-highlight-color:transparent}
+.plan-option:active{border-color:var(--accent);background:rgba(127,119,221,.08)}
+.plan-option-icon{font-size:26px;flex-shrink:0;line-height:1}
+.plan-option-name{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.plan-option-desc{font-size:12px;color:var(--muted);margin-top:1px}
+.active-plan-card{background:var(--surface);border:.5px solid rgba(127,119,221,.4);border-radius:14px;overflow:hidden;margin-bottom:8px}
+.plan-prog-header{background:rgba(127,119,221,.1);padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.plan-prog-title{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.plan-prog-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.plan-week-row{padding:12px 16px;border-top:.5px solid var(--border);display:flex;gap:14px;align-items:flex-start}
+.plan-week-row.pw-current{background:rgba(127,119,221,.06)}
+.plan-week-row.pw-past{opacity:.45}
+.pw-num{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;width:28px;flex-shrink:0;padding-top:2px}
+.pw-content{flex:1}
+.pw-label{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+.pw-tasks{display:flex;flex-direction:column;gap:3px}
+.pw-tasks span{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:flex-start;line-height:1.4}
+.pw-tasks span::before{content:'·';flex-shrink:0}
+.btn-stop-plan{background:none;border:.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;padding:5px 12px;cursor:pointer;transition:color .15s,border-color .15s}
+.btn-stop-plan:active{color:var(--danger);border-color:var(--danger)}
+
+/* DAGBOEK */
+.otd-card{margin:0 16px 12px;background:linear-gradient(135deg,rgba(255,193,7,.12),rgba(255,193,7,.04));border:.5px solid rgba(255,193,7,.3);border-radius:14px;padding:14px 16px;display:flex;align-items:flex-start;gap:13px;animation:slideUp .3s ease both}
+.otd-icon{font-size:24px;flex-shrink:0;line-height:1;margin-top:1px}
+.otd-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:#ffc107;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.otd-body{font-size:13px;color:var(--muted);line-height:1.4}
+.dagboek-entry{margin:0 16px 12px;background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;animation:slideUp .25s ease both}
+.dagboek-date-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px}
+.dagboek-gym{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;text-transform:uppercase;margin-bottom:8px}
+.dagboek-note{font-size:14px;color:var(--text);line-height:1.55;font-style:italic}
+.dagboek-meta{font-size:11px;color:var(--muted);margin-top:8px;display:flex;gap:10px}
+.feed-toggle{display:flex;gap:6px;padding:10px 16px;border-bottom:.5px solid var(--border)}
+.feed-toggle-btn{flex:1;padding:8px 4px;border-radius:8px;border:.5px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;cursor:pointer;letter-spacing:.5px;transition:all .15s}
+.feed-toggle-btn.active{background:rgba(127,119,221,.2);border-color:var(--accent);color:var(--accent)}
+
 /* FINGER HEALTH */
 .fh-risk-card{border-radius:16px;padding:18px 20px;margin-bottom:4px;border:.5px solid}
 .fh-risk-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
@@ -498,13 +534,23 @@ select option{background:#1e1e1e}
     </div>
   </div>
   <div id="streak-banner-area"></div>
-  <div id="filter-bar" class="filter-bar">
-    <select id="filter-gym" onchange="renderFeed()"><option value="">Alle gyms</option></select>
-    <select id="filter-grade" onchange="renderFeed()"><option value="">Min. graad</option></select>
-    <button class="btn-filter-clear" id="filter-clear-btn" onclick="clearFilters()">Wis</button>
+  <div id="otd-section"></div>
+  <div class="feed-toggle">
+    <button class="feed-toggle-btn active" id="tab-feed" onclick="switchFeedTab('feed')">Sessies</button>
+    <button class="feed-toggle-btn" id="tab-dagboek" onclick="switchFeedTab('dagboek')">Dagboek</button>
   </div>
-  <div class="section-title">Recente sessies</div>
-  <div id="feed"></div>
+  <div id="feed-tab-feed">
+    <div id="filter-bar" class="filter-bar">
+      <select id="filter-gym" onchange="renderFeed()"><option value="">Alle gyms</option></select>
+      <select id="filter-grade" onchange="renderFeed()"><option value="">Min. graad</option></select>
+      <button class="btn-filter-clear" id="filter-clear-btn" onclick="clearFilters()">Wis</button>
+    </div>
+    <div class="section-title">Recente sessies</div>
+    <div id="feed"></div>
+  </div>
+  <div id="feed-tab-dagboek" style="display:none">
+    <div id="dagboek-feed"></div>
+  </div>
 </div>
 
 <!-- LOG -->
@@ -602,6 +648,10 @@ select option{background:#1e1e1e}
       </div>
       <button class="btn-add-goal count-btn" onclick="addCountGoal()">Toevoegen</button>
     </div>
+
+    <!-- Trainingsplan -->
+    <div class="goal-section-header">📋 Trainingsplan</div>
+    <div id="plan-section"></div>
 
   </div>
 </div>
@@ -732,6 +782,8 @@ const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch',
    STATE
 ══════════════════════════════════════════ */
 let sessions=[],gyms=[],goals=[],hangSessions=[],projects=[],injuries=[];
+let activePlan=null;
+let feedTab='feed';
 let chartP=null,chartG=null,chartH=null,tliChart=null;
 let routeCount=0,hangSetCount=0;
 let editMode=false,editSessionId=null;
@@ -754,7 +806,7 @@ function saveProfiles(profiles){
   try{localStorage.setItem(PFK,JSON.stringify(profiles))}catch(e){}
 }
 function profileStorageKeys(id){
-  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id,prk:'flagit_projects_v1_'+id,ijk:'flagit_injuries_v1_'+id};
+  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id,prk:'flagit_projects_v1_'+id,ijk:'flagit_injuries_v1_'+id,plk:'flagit_plan_v1_'+id};
 }
 function maybeRunMigration(){
   const profiles=loadProfiles();
@@ -1004,7 +1056,7 @@ function promptNewProfileFromGyms(){
    STORAGE
    — sessies en hangsessies worden elk apart opgeslagen
 ══════════════════════════════════════════ */
-let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1',PRK='flagit_projects_v1',IJK='flagit_injuries_v1';
+let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1',PRK='flagit_projects_v1',IJK='flagit_injuries_v1',PLK='flagit_plan_v1';
 
 function save(){
   try{localStorage.setItem(SK,JSON.stringify(sessions))}
@@ -1022,6 +1074,9 @@ function saveHang(){
 }
 function saveInjuries(){
   try{localStorage.setItem(IJK,JSON.stringify(injuries))}catch(e){}
+}
+function saveActivePlan(){
+  try{localStorage.setItem(PLK,activePlan?JSON.stringify(activePlan):'null')}catch(e){}
 }
 function saveProjects(){
   try{localStorage.setItem(PRK,JSON.stringify(projects))}catch(e){}
@@ -1197,6 +1252,7 @@ function renderFeed(){
   document.getElementById('hs-pr').textContent=pt?pt.grade:'—';
   const se=document.getElementById('hs-streak');se.textContent=streak;se.className='stat-num'+(streak>=2?' streak-active':'');
   document.getElementById('streak-banner-area').innerHTML=streak>=2?`<div class="streak-banner"><div class="streak-fire">🔥</div><div><div class="streak-text-main">${streak} weken op rij!</div><div class="streak-text-sub">Blijf zo doorgaan — je bent op de goede weg</div></div></div>`:'';
+  renderOnThisDay();
 
   // Sync gym filter options with sessions
   const fgEl=document.getElementById('filter-gym');
@@ -1535,6 +1591,7 @@ function renderGoals(){
       </div>`;
     }
   }).join('');
+  renderPlanSection();
 }
 
 /* ══════════════════════════════════════════
@@ -2245,6 +2302,152 @@ function confirmImport(btn){
 }
 
 /* ══════════════════════════════════════════
+   GESTRUCTUREERDE TRAININGSPLANNEN
+══════════════════════════════════════════ */
+const TRAINING_PLANS=[
+  {id:'grade-breakthrough',icon:'🚀',name:'Graad Doorbraak',desc:'8 weken gericht jouw PR verbeteren',weeks:[
+    {label:'Volume',tasks:['3 sessies op comfortzone','Focus op techniek en lezen','Geen projecten — rustig opbouwen']},
+    {label:'Techniek',tasks:['Bewust voetplaatsing oefenen','Probeer routes 2× te flashen','Hangboard: 2× max hangs']},
+    {label:'Projecting',tasks:['Kies 2 routes 1 graad boven PR','Analyseer moves vóór je pakt','Leg beta vast in Projecten']},
+    {label:'Herstel',tasks:['Max. 1 lichte sessie','Foam roll & stretching','8 uur slaap per nacht']},
+    {label:'Volume',tasks:['Herhaal week 1 met meer volume','2× hangboard sessie','Let op slaagpercentage in Stats']},
+    {label:'Intensiteit',tasks:['Klimt op jouw grens, minder routes','Probeer alle projectroutes opnieuw','Hangboard: voeg licht gewicht toe']},
+    {label:'Piek',tasks:['Volledig gericht op doelgraad','30 min warm-up voor elke sessie','Registreer elke poging']},
+    {label:'Evaluatie',tasks:['Lichte sessie + reflectie','Vergelijk PR voor/na plan','Plan volgend blok']}
+  ]},
+  {id:'flash-foundation',icon:'⚡',name:'Flash Foundation',desc:'6 weken je flash-percentage verhogen',weeks:[
+    {label:'Lezen',tasks:['30 sec route lezen vóór je pakt','Loop moves na in gedachten','Log eerlijk: flash of top']},
+    {label:'Comfortzone',tasks:['Klimt 1 graad onder PR','Doel: 80%+ flash-rate','Voetplaatsing bewust houden']},
+    {label:'Snelheid',tasks:['Pak routes zonder te twijfelen','Oefen decisief klimmen','Minder rustpauzes per route']},
+    {label:'Herstel',tasks:['Lichte sessie','Bekijk flash-trend in Stats','Mobiliteit & stretching']},
+    {label:'Volume',tasks:['Meer routes, niveau iets lager','Flash-rate bijhouden na sessie','Varieer route-types']},
+    {label:'Push',tasks:['Routes 1 graad boven gebruikelijk','Focus op eerste poging','Evalueer flash-trend in Stats']}
+  ]},
+  {id:'fingerboard-strength',icon:'💪',name:'Fingerboard Kracht',desc:'6 weken vingersterkte opbouwen',weeks:[
+    {label:'Basis',tasks:['Max hangs: 5 sets × 8–10s per grip','Rust 3 min tussen sets','2× per week, boulderen apart']},
+    {label:'Opbouw',tasks:['Voeg 1s toe aan elke hang','Probeer een 2e griptype','Log hangtijd in Hangboard']},
+    {label:'Volume',tasks:['3 sets per grip, 3 grips per sessie','Focus op volgreep & krim','Volledig rusten tussen sets']},
+    {label:'Deload',tasks:['Halveer volume deze week','Boulderen mag wel','Vingers rust gunnen']},
+    {label:'Intensiteit',tasks:['5–10% extra gewicht indien mogelijk','Minder reps, zwaarder','Krim & open hand afwisselen']},
+    {label:'Test & Evalueer',tasks:['Max hang-test per grip bijhouden','Vergelijk met week 1','Plan volgend blok op data']}
+  ]}
+];
+
+function renderPlanSection(){
+  const el=document.getElementById('plan-section');
+  if(!el)return;
+  if(!activePlan){
+    el.innerHTML=`<div style="margin-bottom:6px">${TRAINING_PLANS.map(p=>`
+      <div class="plan-option" onclick="startPlan('${p.id}')">
+        <div class="plan-option-icon">${p.icon}</div>
+        <div>
+          <div class="plan-option-name">${p.name}</div>
+          <div class="plan-option-desc">${p.desc}</div>
+        </div>
+        <svg style="margin-left:auto;flex-shrink:0;color:var(--muted)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>`).join('')}</div>`;
+    return;
+  }
+  const plan=TRAINING_PLANS.find(p=>p.id===activePlan.planId);
+  if(!plan){activePlan=null;saveActivePlan();renderPlanSection();return;}
+  const today=new Date().toISOString().split('T')[0];
+  const startMs=new Date(activePlan.startDate+'T00:00:00').getTime();
+  const currentWeek=Math.min(Math.floor((Date.now()-startMs)/604800000),plan.weeks.length-1);
+  const weeksLeft=plan.weeks.length-1-currentWeek;
+  const weeksHtml=plan.weeks.map((w,i)=>{
+    const cls=i<currentWeek?'pw-past':i===currentWeek?'pw-current':'';
+    return`<div class="plan-week-row ${cls}">
+      <div class="pw-num">${i===currentWeek?'▶ W'+(i+1):'W'+(i+1)}</div>
+      <div class="pw-content">
+        <div class="pw-label" style="${i===currentWeek?'color:var(--accent)':''}">${w.label}</div>
+        ${i===currentWeek?`<div class="pw-tasks">${w.tasks.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div class="active-plan-card">
+    <div class="plan-prog-header">
+      <div>
+        <div class="plan-prog-title">${plan.icon} ${plan.name}</div>
+        <div class="plan-prog-sub">Week ${currentWeek+1} van ${plan.weeks.length} · ${weeksLeft>0?weeksLeft+' weken resterend':'Laatste week!'}</div>
+      </div>
+      <button class="btn-stop-plan" onclick="stopPlan()">Stop</button>
+    </div>
+    ${weeksHtml}
+  </div>`;
+}
+
+function startPlan(planId){
+  activePlan={planId,startDate:new Date().toISOString().split('T')[0]};
+  saveActivePlan();
+  renderPlanSection();
+  toast('Trainingsplan gestart!');
+}
+
+function stopPlan(){
+  activePlan=null;saveActivePlan();renderPlanSection();
+}
+
+/* ══════════════════════════════════════════
+   KLIMDAGBOEK / JOURNALING
+══════════════════════════════════════════ */
+function renderOnThisDay(){
+  const el=document.getElementById('otd-section');
+  if(!el)return;
+  if(!sessions.length){el.innerHTML='';return;}
+  const today=new Date();
+  const yearAgo=new Date(today);yearAgo.setFullYear(today.getFullYear()-1);
+  const targetDate=yearAgo.toISOString().split('T')[0];
+  const matches=sessions.filter(s=>{
+    const diff=Math.abs(new Date(s.date+'T00:00:00')-yearAgo);
+    return diff<=3*86400000;
+  }).sort((a,b)=>Math.abs(new Date(a.date+'T00:00:00')-yearAgo)-Math.abs(new Date(b.date+'T00:00:00')-yearAgo));
+  if(!matches.length){el.innerHTML='';return;}
+  const s=matches[0];
+  const mg=maxGrade(s.routes);
+  const feelEmojis=['😓','😐','💪','🔥'];
+  el.innerHTML=`<div class="otd-card">
+    <div class="otd-icon">📅</div>
+    <div>
+      <div class="otd-title">Op deze dag vorig jaar</div>
+      <div class="otd-body">${esc(s.gym||'Onbekende gym')} · ${s.routes.length} routes${mg?' · max <strong style="color:var(--accent)">${mg.grade}</strong>':''}${s.feel!=null?' · '+feelEmojis[s.feel]:''}${s.note?'<br><em>"'+esc(s.note)+'"</em>':''}</div>
+    </div>
+  </div>`;
+}
+
+function switchFeedTab(tab){
+  feedTab=tab;
+  document.getElementById('tab-feed').className='feed-toggle-btn'+(tab==='feed'?' active':'');
+  document.getElementById('tab-dagboek').className='feed-toggle-btn'+(tab==='dagboek'?' active':'');
+  document.getElementById('feed-tab-feed').style.display=tab==='feed'?'':'none';
+  document.getElementById('feed-tab-dagboek').style.display=tab==='dagboek'?'':'none';
+  if(tab==='dagboek')renderDagboek();
+}
+
+function renderDagboek(){
+  const el=document.getElementById('dagboek-feed');
+  if(!el)return;
+  const withNotes=[...sessions].filter(s=>s.note&&s.note.trim()).sort((a,b)=>b.date.localeCompare(a.date));
+  const feelEmojis=['😓','😐','💪','🔥'];
+  if(!withNotes.length){
+    el.innerHTML='<div class="empty-state"><div class="empty-icon">📓</div><div class="empty-title">Nog geen notities</div><div class="empty-sub">Voeg notities toe bij het loggen van sessies — ze verschijnen hier als dagboek.</div></div>';
+    return;
+  }
+  el.innerHTML='<div style="padding-top:4px">'+withNotes.map((s,i)=>{
+    const mg=maxGrade(s.routes);
+    return`<div class="dagboek-entry" style="animation-delay:${i*.04}s">
+      <div class="dagboek-date-lbl">${fmtDate(s.date)}</div>
+      <div class="dagboek-gym">${esc(s.gym||'Sessie')}</div>
+      <div class="dagboek-note">"${esc(s.note)}"</div>
+      <div class="dagboek-meta">
+        ${mg?`<span>${mg.grade}</span>`:''}
+        <span>${s.routes.length} routes</span>
+        ${s.feel!=null?`<span>${feelEmojis[s.feel]}</span>`:''}
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+/* ══════════════════════════════════════════
    VINGER GEZONDHEIDS-MONITOR
 ══════════════════════════════════════════ */
 const BODY_PARTS=['A2 pulley (ringvinger)','A2 pulley (middelvinger)','A2 pulley (wijsvinger)','A4 pulley','Teres/lat','Biceps pees','Pols','Elleboog (mediaal)','Elleboog (lateraal)','Schouder','Rug/kern','Anders'];
@@ -2589,7 +2792,7 @@ function initApp(profileId){
 
   // Point storage keys at this profile's namespace
   const keys=profileStorageKeys(profileId);
-  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;PRK=keys.prk;IJK=keys.ijk;
+  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;PRK=keys.prk;IJK=keys.ijk;PLK=keys.plk;
 
   // Load data
   sessions=loadArr(SK,'bsessions');
@@ -2598,6 +2801,8 @@ function initApp(profileId){
   hangSessions=loadArr(HSK);
   projects=loadArr(PRK);
   injuries=loadArr(IJK);
+  try{const _p=localStorage.getItem(PLK);activePlan=_p&&_p!=='null'?JSON.parse(_p):null;}catch(e){activePlan=null;}
+  feedTab='feed';
 
   // Migrate gyms without id
   let _gymsMigrated=false;
