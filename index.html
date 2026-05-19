@@ -76,7 +76,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .route-chip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .chip-top .dot{background:var(--success)}.chip-flash .dot{background:var(--flash)}.chip-poging .dot{background:var(--attempt)}
 
-.btn-delete-session{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;transition:color .2s,background .2s;margin-top:2px}
+.btn-delete-session{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;margin-top:2px;min-width:44px;min-height:44px}
 .btn-delete-session:active{color:var(--danger);background:rgba(229,57,53,.12)}
 
 .empty-state{text-align:center;padding:48px 20px 40px;color:var(--muted)}
@@ -219,7 +219,7 @@ select option{background:#1e1e1e}
 .goal-card.achieved .goal-progress-fill{background:var(--success)}
 .goal-progress-label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
 .goal-progress-pct{color:var(--text);font-weight:600}
-.btn-delete-goal{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;transition:color .2s}
+.btn-delete-goal{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .2s;min-width:44px;min-height:44px}
 .btn-delete-goal:active{color:var(--danger)}
 
 /* add goal forms side by side in one card */
@@ -290,7 +290,7 @@ select option{background:#1e1e1e}
 .gym-actions{display:flex;align-items:center;gap:8px}
 .btn-fav{background:none;border:.5px solid var(--border);border-radius:8px;color:var(--muted);padding:6px 10px;font-size:11px;font-family:'Barlow',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:all .15s}
 .btn-fav.active{color:var(--accent);border-color:var(--accent);background:rgba(127,119,221,.1)}
-.btn-del-gym{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;transition:color .2s}
+.btn-del-gym{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .2s;min-width:44px;min-height:44px}
 .btn-del-gym:active{color:var(--danger)}
 .add-gym-row{display:flex;gap:8px}
 .add-gym-row input{flex:1}
@@ -345,7 +345,7 @@ select option{background:#1e1e1e}
 .filter-bar select{flex:1;min-width:100px;font-size:13px;padding:8px 10px}
 .btn-filter-clear{background:var(--surface2);border:.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;padding:8px 14px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:color .2s,border-color .2s;text-transform:uppercase;letter-spacing:.5px}
 .btn-filter-clear.active{color:var(--danger);border-color:var(--danger)}
-.btn-edit-session{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;transition:color .2s,background .2s;margin-top:2px}
+.btn-edit-session{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;margin-top:2px;min-width:44px;min-height:44px}
 .btn-edit-session:active{color:var(--accent);background:rgba(127,119,221,.12)}
 .goal-card.overdue{border-color:rgba(229,57,53,.4)}
 .goal-overdue-badge{font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--danger);text-transform:uppercase;background:rgba(229,57,53,.15);border-radius:20px;padding:3px 10px}
@@ -445,7 +445,7 @@ select option{background:#1e1e1e}
 .project-card-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:.5px solid var(--border)}
 .btn-edit-project{flex:1;padding:9px;background:none;border:.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;cursor:pointer;transition:color .15s,border-color .15s}
 .btn-edit-project:active{color:var(--accent);border-color:var(--accent)}
-.btn-delete-project{padding:9px 12px;background:none;border:.5px solid var(--border);border-radius:10px;color:var(--muted);cursor:pointer;display:flex;align-items:center;transition:color .15s,border-color .15s}
+.btn-delete-project{padding:9px 12px;background:none;border:.5px solid var(--border);border-radius:10px;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .15s,border-color .15s;min-height:44px;min-width:44px}
 .btn-delete-project:active{color:var(--danger);border-color:var(--danger)}
 .btn-add-project{width:100%;padding:14px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:14px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:background .15s,border-color .15s;margin-top:4px}
 .btn-add-project:active{background:rgba(127,119,221,.08);border-color:var(--accent)}
@@ -1022,29 +1022,29 @@ select option{background:#1e1e1e}
 </div>
 
 <!-- NAV -->
-<nav class="bottom-nav">
-  <button class="nav-btn active" onclick="showPage('home')" id="nav-home">
+<nav class="bottom-nav" role="navigation" aria-label="Hoofdnavigatie">
+  <button class="nav-btn active" onclick="showPage('home')" id="nav-home" aria-label="Feed">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Feed
   </button>
-  <button class="nav-btn" onclick="showPage('log')" id="nav-log">
+  <button class="nav-btn" onclick="showPage('log')" id="nav-log" aria-label="Sessie loggen">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Loggen
   </button>
-  <button class="nav-btn" onclick="showPage('stats')" id="nav-stats">
+  <button class="nav-btn" onclick="showPage('stats')" id="nav-stats" aria-label="Statistieken">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Stats
   </button>
-  <button class="nav-btn" onclick="showPage('goals')" id="nav-goals">
+  <button class="nav-btn" onclick="showPage('goals')" id="nav-goals" aria-label="Doelen">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Doelen
   </button>
-  <button class="nav-btn" onclick="showPage('projects')" id="nav-projects">
+  <button class="nav-btn" onclick="showPage('projects')" id="nav-projects" aria-label="Projecten">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>Project
   </button>
-  <button class="nav-btn" onclick="showPage('hang')" id="nav-hang">
+  <button class="nav-btn" onclick="showPage('hang')" id="nav-hang" aria-label="Hangboard">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Hang
   </button>
-  <button class="nav-btn" onclick="showPage('gyms')" id="nav-gyms">
+  <button class="nav-btn" onclick="showPage('gyms')" id="nav-gyms" aria-label="Gyms beheren">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/><line x1="9" y1="12" x2="15" y2="12"/></svg>Gyms
   </button>
-  <button class="nav-btn" onclick="showPage('coach')" id="nav-coach">
+  <button class="nav-btn" onclick="showPage('coach')" id="nav-coach" aria-label="Coach">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 1 0 0 10A5 5 0 0 0 12 2z"/><path d="M12 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z"/><path d="M17 8l2 2 4-4"/></svg>Coach
   </button>
 </nav>
@@ -1055,6 +1055,7 @@ select option{background:#1e1e1e}
 /* ══════════════════════════════════════════
    CONSTANTS
 ══════════════════════════════════════════ */
+const STAGGER_DELAY_S=0.04;
 const GRADES=['4','4+','5','5+','5a','5b','5c','6a','6a+','6b','6b+','6c','6c+','7a','7a+','7b','7b+','7c','7c+','8a','8a+','8b','8b+'];
 const GRADE_COLORS=['#9FE1CB','#5DCAA5','#1D9E75','#0F6E56','#7EC8A0','#50B090','#2A9480','#B5D4F4','#85B7EB','#378ADD','#185FA5','#CECBF6','#AFA9EC','#7F77DD','#534AB7','#F5C4B3','#F0997B','#D85A30','#993C1D','#F4C0D1','#ED93B1','#D4537E','#993356'];
 const TYPES=['Slab','Verticaal','Overhang','Cave','Dyno','Mantle','Pinch','Crimp','Sloper'];
@@ -1129,12 +1130,12 @@ function renderProfileScreen(){
       ${profiles.length>1?`<button class="btn-ps-delete" data-del-id="${p.id}" title="Profiel verwijderen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>`:''}
       <svg class="ps-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
     </div>`).join('');
-  list.addEventListener('click',function(e){
+  list.onclick=function(e){
     const delBtn=e.target.closest('[data-del-id]');
     if(delBtn){promptDeleteProfileById(delBtn.dataset.delId);return;}
     const card=e.target.closest('[data-profile-id]');
     if(card)selectProfile(card.dataset.profileId);
-  });
+  };
 }
 function showNewProfileForm(){
   document.getElementById('ps-new-form')?.remove();
@@ -1425,6 +1426,11 @@ function showPage(id){
     pendingNavTarget=id;showNavLeaveConfirm();return;
   }
   haptic();
+  // Stop hang-page timers when navigating away
+  if(id!=='hang'&&document.querySelector('.page.active')?.id==='page-hang'){
+    if(timerRunning){clearInterval(timerInterval);timerInterval=null;timerRunning=false;const tb=document.getElementById('btn-timer');if(tb){tb.textContent='Hervatten';tb.className='btn-timer-start';}}
+    if(restTimerRunning){clearInterval(restTimerInterval);restTimerInterval=null;restTimerRunning=false;const rb=document.getElementById('btn-rest-timer');if(rb){rb.textContent='▶ Start rust';rb.className='btn-rest-start';}}
+  }
   if(id!=='log'&&editMode){
     editMode=false;editSessionId=null;
     document.querySelector('#page-log .page-title').textContent='Nieuwe sessie';
@@ -1623,7 +1629,7 @@ function renderFeed(){
     lastBucket=bucket;
     if(item.type==='milestone'){
       const m=item.m;
-      return`${header}<div class="milestone-card" style="animation-delay:${cardIdx++*.04}s">
+      return`${header}<div class="milestone-card" style="animation-delay:${cardIdx++*STAGGER_DELAY_S}s">
         <div class="milestone-emoji">${m.emoji}</div>
         <div><div class="milestone-title">${esc(m.title)}</div><div class="milestone-sub">${esc(m.sub)}</div></div>
       </div>`;
@@ -1635,7 +1641,7 @@ function renderFeed(){
     const heat=s.routes.map(r=>{const gc=GRADE_COLORS[GRADES.indexOf(r.grade)]||'#555';return`<div class="heat-block" style="background:${gc}"></div>`;}).join('');
     const feelEmojis=['😓','😐','💪','🔥'];
     const feelStr=s.feel!=null?` · <span class="feed-feel">${feelEmojis[s.feel]}</span>`:'';
-    return`${header}<div class="activity-card" style="animation-delay:${idx*.04}s">
+    return`${header}<div class="activity-card" style="animation-delay:${idx*STAGGER_DELAY_S}s">
       <div class="activity-header">
         <div>
           <div class="activity-gym">${esc(s.gym||'Gym')}</div>
@@ -1758,7 +1764,16 @@ function addGym(){
   gyms.push({id:Date.now(),name,fav:gyms.length===0});saveGyms();inp.value='';renderGymsPage();refreshGymSelect();toast('Gym toegevoegd!')
 }
 function setFav(id){gyms.forEach(g=>g.fav=(g.id===id));saveGyms();renderGymsPage();refreshGymSelect()}
-function deleteGym(id){gyms=gyms.filter(g=>g.id!==id);if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms();renderGymsPage();refreshGymSelect()}
+function deleteGym(id){
+  const g=gyms.find(x=>x.id===id);if(!g)return;
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-gym-ov';
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Gym verwijderen?</div><div class="confirm-sub">${esc(g.name)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('del-gym-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDeleteGym(${id})">Verwijderen</button></div></div>`;
+  document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+function confirmDeleteGym(id){
+  document.getElementById('del-gym-ov')?.remove();
+  gyms=gyms.filter(g=>g.id!==id);if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms();renderGymsPage();refreshGymSelect();
+}
 function renderGymsPage(){
   const list=document.getElementById('gym-list');
   if(!gyms.length){list.innerHTML='<div class="empty-state" style="padding:30px 0"><div>Nog geen gyms — voeg er een toe hieronder.</div></div>';}
@@ -2223,6 +2238,13 @@ function saveHangSession(){
 }
 
 function deleteHangSession(id){
+  const s=hangSessions.find(x=>x.id===id);if(!s)return;
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-hang-ov';
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Hangsessie verwijderen?</div><div class="confirm-sub">${esc(fmtDate(s.date))} · ${s.sets.length} set${s.sets.length!==1?'s':''}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('del-hang-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDeleteHangSession(${id})">Verwijderen</button></div></div>`;
+  document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+function confirmDeleteHangSession(id){
+  document.getElementById('del-hang-ov')?.remove();
   hangSessions=hangSessions.filter(s=>s.id!==id);
   saveHang();renderHangPage();toast('Verwijderd','#e53935');
 }
@@ -2244,7 +2266,7 @@ function renderHangPage(){
   const feed=document.getElementById('hang-feed');
   if(!hangSessions.length){feed.innerHTML='<div class="empty-state"><div class="big">Nog geen hangsessies</div></div>';return}
   renderHangChart();
-  feed.innerHTML=[...hangSessions].reverse().map((s,i)=>`<div class="hang-card" style="animation-delay:${i*.05}s">
+  feed.innerHTML=[...hangSessions].reverse().map((s,i)=>`<div class="hang-card" style="animation-delay:${i*STAGGER_DELAY_S}s">
     <div class="hang-card-header">
       <div>
         <div class="hang-card-date">${fmtDate(s.date)}</div>
@@ -2689,7 +2711,7 @@ function renderProjects(){
       const badgeClass='s-'+sec.key;
       const badgeLabel=sec.key==='project'?'Project':sec.key==='completed'?'Voltooid':'Teruggetrokken';
       const gradeColor=GRADE_COLORS[GRADES.indexOf(p.grade)]||'var(--accent)';
-      html+=`<div class="project-card ${statusClass}" style="animation-delay:${i*.04}s">
+      html+=`<div class="project-card ${statusClass}" style="animation-delay:${i*STAGGER_DELAY_S}s">
         <div class="project-card-header">
           <div>
             <div class="project-grade" style="${statusClass==='project'?'color:'+gradeColor:''}">${esc(p.grade)}</div>
@@ -2953,6 +2975,13 @@ function addComp(){
 }
 
 function deleteComp(id){
+  const c=competitions.find(x=>x.id===id);if(!c)return;
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-comp-ov';
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Competitie verwijderen?</div><div class="confirm-sub">${esc(c.name)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('del-comp-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDeleteComp(${id})">Verwijderen</button></div></div>`;
+  document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+function confirmDeleteComp(id){
+  document.getElementById('del-comp-ov')?.remove();
   competitions=competitions.filter(c=>c.id!==id);
   saveCompetitions();renderCompSection();renderCompCountdown();
 }
@@ -3152,7 +3181,7 @@ function renderDagboek(){
   }
   el.innerHTML='<div style="padding-top:4px">'+withNotes.map((s,i)=>{
     const mg=maxGrade(s.routes);
-    return`<div class="dagboek-entry" style="animation-delay:${i*.04}s">
+    return`<div class="dagboek-entry" style="animation-delay:${i*STAGGER_DELAY_S}s">
       <div class="dagboek-date-lbl">${fmtDate(s.date)}</div>
       <div class="dagboek-gym">${esc(s.gym||'Sessie')}</div>
       <div class="dagboek-note">"${esc(s.note)}"</div>
@@ -3595,7 +3624,7 @@ function renderNudges(){
   const label=stale.length===1?'project mist jou':'projecten missen jou';
   el.innerHTML=`<div class="section-title" style="padding:16px 20px 8px">👻 ${stale.length} ${label}</div>`+
     stale.map((p,i)=>`
-    <div class="proj-nudge-card" style="animation-delay:${i*.05}s">
+    <div class="proj-nudge-card" style="animation-delay:${i*STAGGER_DELAY_S}s">
       <div style="font-size:22px;flex-shrink:0">🧗</div>
       <div style="flex:1;min-width:0">
         <div class="proj-nudge-name">${esc(p.grade)}${p.name?' · '+esc(p.name.slice(0,22)):''}</div>
