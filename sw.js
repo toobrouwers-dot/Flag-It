@@ -1,4 +1,4 @@
-const CACHE = 'flagit-v8';
+const CACHE = 'flagit-v9';
 const ASSETS = [
   './',
   './index.html',
@@ -24,8 +24,8 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Pass through non-GET and cross-origin requests (CDN fonts/Chart.js)
-  if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
+  // Pass through non-GET requests
+  if (e.request.method !== 'GET') return;
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
