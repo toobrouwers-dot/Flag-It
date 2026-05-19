@@ -135,6 +135,7 @@ select option{background:#1e1e1e}
 .route-num{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
 .route-summary{display:flex;align-items:center;gap:6px}
 .rs-grade{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700}
+.rs-attempts{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;color:var(--muted)}
 .rs-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .rc-right{display:flex;align-items:center;gap:8px}
 .route-chevron{color:var(--muted);transition:transform .2s;flex-shrink:0}
@@ -812,22 +813,6 @@ select option{background:#1e1e1e}
       <div style="display:flex;gap:8px;margin-bottom:12px">
         <button class="btn-add-route" style="flex:1;margin-bottom:0" onclick="addRouteCard(getSmartDefaultGrade())">+ Route toevoegen</button>
         <button onclick="openSetterModal()" style="padding:13px 16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:12px;color:var(--accent);font-family:'Barlow',sans-serif;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0" onmousedown="this.style.background='rgba(127,119,221,.08)'" onmouseup="this.style.background='none'">🏗️ Setter</button>
-      </div>
-    </div>
-    <div class="form-section">
-      <div class="form-section-title sess-hang-toggle" onclick="toggleSessHangSection()">Hangsets <span id="sess-hang-chevron">▶</span></div>
-      <div id="sess-hang-section" style="display:none">
-        <div class="chart-card" style="margin-bottom:12px">
-          <div class="timer-display" id="sess-hang-display">0:00</div>
-          <div class="timer-sub" id="sess-hang-sub">Druk start om te beginnen</div>
-          <div class="timer-btns">
-            <button class="btn-timer-start" id="sess-hang-btn" onclick="toggleSessHangTimer()">Start</button>
-            <button class="btn-timer-reset" onclick="resetSessHangTimer()">Reset</button>
-          </div>
-          <button class="btn-timer-use" id="sess-hang-use-btn" onclick="useSessHangTimer()"></button>
-        </div>
-        <div id="sess-hang-cards"></div>
-        <button class="btn-add-route" onclick="addSessHangCard()">+ Set toevoegen</button>
       </div>
     </div>
     <button class="btn-save" onclick="saveSession()">Sessie opslaan</button>
@@ -1822,6 +1807,7 @@ function getSmartDefaultGrade(){
 }
 function addRouteCard(grade='6a',attempts=1,result='poging',type=''){
   if(!editMode&&routeCount===0)startSessionTimer();
+  document.querySelectorAll('#route-cards .route-card.expanded').forEach(c=>c.classList.remove('expanded'));
   routeCount++;const id=routeCount;
   const div=document.createElement('div');div.className='route-card expanded';div.id='rc-'+id;
   div.innerHTML=`<div class="route-card-header" onclick="toggleRC(${id})">
@@ -1830,6 +1816,7 @@ function addRouteCard(grade='6a',attempts=1,result='poging',type=''){
       <div class="route-summary" id="rs-${id}">
         <div class="rs-dot" style="background:${getResultColor(result)}"></div>
         <div class="rs-grade">${grade}</div>
+        <div class="rs-attempts" id="rsa-${id}">${attempts > 1 ? `· ${attempts}×` : ''}</div>
       </div>
     </div>
     <div class="rc-right">
@@ -1854,7 +1841,7 @@ function addRouteCard(grade='6a',attempts=1,result='poging',type=''){
   haptic();updateSessStatsBar();
 }
 function toggleRC(id){document.getElementById('rc-'+id).classList.toggle('expanded')}
-function stepAttempts(id,delta){const el=document.getElementById('ra-'+id);if(!el)return;const v=Math.min(99,Math.max(1,(parseInt(el.textContent)||1)+delta));el.textContent=v;haptic();}
+function stepAttempts(id,delta){const el=document.getElementById('ra-'+id);if(!el)return;const v=Math.min(99,Math.max(1,(parseInt(el.textContent)||1)+delta));el.textContent=v;const rsa=document.getElementById('rsa-'+id);if(rsa)rsa.textContent=v>1?`· ${v}×`:'';haptic();}
 function updRS(id){const g=document.getElementById('rg-'+id).value,res=document.getElementById('rr-'+id).value,s=document.getElementById('rs-'+id);s.querySelector('.rs-grade').textContent=g;s.querySelector('.rs-dot').style.background=getResultColor(res);updateSessStatsBar();}
 function setResult(id,val,btn){
   const hidden=document.getElementById('rr-'+id);
@@ -1914,17 +1901,6 @@ function saveSession(){
   sessions.sort((a,b)=>a.date.localeCompare(b.date));
   save();
   const sessionDurSecs=sessionTimerStart?sessionTimerElapsed+Math.floor((Date.now()-sessionTimerStart)/1000):null;
-  // Sla inline hangsets op als gekoppelde hangsessie
-  const sessHangCardEls=document.querySelectorAll('#sess-hang-cards .hang-set-card');
-  if(sessHangCardEls.length){
-    const hsets=[];
-    sessHangCardEls.forEach(c=>{const hid=c.id.replace('ssh-','');hsets.push({grip:document.getElementById('hgrip-ssh-'+hid)?.value||'',time:parseInt(document.getElementById('htime-ssh-'+hid)?.value)||0,rest:parseInt(document.getElementById('hrest-ssh-'+hid)?.value)||0,reps:parseInt(document.getElementById('hreps-ssh-'+hid)?.value)||1,weight:parseFloat(document.getElementById('hwt-ssh-'+hid)?.value)||0});});
-    hangSessions.push({id:Date.now()+1,date,note:'Gekoppeld aan '+(gym||'sessie'),sets:hsets});
-    hangSessions.sort((a,b)=>a.date.localeCompare(b.date));
-    saveHang();
-  }
-  document.getElementById('sess-hang-cards').innerHTML='';
-  sessHangCount=0;resetSessHangTimer();
   document.getElementById('route-cards').innerHTML='';
   document.getElementById('inp-note').value='';
   routeCount=0;addRouteCard();
