@@ -155,6 +155,34 @@ select option{background:#1e1e1e}
 .result-btn.sel-flash{background:rgba(255,193,7,.2);border-color:var(--flash);color:var(--flash)}
 .result-btn.sel-poging{background:rgba(85,85,85,.3);border-color:#777;color:#ccc}
 
+/* HEADER RESULT BUTTONS */
+.rc-result-btns{display:flex;gap:4px}
+.rc-res-btn{padding:5px 10px;border-radius:7px;border:.5px solid var(--border);background:var(--surface2);color:var(--muted);font-family:'Barlow',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.rc-res-btn:active{opacity:.7}
+.rc-res-btn.sel-top{background:rgba(76,175,80,.2);border-color:var(--success);color:var(--success)}
+.rc-res-btn.sel-flash{background:rgba(255,193,7,.2);border-color:var(--flash);color:var(--flash)}
+
+/* ATTEMPTS STEPPER */
+.attempts-stepper{display:flex;align-items:center;gap:0;background:var(--surface);border:.5px solid var(--border);border-radius:10px;overflow:hidden}
+.stepper-btn{background:none;border:none;color:var(--text);font-size:20px;font-weight:300;padding:10px 18px;cursor:pointer;line-height:1;transition:background .1s;flex-shrink:0}
+.stepper-btn:active{background:rgba(255,255,255,.08)}
+.stepper-val{flex:1;text-align:center;font-family:'Barlow',sans-serif;font-size:15px;color:var(--text);padding:12px 0;min-width:32px}
+
+/* QUICK-TOP SHEET */
+.btn-quick-top{padding:13px 16px;background:rgba(76,175,80,.12);border:.5px solid rgba(76,175,80,.4);border-radius:12px;color:var(--success);font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s}
+.btn-quick-top:active{background:rgba(76,175,80,.22)}
+.quick-top-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-radius:24px 24px 0 0;border-top:.5px solid var(--border);padding:20px 24px calc(var(--safe-bot) + 90px);z-index:310;animation:sheetUp .3s cubic-bezier(.34,1.3,.64,1) both}
+.qt-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;text-transform:uppercase;margin-bottom:16px}
+.qt-grade-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:20px}
+.qt-grade-btn{padding:10px 4px;border-radius:9px;border:.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s}
+.qt-grade-btn.qt-sel{background:rgba(76,175,80,.2);border-color:var(--success);color:var(--success)}
+.qt-confirm{width:100%;padding:15px;background:var(--success);border:none;border-radius:13px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;text-transform:uppercase;cursor:pointer;transition:opacity .15s}
+.qt-confirm:active{opacity:.8}
+
+/* INLINE HANG SECTION */
+.sess-hang-toggle{cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:8px 0;user-select:none}
+.sess-hang-toggle:active{color:var(--accent)}
+
 .btn-add-route{width:100%;padding:13px;background:none;border:.5px dashed rgba(255,255,255,.2);border-radius:12px;color:var(--muted);font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer;margin-bottom:12px;transition:all .15s}
 .btn-add-route:active{background:var(--surface)}
 .sess-stats-bar{display:none;background:rgba(127,119,221,.08);border:.5px solid rgba(127,119,221,.2);border-radius:10px;padding:8px 14px;margin-bottom:10px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--accent2,#7f77dd);text-transform:uppercase;letter-spacing:.5px;text-align:center}
@@ -335,7 +363,7 @@ select option{background:#1e1e1e}
 .summary-handle{width:36px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:0 auto 20px}
 .summary-title{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;text-transform:uppercase;margin-bottom:4px}
 .summary-msg{font-size:13px;color:var(--muted);margin-bottom:20px}
-.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:8px;margin-bottom:16px}
 .summary-cell{background:var(--surface2);border-radius:12px;padding:14px 8px;text-align:center}
 .summary-num{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;line-height:1}
 .summary-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
@@ -784,6 +812,22 @@ select option{background:#1e1e1e}
       <div style="display:flex;gap:8px;margin-bottom:12px">
         <button class="btn-add-route" style="flex:1;margin-bottom:0" onclick="addRouteCard(getSmartDefaultGrade())">+ Route toevoegen</button>
         <button onclick="openSetterModal()" style="padding:13px 16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:12px;color:var(--accent);font-family:'Barlow',sans-serif;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0" onmousedown="this.style.background='rgba(127,119,221,.08)'" onmouseup="this.style.background='none'">🏗️ Setter</button>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title sess-hang-toggle" onclick="toggleSessHangSection()">Hangsets <span id="sess-hang-chevron">▶</span></div>
+      <div id="sess-hang-section" style="display:none">
+        <div class="chart-card" style="margin-bottom:12px">
+          <div class="timer-display" id="sess-hang-display">0:00</div>
+          <div class="timer-sub" id="sess-hang-sub">Druk start om te beginnen</div>
+          <div class="timer-btns">
+            <button class="btn-timer-start" id="sess-hang-btn" onclick="toggleSessHangTimer()">Start</button>
+            <button class="btn-timer-reset" onclick="resetSessHangTimer()">Reset</button>
+          </div>
+          <button class="btn-timer-use" id="sess-hang-use-btn" onclick="useSessHangTimer()"></button>
+        </div>
+        <div id="sess-hang-cards"></div>
+        <button class="btn-add-route" onclick="addSessHangCard()">+ Set toevoegen</button>
       </div>
     </div>
     <button class="btn-save" onclick="saveSession()">Sessie opslaan</button>
@@ -1623,7 +1667,8 @@ function renderFeed(){
   }).join('');
 }
 
-function showSessionSummary(routes,wasEdit){
+function fmtDur(secs){if(!secs||secs<60)return secs+'s';const h=Math.floor(secs/3600),m=Math.floor((secs%3600)/60);return h>0?h+'u '+m+'m':m+'m';}
+function showSessionSummary(routes,wasEdit,durSecs=null){
   const mg=maxGrade(routes);
   const flashes=routes.filter(r=>r.result==='flash').length;
   const success=routes.filter(r=>r.result!=='poging').length;
@@ -1640,6 +1685,7 @@ function showSessionSummary(routes,wasEdit){
       <div class="summary-cell"><div class="summary-num">${routes.length}</div><div class="summary-lbl">Routes</div></div>
       <div class="summary-cell"><div class="summary-num" style="color:var(--success)">${success}</div><div class="summary-lbl">Geslaagd</div></div>
       <div class="summary-cell"><div class="summary-num" style="color:var(--accent)">${mg?mg.grade:'—'}</div><div class="summary-lbl">Max graad</div></div>
+      ${durSecs?`<div class="summary-cell"><div class="summary-num">${fmtDur(durSecs)}</div><div class="summary-lbl">Duur</div></div>`:''}
     </div>
     ${flashes?`<div class="summary-flash">⚡ ${flashes} flash${flashes!==1?'es':''}!</div>`:''}
     <button class="summary-btn" onclick="this.closest('.summary-sheet').remove()">Top!</button>
@@ -1759,7 +1805,7 @@ function getSmartDefaultGrade(){
   if(sessions.length){const freq={};[...sessions].slice(-5).forEach(s=>s.routes.forEach(r=>{freq[r.grade]=(freq[r.grade]||0)+1}));const best=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];if(best)return best[0];}
   return'6a';
 }
-function addRouteCard(grade='6a',attempts=1,result='top',type=''){
+function addRouteCard(grade='6a',attempts=1,result='poging',type=''){
   if(!editMode&&routeCount===0)startSessionTimer();
   routeCount++;const id=routeCount;
   const div=document.createElement('div');div.className='route-card expanded';div.id='rc-'+id;
@@ -1772,6 +1818,10 @@ function addRouteCard(grade='6a',attempts=1,result='top',type=''){
       </div>
     </div>
     <div class="rc-right">
+      <div class="rc-result-btns" onclick="event.stopPropagation()">
+        <button class="rc-res-btn${result==='top'?' sel-top':''}" data-res="top" onclick="setResult(${id},'top',this)">Top</button>
+        <button class="rc-res-btn${result==='flash'?' sel-flash':''}" data-res="flash" onclick="setResult(${id},'flash',this)">Flash</button>
+      </div>
       <svg class="route-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="6 9 12 15 18 9"/></svg>
       <button class="btn-dup-route" onclick="event.stopPropagation();duplicateRouteCard(${id})" title="Dupliceer route">⧉</button>
       <button class="btn-remove-route" onclick="event.stopPropagation();removeRouteCard('rc-${id}')">×</button>
@@ -1781,14 +1831,7 @@ function addRouteCard(grade='6a',attempts=1,result='top',type=''){
     <div class="route-fields">
       <div class="field"><label>Graad</label><select id="rg-${id}" onchange="updRS(${id})">${GRADES.map(g=>`<option ${g===grade?'selected':''}>${g}</option>`).join('')}</select></div>
       <div class="field"><label>Type</label><select id="rt-${id}"><option value="">— type —</option>${TYPES.map(t=>`<option ${t===type?'selected':''}>${t}</option>`).join('')}</select></div>
-      <div class="field"><label>Pogingen</label><input type="number" id="ra-${id}" value="${attempts}" min="1" max="99"></div>
-      <div class="field full"><label>Resultaat</label>
-        <div class="result-toggle">
-          <button class="result-btn ${result==='top'?'sel-top':''}" onclick="setResult(${id},'top',this)">Top</button>
-          <button class="result-btn ${result==='flash'?'sel-flash':''}" onclick="setResult(${id},'flash',this)">Flash</button>
-          <button class="result-btn ${result==='poging'?'sel-poging':''}" onclick="setResult(${id},'poging',this)">Poging</button>
-        </div>
-      </div>
+      <div class="field"><label>Pogingen</label><div class="attempts-stepper"><button class="stepper-btn" onclick="event.stopPropagation();stepAttempts(${id},-1)">−</button><span class="stepper-val" id="ra-${id}">${attempts}</span><button class="stepper-btn" onclick="event.stopPropagation();stepAttempts(${id},1)">+</button></div></div>
     </div>
   </div>
   <input type="hidden" id="rr-${id}" value="${result}">`;
@@ -1796,13 +1839,21 @@ function addRouteCard(grade='6a',attempts=1,result='top',type=''){
   haptic();updateSessStatsBar();
 }
 function toggleRC(id){document.getElementById('rc-'+id).classList.toggle('expanded')}
+function stepAttempts(id,delta){const el=document.getElementById('ra-'+id);if(!el)return;const v=Math.min(99,Math.max(1,(parseInt(el.textContent)||1)+delta));el.textContent=v;haptic();}
 function updRS(id){const g=document.getElementById('rg-'+id).value,res=document.getElementById('rr-'+id).value,s=document.getElementById('rs-'+id);s.querySelector('.rs-grade').textContent=g;s.querySelector('.rs-dot').style.background=getResultColor(res);updateSessStatsBar();}
-function setResult(id,val,btn){document.getElementById('rr-'+id).value=val;btn.parentElement.querySelectorAll('.result-btn').forEach(b=>b.className='result-btn');btn.classList.add('sel-'+val);updRS(id)}
+function setResult(id,val,btn){
+  const hidden=document.getElementById('rr-'+id);
+  const curr=hidden.value;
+  const newVal=curr===val?'poging':val;
+  hidden.value=newVal;
+  document.querySelectorAll('#rc-'+id+' .rc-res-btn').forEach(b=>{b.className='rc-res-btn';if(b.dataset.res===newVal)b.classList.add('sel-'+newVal);});
+  updRS(id);haptic();
+}
 function removeRouteCard(elemId){document.getElementById(elemId)?.remove();updateSessStatsBar();}
 function duplicateRouteCard(id){
   const g=document.getElementById('rg-'+id)?.value||'6a';
   const t=document.getElementById('rt-'+id)?.value||'';
-  const a=parseInt(document.getElementById('ra-'+id)?.value)||1;
+  const a=parseInt(document.getElementById('ra-'+id)?.textContent)||1;
   const r=document.getElementById('rr-'+id)?.value||'top';
   addRouteCard(g,a,r,t);
 }
@@ -1827,7 +1878,7 @@ function saveSession(){
     routes.push({
       grade:document.getElementById('rg-'+id).value,
       type:document.getElementById('rt-'+id).value,
-      attempts:parseInt(document.getElementById('ra-'+id).value)||1,
+      attempts:parseInt(document.getElementById('ra-'+id).textContent)||1,
       result:document.getElementById('rr-'+id).value
     })
   });
@@ -1847,11 +1898,23 @@ function saveSession(){
   document.querySelector('#page-log .btn-save').textContent='Sessie opslaan';
   sessions.sort((a,b)=>a.date.localeCompare(b.date));
   save();
+  const sessionDurSecs=sessionTimerStart?sessionTimerElapsed+Math.floor((Date.now()-sessionTimerStart)/1000):null;
+  // Sla inline hangsets op als gekoppelde hangsessie
+  const sessHangCardEls=document.querySelectorAll('#sess-hang-cards .hang-set-card');
+  if(sessHangCardEls.length){
+    const hsets=[];
+    sessHangCardEls.forEach(c=>{const hid=c.id.replace('ssh-','');hsets.push({grip:document.getElementById('hgrip-ssh-'+hid)?.value||'',time:parseInt(document.getElementById('htime-ssh-'+hid)?.value)||0,rest:parseInt(document.getElementById('hrest-ssh-'+hid)?.value)||0,reps:parseInt(document.getElementById('hreps-ssh-'+hid)?.value)||1,weight:parseFloat(document.getElementById('hwt-ssh-'+hid)?.value)||0});});
+    hangSessions.push({id:Date.now()+1,date,note:'Gekoppeld aan '+(gym||'sessie'),sets:hsets});
+    hangSessions.sort((a,b)=>a.date.localeCompare(b.date));
+    saveHang();
+  }
+  document.getElementById('sess-hang-cards').innerHTML='';
+  sessHangCount=0;resetSessHangTimer();
   document.getElementById('route-cards').innerHTML='';
   document.getElementById('inp-note').value='';
   routeCount=0;addRouteCard();
   resetSessionTimer();
-  showPage('home');showSessionSummary(routes,wasEdit);
+  showPage('home');showSessionSummary(routes,wasEdit,sessionDurSecs);
 }
 
 /* ══════════════════════════════════════════
@@ -1936,6 +1999,95 @@ function renderGoals(){
      waardoor bouldering route cards ook mee werden
      gepakt. Nu filteren we op hang-set-card class.
 ══════════════════════════════════════════ */
+
+/* -- Quick Top -- */
+function openQuickTop(){
+  const overlay=document.createElement('div');
+  overlay.className='quick-top-sheet';
+  let selGrade=getSmartDefaultGrade();
+  overlay.innerHTML=`<div class="summary-handle"></div><div class="qt-title">Snel toppen ⚡</div><div class="qt-grade-grid">${GRADES.map(g=>`<button class="qt-grade-btn${g===selGrade?' qt-sel':''}" onclick="qtSel(this,'${g}')">${g}</button>`).join('')}</div><button class="qt-confirm" onclick="qtConfirm()">Toevoegen als Top</button>`;
+  overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove()});
+  document.body.appendChild(overlay);
+  overlay._grade=selGrade;
+}
+function qtSel(btn,grade){
+  btn.closest('.quick-top-sheet')._grade=grade;
+  btn.closest('.qt-grade-grid').querySelectorAll('.qt-grade-btn').forEach(b=>b.classList.remove('qt-sel'));
+  btn.classList.add('qt-sel');
+}
+function qtConfirm(){
+  const sheet=document.querySelector('.quick-top-sheet');
+  if(!sheet)return;
+  addRouteCard(sheet._grade,1,'top','');
+  sheet.remove();
+}
+
+/* -- Inline sessie hangsets -- */
+let sessHangCount=0,sessHangTimerSecs=0,sessHangTimerInterval=null,sessHangTimerRunning=false;
+function toggleSessHangSection(){
+  const sec=document.getElementById('sess-hang-section');
+  const chev=document.getElementById('sess-hang-chevron');
+  if(!sec)return;
+  const open=sec.style.display==='none'||sec.style.display==='';
+  sec.style.display=open?'block':'none';
+  if(chev)chev.textContent=open?'▼':'▶';
+}
+function addSessHangCard(){
+  sessHangCount++;const id=sessHangCount;
+  const div=document.createElement('div');
+  div.className='hang-set-card expanded';div.id='ssh-'+id;
+  div.innerHTML=`<div class="route-card-header" onclick="document.getElementById('ssh-${id}').classList.toggle('expanded')">
+    <div class="rc-left"><div class="route-num">Set ${id}</div><div class="route-summary"><div class="rs-grade" id="ssh-sg-${id}">Volgreep</div></div></div>
+    <div class="rc-right">
+      <svg class="route-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="6 9 12 15 18 9"/></svg>
+      <button class="btn-remove-route" onclick="event.stopPropagation();document.getElementById('ssh-${id}').remove()">×</button>
+    </div>
+  </div>
+  <div class="route-body"><div class="hang-set-fields">
+    <div class="field full"><label>Grip</label><select id="hgrip-ssh-${id}" onchange="document.getElementById('ssh-sg-${id}').textContent=this.value">${GRIPS.map(g=>`<option>${g}</option>`).join('')}</select></div>
+    <div class="field"><label>Hangtijd (sec)</label><input type="number" id="htime-ssh-${id}" value="10" min="1" max="999"></div>
+    <div class="field"><label>Rust (sec)</label><input type="number" id="hrest-ssh-${id}" value="60" min="0" max="999"></div>
+    <div class="field"><label>Herhalingen</label><input type="number" id="hreps-ssh-${id}" value="3" min="1" max="99"></div>
+    <div class="field"><label>Gewicht (kg extra)</label><input type="number" id="hwt-ssh-${id}" value="0" min="-99" max="200"></div>
+  </div></div>`;
+  document.getElementById('sess-hang-cards').appendChild(div);
+  haptic();
+}
+function toggleSessHangTimer(){
+  if(sessHangTimerRunning){
+    clearInterval(sessHangTimerInterval);sessHangTimerRunning=false;
+    document.getElementById('sess-hang-btn').textContent='Hervatten';
+    document.getElementById('sess-hang-btn').className='btn-timer-start';
+    document.getElementById('sess-hang-sub').textContent='Gepauzeerd op '+fmtSecs(sessHangTimerSecs);
+    updateSessHangUseBtn();
+  }else{
+    sessHangTimerInterval=setInterval(()=>{sessHangTimerSecs++;document.getElementById('sess-hang-display').textContent=fmtSecs(sessHangTimerSecs);document.getElementById('sess-hang-sub').textContent='Hangend...';updateSessHangUseBtn();},1000);
+    sessHangTimerRunning=true;
+    document.getElementById('sess-hang-btn').textContent='Stop';
+    document.getElementById('sess-hang-btn').className='btn-timer-start running';
+    document.getElementById('sess-hang-sub').textContent='Hangend...';
+  }
+}
+function resetSessHangTimer(){
+  clearInterval(sessHangTimerInterval);sessHangTimerRunning=false;sessHangTimerSecs=0;
+  const disp=document.getElementById('sess-hang-display');if(disp)disp.textContent='0:00';
+  const btn=document.getElementById('sess-hang-btn');if(btn){btn.textContent='Start';btn.className='btn-timer-start';}
+  const sub=document.getElementById('sess-hang-sub');if(sub)sub.textContent='Druk start om te beginnen';
+  updateSessHangUseBtn();
+}
+function updateSessHangUseBtn(){
+  const btn=document.getElementById('sess-hang-use-btn');if(!btn)return;
+  if(sessHangTimerSecs>0){btn.className='btn-timer-use visible';btn.textContent='Gebruik timer ('+fmtSecs(sessHangTimerSecs)+')';}
+  else btn.className='btn-timer-use';
+}
+function useSessHangTimer(){
+  const cards=document.querySelectorAll('#sess-hang-cards .hang-set-card');
+  if(!cards.length){toast('Voeg eerst een set toe','#e53935');return;}
+  const lastId=cards[cards.length-1].id.replace('ssh-','');
+  const inp=document.getElementById('htime-ssh-'+lastId);
+  if(inp){inp.value=sessHangTimerSecs;haptic();}
+  toast('Hangtijd ingevuld!','#e91e8c');
+}
 
 /* -- Timer -- */
 let timerSecs=0,timerInterval=null,timerRunning=false;
