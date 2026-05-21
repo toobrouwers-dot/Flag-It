@@ -10,8 +10,8 @@
    5. Set Site URL: Authentication → URL Configuration
    ============================================================ */
 
-const CLOUD_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-const CLOUD_KEY = 'YOUR_ANON_KEY';
+const CLOUD_URL = 'https://rnaykehkgfqqzhhumaub.supabase.co';
+const CLOUD_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuYXlrZWhrZ2ZxcXpoaHVtYXViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNTMyMzIsImV4cCI6MjA5NDkyOTIzMn0.8qV8ZzzZKD-kHWCygTjWAHg0Wn0vqz-zRrqrw8DSxf0';
 
 let _db = null;
 
