@@ -246,7 +246,9 @@ create policy "comments_delete" on public.comments for delete using (user_id = a
 -- ════════════════════════════════════════════════════════════
 
 create or replace function public.handle_updated_at()
-returns trigger language plpgsql as $$
+returns trigger language plpgsql
+set search_path = ''
+as $$
 begin new.updated_at = now(); return new; end; $$;
 
 create trigger sessions_updated_at  before update on public.sessions  for each row execute function public.handle_updated_at();
@@ -255,7 +257,9 @@ create trigger projects_updated_at  before update on public.projects  for each r
 
 -- Auto-create account row on signup (username defaults to first part of email)
 create or replace function public.handle_new_user()
-returns trigger language plpgsql security definer as $$
+returns trigger language plpgsql security definer
+set search_path = ''
+as $$
 declare
   base_username text;
   final_username text;
@@ -276,6 +280,9 @@ begin
   end loop;
   return new;
 end; $$;
+
+-- This function must only fire via the auth trigger, not be callable via the REST API.
+revoke execute on function public.handle_new_user() from anon, authenticated;
 
 create trigger on_auth_user_created
   after insert on auth.users
