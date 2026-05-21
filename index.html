@@ -897,7 +897,6 @@ select option{background:#1e1e1e}
   <div class="feed-toggle">
     <button class="feed-toggle-btn active" id="tab-feed" onclick="switchFeedTab('feed')">Sessies</button>
     <button class="feed-toggle-btn" id="tab-dagboek" onclick="switchFeedTab('dagboek')">Dagboek</button>
-    <button class="feed-toggle-btn" id="tab-social" onclick="switchFeedTab('social')">Vrienden</button>
   </div>
   <div id="feed-tab-feed">
     <div id="filter-bar" class="filter-bar">
@@ -911,15 +910,6 @@ select option{background:#1e1e1e}
   </div>
   <div id="feed-tab-dagboek" style="display:none">
     <div id="dagboek-feed"></div>
-  </div>
-  <div id="feed-tab-social" style="display:none">
-    <div style="padding:16px 20px 0;display:flex;gap:8px;align-items:center">
-      <input id="user-search-input" class="form-input" placeholder="🔍 Zoek klimmer..." oninput="renderUserSearch()" style="flex:1;font-size:14px">
-    </div>
-    <div id="user-search-results" style="padding:0 20px"></div>
-    <div id="social-feed"></div>
-    <div class="section-title" style="margin-top:8px">Ranglijst (90 dagen)</div>
-    <div id="leaderboard-list"></div>
   </div>
 </div>
 
@@ -1000,43 +990,57 @@ select option{background:#1e1e1e}
 
 <!-- GOALS — één gemengde lijst -->
 <div id="page-goals" class="page">
-  <div class="page-header"><div class="page-title">Doelen</div></div>
-  <div class="goals-content">
+  <div class="page-header"><div class="page-title">Doelen & Projecten</div></div>
+  <div class="feed-toggle">
+    <button class="feed-toggle-btn active" id="tab-doelen-goals" onclick="switchDoelenTab('goals')">Doelen</button>
+    <button class="feed-toggle-btn" id="tab-doelen-projects" onclick="switchDoelenTab('projects')">Projecten</button>
+  </div>
 
-    <!-- Gemengde lijst -->
-    <div id="goals-list-all"></div>
+  <div id="doelen-tab-goals">
+    <div class="goals-content">
 
-    <!-- Graad doel toevoegen -->
-    <div class="goal-section-header">🧗 Graad-doel toevoegen</div>
-    <div class="add-goal-form">
-      <div class="add-goal-grid">
-        <div class="field"><label>Graad</label><select id="gg-grade"></select></div>
-        <div class="field"><label>Resultaat</label><select id="gg-result"><option value="top">Top</option><option value="flash">Flash</option></select></div>
-        <div class="field full"><label>Deadline (optioneel)</label><input type="date" id="gg-deadline"></div>
+      <!-- Gemengde lijst -->
+      <div id="goals-list-all"></div>
+
+      <!-- Graad doel toevoegen -->
+      <div class="goal-section-header">🧗 Graad-doel toevoegen</div>
+      <div class="add-goal-form">
+        <div class="add-goal-grid">
+          <div class="field"><label>Graad</label><select id="gg-grade"></select></div>
+          <div class="field"><label>Resultaat</label><select id="gg-result"><option value="top">Top</option><option value="flash">Flash</option></select></div>
+          <div class="field full"><label>Deadline (optioneel)</label><input type="date" id="gg-deadline"></div>
+        </div>
+        <button class="btn-add-goal" onclick="addGradeGoal()">Toevoegen</button>
       </div>
-      <button class="btn-add-goal" onclick="addGradeGoal()">Toevoegen</button>
-    </div>
 
-    <!-- Herhaling doel toevoegen -->
-    <div class="goal-section-header">📊 Herhaling-doel toevoegen</div>
-    <div class="add-goal-form">
-      <div class="add-goal-grid">
-        <div class="field"><label>Graad</label><select id="gc-grade"></select></div>
-        <div class="field"><label>Resultaat</label><select id="gc-result"><option value="top">Top</option><option value="flash">Flash</option></select></div>
-        <div class="field"><label>Aantal keer</label><input type="number" id="gc-count" value="5" min="1" max="999"></div>
-        <div class="field"><label>Deadline (optioneel)</label><input type="date" id="gc-deadline"></div>
+      <!-- Herhaling doel toevoegen -->
+      <div class="goal-section-header">📊 Herhaling-doel toevoegen</div>
+      <div class="add-goal-form">
+        <div class="add-goal-grid">
+          <div class="field"><label>Graad</label><select id="gc-grade"></select></div>
+          <div class="field"><label>Resultaat</label><select id="gc-result"><option value="top">Top</option><option value="flash">Flash</option></select></div>
+          <div class="field"><label>Aantal keer</label><input type="number" id="gc-count" value="5" min="1" max="999"></div>
+          <div class="field"><label>Deadline (optioneel)</label><input type="date" id="gc-deadline"></div>
+        </div>
+        <button class="btn-add-goal count-btn" onclick="addCountGoal()">Toevoegen</button>
       </div>
-      <button class="btn-add-goal count-btn" onclick="addCountGoal()">Toevoegen</button>
+
+      <!-- Trainingsplan -->
+      <div class="goal-section-header">📋 Trainingsplan</div>
+      <div id="plan-section"></div>
+
+      <!-- Competities -->
+      <div class="goal-section-header">🏆 Competities</div>
+      <div id="comp-section"></div>
+
     </div>
+  </div>
 
-    <!-- Trainingsplan -->
-    <div class="goal-section-header">📋 Trainingsplan</div>
-    <div id="plan-section"></div>
-
-    <!-- Competities -->
-    <div class="goal-section-header">🏆 Competities</div>
-    <div id="comp-section"></div>
-
+  <div id="doelen-tab-projects" style="display:none">
+    <div class="projects-content">
+      <div id="projects-list"></div>
+      <button class="btn-add-project" onclick="openProjectModal()">+ Project toevoegen</button>
+    </div>
   </div>
 </div>
 
@@ -1138,12 +1142,26 @@ select option{background:#1e1e1e}
   </div>
 </div>
 
-<!-- PROJECTS -->
-<div id="page-projects" class="page">
-  <div class="page-header"><div class="page-title">Projecten</div><div class="page-sub">Routes die je aan het werken bent</div></div>
-  <div class="projects-content">
-    <div id="projects-list"></div>
-    <button class="btn-add-project" onclick="openProjectModal()">+ Project toevoegen</button>
+<!-- SOCIAAL -->
+<div id="page-sociaal" class="page">
+  <div class="page-header"><div class="page-title">Sociaal</div><div class="page-sub">Vrienden, ranglijst &amp; zoeken</div></div>
+  <div class="feed-toggle">
+    <button class="feed-toggle-btn active" id="tab-sociaal-feed" onclick="switchSociaalTab('feed')">Feed</button>
+    <button class="feed-toggle-btn" id="tab-sociaal-search" onclick="switchSociaalTab('search')">Zoeken</button>
+    <button class="feed-toggle-btn" id="tab-sociaal-lb" onclick="switchSociaalTab('lb')">Ranglijst</button>
+  </div>
+  <div id="sociaal-tab-feed">
+    <div id="social-feed"></div>
+  </div>
+  <div id="sociaal-tab-search" style="display:none">
+    <div style="padding:16px 20px 0">
+      <input id="user-search-input" class="form-input" placeholder="🔍 Zoek klimmer..." oninput="renderUserSearch()" style="font-size:14px;width:100%;box-sizing:border-box">
+    </div>
+    <div id="user-search-results" style="padding:0 20px"></div>
+  </div>
+  <div id="sociaal-tab-lb" style="display:none">
+    <div class="section-title" style="padding-top:12px">Ranglijst (90 dagen)</div>
+    <div id="leaderboard-list"></div>
   </div>
 </div>
 
@@ -1164,17 +1182,17 @@ select option{background:#1e1e1e}
   <button class="nav-btn" onclick="showPage('stats')" id="nav-stats" aria-label="Statistieken">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Stats
   </button>
-  <button class="nav-btn" onclick="showPage('goals')" id="nav-goals" aria-label="Doelen">
+  <button class="nav-btn" onclick="showPage('goals')" id="nav-goals" aria-label="Doelen &amp; Projecten">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Doelen
-  </button>
-  <button class="nav-btn" onclick="showPage('projects')" id="nav-projects" aria-label="Projecten">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>Project
   </button>
   <button class="nav-btn" onclick="showPage('hang')" id="nav-hang" aria-label="Hangboard">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Hang
   </button>
   <button class="nav-btn" onclick="showPage('gyms')" id="nav-gyms" aria-label="Gyms beheren">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/><line x1="9" y1="12" x2="15" y2="12"/></svg>Gyms
+  </button>
+  <button class="nav-btn" onclick="showPage('sociaal')" id="nav-sociaal" aria-label="Sociaal">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Sociaal
   </button>
   <button class="nav-btn" onclick="showPage('coach')" id="nav-coach" aria-label="Coach">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 1 0 0 10A5 5 0 0 0 12 2z"/><path d="M12 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z"/><path d="M17 8l2 2 4-4"/></svg>Coach
@@ -1206,6 +1224,8 @@ let setterHolds=[],setterActiveHoldType='hand',setterAngle='Verticaal',setterCol
 let pendingSetterData=null;
 let activePlan=null;
 let feedTab='feed';
+let doelenTab='goals';
+let sociaalTab='feed';
 let chartP=null,chartG=null,chartH=null,tliChart=null,stokeRadarChart=null;
 let routeCount=0,hangSetCount=0;
 let editMode=false,editSessionId=null;
@@ -1570,13 +1590,13 @@ function calcStreak(){
 /* ══════════════════════════════════════════
    NAVIGATION
 ══════════════════════════════════════════ */
-const PAGE_ORDER=['home','log','stats','goals','projects','hang','gyms','coach'];
+const PAGE_ORDER=['home','log','stats','goals','hang','gyms','sociaal','coach'];
 
 function _doPageRender(id){
   if(id==='home')renderFeed();
   if(id==='stats')renderStats();
-  if(id==='goals')renderGoals();
-  if(id==='projects')renderProjects();
+  if(id==='goals'){renderGoals();if(doelenTab==='projects')renderProjects();}
+  if(id==='sociaal')renderSociaalPage();
   if(id==='hang')renderHangPage();
   if(id==='gyms'){renderGymsPage();renderProfileMgmt();}
   if(id==='log'){refreshGymSelect();refreshNotePlaceholder();}
@@ -3483,12 +3503,37 @@ function switchFeedTab(tab){
   feedTab=tab;
   document.getElementById('tab-feed').className='feed-toggle-btn'+(tab==='feed'?' active':'');
   document.getElementById('tab-dagboek').className='feed-toggle-btn'+(tab==='dagboek'?' active':'');
-  document.getElementById('tab-social').className='feed-toggle-btn'+(tab==='social'?' active':'');
   document.getElementById('feed-tab-feed').style.display=tab==='feed'?'':'none';
   document.getElementById('feed-tab-dagboek').style.display=tab==='dagboek'?'':'none';
-  document.getElementById('feed-tab-social').style.display=tab==='social'?'':'none';
   if(tab==='dagboek')renderDagboek();
-  if(tab==='social'&&typeof renderSocialFeed==='function'){renderSocialFeed();renderLeaderboard();}
+}
+
+function switchDoelenTab(tab){
+  doelenTab=tab;
+  document.getElementById('tab-doelen-goals').className='feed-toggle-btn'+(tab==='goals'?' active':'');
+  document.getElementById('tab-doelen-projects').className='feed-toggle-btn'+(tab==='projects'?' active':'');
+  document.getElementById('doelen-tab-goals').style.display=tab==='goals'?'':'none';
+  document.getElementById('doelen-tab-projects').style.display=tab==='projects'?'':'none';
+  if(tab==='goals')renderGoals();
+  if(tab==='projects')renderProjects();
+}
+
+function switchSociaalTab(tab){
+  sociaalTab=tab;
+  document.getElementById('tab-sociaal-feed').className='feed-toggle-btn'+(tab==='feed'?' active':'');
+  document.getElementById('tab-sociaal-search').className='feed-toggle-btn'+(tab==='search'?' active':'');
+  document.getElementById('tab-sociaal-lb').className='feed-toggle-btn'+(tab==='lb'?' active':'');
+  document.getElementById('sociaal-tab-feed').style.display=tab==='feed'?'':'none';
+  document.getElementById('sociaal-tab-search').style.display=tab==='search'?'':'none';
+  document.getElementById('sociaal-tab-lb').style.display=tab==='lb'?'':'none';
+  if(tab==='feed'&&typeof renderSocialFeed==='function')renderSocialFeed();
+  if(tab==='lb'&&typeof renderLeaderboard==='function')renderLeaderboard();
+  if(tab==='search'){const inp=document.getElementById('user-search-input');if(inp)setTimeout(()=>inp.focus(),100);}
+}
+
+function renderSociaalPage(){
+  if(sociaalTab==='feed'&&typeof renderSocialFeed==='function')renderSocialFeed();
+  if(sociaalTab==='lb'&&typeof renderLeaderboard==='function')renderLeaderboard();
 }
 
 function renderDagboek(){
@@ -3951,7 +3996,7 @@ function renderNudges(){
         <div class="proj-nudge-name">${esc(p.grade)}${p.name?' · '+esc(p.name.slice(0,22)):''}</div>
         <div class="proj-nudge-sub">${p.daysSince} dagen geen pogingen${p.gym?' @ '+esc(p.gym):''}</div>
       </div>
-      <button class="proj-nudge-go" onclick="showPage('projects')">Aanpakken →</button>
+      <button class="proj-nudge-go" onclick="switchDoelenTab('projects');showPage('goals')">Aanpakken →</button>
     </div>`).join('');
 }
 
@@ -4453,6 +4498,8 @@ function initApp(profileId){
   gymResets=loadArr(RSTK);
   try{const _p=localStorage.getItem(PLK);activePlan=_p&&_p!=='null'?JSON.parse(_p):null;}catch(e){activePlan=null;}
   feedTab='feed';
+  doelenTab='goals';
+  sociaalTab='feed';
 
   // Migrate gyms without id
   let _gymsMigrated=false;
