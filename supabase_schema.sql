@@ -281,6 +281,9 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
+-- Revoke direct REST API access to trigger-only functions
+revoke execute on function public.handle_new_user() from anon, authenticated;
+
 -- ════════════════════════════════════════════════════════════
 -- INDEXES
 -- ════════════════════════════════════════════════════════════
