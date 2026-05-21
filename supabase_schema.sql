@@ -282,7 +282,8 @@ begin
 end; $$;
 
 -- This function must only fire via the auth trigger, not be callable via the REST API.
-revoke execute on function public.handle_new_user() from anon, authenticated;
+-- Revoke from PUBLIC (the default grantee) to close the /rpc/handle_new_user endpoint.
+revoke execute on function public.handle_new_user() from public;
 
 create trigger on_auth_user_created
   after insert on auth.users
