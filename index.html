@@ -735,6 +735,98 @@ select option{background:#1e1e1e}
 .shake-burst-text{font-family:'Barlow Condensed',sans-serif;font-size:62px;font-weight:800;color:#fff;text-transform:uppercase;text-shadow:0 0 30px var(--accent),0 0 80px rgba(127,119,221,.7);animation:shakePop .5s cubic-bezier(.34,1.56,.64,1) both;letter-spacing:3px;text-align:center;line-height:1.1}
 .shake-burst-sub{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:1.5px;animation:shakePop .5s .1s cubic-bezier(.34,1.56,.64,1) both;margin-top:8px}
 @keyframes shakePop{from{opacity:0;transform:scale(.3) rotate(-15deg)}to{opacity:1;transform:none}}
+
+/* ── CLOUD SYNC DOT ──────────────────────────────────── */
+.cloud-sync-dot{width:8px;height:8px;border-radius:50%;background:var(--border);display:inline-block;margin-left:6px;vertical-align:middle;transition:background .3s;flex-shrink:0}
+.cloud-sync-dot[data-status=idle]{background:var(--success)}
+.cloud-sync-dot[data-status=syncing]{background:var(--accent);animation:syncPulse 1s ease-in-out infinite}
+.cloud-sync-dot[data-status=error]{background:var(--danger)}
+.cloud-sync-dot[data-status=offline]{background:var(--muted)}
+@keyframes syncPulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── CLOUD AUTH BADGE ────────────────────────────────── */
+.cloud-badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:4px 10px;border-radius:20px;cursor:pointer;white-space:nowrap}
+.cloud-badge-in{background:rgba(127,119,221,.15);color:var(--accent);border:.5px solid rgba(127,119,221,.4)}
+.cloud-badge-out{background:rgba(255,255,255,.06);color:var(--muted);border:.5px solid var(--border)}
+.cloud-badge-off{background:rgba(255,255,255,.04);color:var(--muted);border:.5px solid var(--border);cursor:default;font-size:10px}
+
+/* ── AUTH SCREEN ─────────────────────────────────────── */
+#auth-screen{position:fixed;inset:0;background:var(--bg);z-index:700;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;opacity:0;transform:scale(.97);transition:opacity .3s ease,transform .3s ease;pointer-events:none}
+#auth-screen.auth-visible{opacity:1;transform:scale(1);pointer-events:auto}
+#auth-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 100% 40% at 50% 0%,rgba(127,119,221,.2) 0%,transparent 65%);pointer-events:none}
+.auth-inner{width:100%;max-width:380px;padding:calc(env(safe-area-inset-top,0px)+40px) 24px calc(env(safe-area-inset-bottom,0px)+32px);position:relative}
+.auth-logo-wrap{text-align:center;margin-bottom:24px}
+.auth-logo{width:56px;height:56px;border-radius:14px;margin-bottom:10px}
+.auth-title{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.auth-title span{color:var(--accent)}
+.auth-sub{font-size:14px;color:var(--muted);margin-top:4px}
+.auth-tabs{display:flex;background:var(--surface);border-radius:12px;padding:3px;margin-bottom:20px}
+.auth-tab{flex:1;padding:10px;background:none;border:none;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);cursor:pointer;transition:background .2s,color .2s}
+.auth-tab.active{background:var(--surface2);color:var(--text)}
+.auth-input{width:100%;background:var(--surface);border:.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:14px 16px;margin-bottom:10px;outline:none;transition:border-color .2s;display:block}
+.auth-input:focus{border-color:var(--accent)}
+.auth-btn-primary{width:100%;padding:15px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:opacity .15s;margin-top:4px}
+.auth-btn-primary:active{opacity:.85}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--muted);font-size:13px}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:.5px;background:var(--border)}
+.auth-btn-google{width:100%;padding:13px;background:var(--surface);border:.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .2s}
+.auth-btn-google:active{background:var(--surface2)}
+.auth-msg{font-size:13px;text-align:center;margin-top:12px;min-height:20px;display:none}
+.auth-skip{display:block;width:100%;padding:14px;background:none;border:none;color:var(--muted);font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer;text-align:center;margin-top:16px}
+.auth-skip:active{color:var(--text)}
+
+/* ── SOCIAL FEED ─────────────────────────────────────── */
+.social-card{margin:0 16px 12px;background:var(--surface);border-radius:16px;border:.5px solid var(--border);overflow:hidden;animation:slideUp .3s ease both}
+.social-card-head{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
+.social-avatar{font-size:26px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--surface2);border-radius:50%;flex-shrink:0}
+.social-user-info{flex:1;min-width:0}
+.social-username{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.social-meta{font-size:12px;color:var(--muted)}
+.social-max-grade{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:var(--accent);line-height:1}
+.social-heat-row{display:flex;flex-wrap:wrap;gap:3px;padding:0 14px 8px}
+.social-heat-block{width:10px;height:10px;border-radius:2px}
+.social-note{padding:0 14px 8px;font-size:12px;color:var(--muted);font-style:italic}
+.social-footer{display:flex;align-items:center;gap:8px;padding:8px 14px 12px;border-top:.5px solid var(--border)}
+.social-kudos-btn{display:flex;align-items:center;gap:5px;background:var(--surface2);border:.5px solid var(--border);border-radius:20px;color:var(--text);font-size:13px;font-weight:600;padding:6px 12px;cursor:pointer;transition:background .2s,border-color .2s}
+.social-kudos-btn.kudos-active{background:rgba(127,119,221,.2);border-color:rgba(127,119,221,.5);color:var(--accent)}
+.kudos-n{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700}
+.social-comment-btn,.social-profile-btn{background:var(--surface2);border:.5px solid var(--border);border-radius:20px;color:var(--muted);font-size:12px;padding:6px 10px;cursor:pointer;font-family:'Barlow',sans-serif}
+.social-profile-btn{flex:1;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}
+.social-empty{padding:48px 20px;text-align:center}
+.social-empty-icon{font-size:36px;margin-bottom:10px}
+.social-empty-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;margin-bottom:6px}
+.social-empty-sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.social-empty-btn{background:var(--accent);border:none;border-radius:12px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;padding:12px 28px;cursor:pointer}
+
+/* ── COMMENTS ────────────────────────────────────────── */
+.comment-row{display:flex;gap:10px;padding:10px 0;border-bottom:.5px solid var(--border)}
+.comment-avatar{font-size:20px;flex-shrink:0;margin-top:2px}
+.comment-user{font-size:13px;font-weight:600;margin-bottom:2px}
+.comment-text{font-size:13px;color:var(--muted);line-height:1.4}
+.comment-input-row{display:flex;gap:8px;padding-top:10px}
+
+/* ── LEADERBOARD ─────────────────────────────────────── */
+.lb-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:.5px solid var(--border);cursor:pointer;transition:background .15s}
+.lb-row:active{background:var(--surface2)}
+.lb-rank{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;width:28px;text-align:center;flex-shrink:0}
+.lb-avatar{font-size:22px;flex-shrink:0}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-sub{font-size:11px;color:var(--muted)}
+.lb-grade{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;flex-shrink:0}
+
+/* ── USER SEARCH + FOLLOW ────────────────────────────── */
+.user-result{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid var(--border)}
+.user-result-avatar{font-size:24px;flex-shrink:0}
+.user-result-info{flex:1;min-width:0}
+.user-result-name{font-size:14px;font-weight:600}
+.user-result-sub{font-size:12px;color:var(--muted)}
+.btn-follow{background:var(--accent);border:none;border-radius:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:background .2s,color .2s;flex-shrink:0}
+.btn-following{background:var(--surface2);color:var(--muted);border:.5px solid var(--border)}
+
+/* ── PUBLIC TOGGLE ON SESSION CARD ──────────────────── */
+.session-public-toggle{background:none;border:.5px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;font-family:'Barlow',sans-serif;padding:3px 8px;cursor:pointer;transition:background .2s,color .2s;display:inline-flex;align-items:center;gap:4px}
+.session-public-toggle.is-public{color:var(--accent);border-color:rgba(127,119,221,.4);background:rgba(127,119,221,.08)}
 </style>
 </head>
 <body>
@@ -772,7 +864,13 @@ select option{background:#1e1e1e}
 <!-- HOME -->
 <div id="page-home" class="page active">
   <div class="hero-stats">
-    <div class="hero-greeting">Jouw stats</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+      <div class="hero-greeting">Jouw stats</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div id="cloud-auth-badge"></div>
+        <div id="cloud-sync-dot" class="cloud-sync-dot" title="Sync status"></div>
+      </div>
+    </div>
     <div class="hero-name"><span id="hero-profile-name">Flag it</span><img src="./icons/icon-192.png" alt="" class="hero-logo"></div>
     <div class="stats-row">
       <div class="stat-box"><div class="stat-num" id="hs-sessions">0</div><div class="stat-label">Sessies</div></div>
@@ -789,6 +887,7 @@ select option{background:#1e1e1e}
   <div class="feed-toggle">
     <button class="feed-toggle-btn active" id="tab-feed" onclick="switchFeedTab('feed')">Sessies</button>
     <button class="feed-toggle-btn" id="tab-dagboek" onclick="switchFeedTab('dagboek')">Dagboek</button>
+    <button class="feed-toggle-btn" id="tab-social" onclick="switchFeedTab('social')">Vrienden</button>
   </div>
   <div id="feed-tab-feed">
     <div id="filter-bar" class="filter-bar">
@@ -802,6 +901,15 @@ select option{background:#1e1e1e}
   </div>
   <div id="feed-tab-dagboek" style="display:none">
     <div id="dagboek-feed"></div>
+  </div>
+  <div id="feed-tab-social" style="display:none">
+    <div style="padding:16px 20px 0;display:flex;gap:8px;align-items:center">
+      <input id="user-search-input" class="form-input" placeholder="🔍 Zoek klimmer..." oninput="renderUserSearch()" style="flex:1;font-size:14px">
+    </div>
+    <div id="user-search-results" style="padding:0 20px"></div>
+    <div id="social-feed"></div>
+    <div class="section-title" style="margin-top:8px">Ranglijst (90 dagen)</div>
+    <div id="leaderboard-list"></div>
   </div>
 </div>
 
@@ -1065,6 +1173,9 @@ select option{background:#1e1e1e}
 
 <div class="toast" id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="cloud.js"></script>
+<script src="social.js"></script>
 <script>
 /* ══════════════════════════════════════════
    CONSTANTS
@@ -1364,27 +1475,40 @@ let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flag
 function save(){
   try{localStorage.setItem(SK,JSON.stringify(sessions))}
   catch(e){toast('Opslaan mislukt','#e53935')}
+  if(typeof cloudMarkDirty==='function'){cloudMarkDirty('sessions',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveGyms(){
   try{localStorage.setItem(GYK,JSON.stringify(gyms))}catch(e){}
+  if(typeof cloudMarkDirty==='function'){cloudMarkDirty('gyms',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveGoals(){
   try{localStorage.setItem(GOK,JSON.stringify(goals))}catch(e){}
+  if(typeof cloudMarkDirty==='function'){cloudMarkDirty('goals',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveHang(){
   try{localStorage.setItem(HSK,JSON.stringify(hangSessions))}
   catch(e){toast('Opslaan mislukt','#e53935')}
+  if(typeof cloudMarkDirty==='function'){cloudMarkDirty('hang_sessions',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveInjuries(){
   try{localStorage.setItem(IJK,JSON.stringify(injuries))}catch(e){}
+  if(typeof cloudMarkDirty==='function'){cloudMarkDirty('injuries',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveActivePlan(){
   try{localStorage.setItem(PLK,activePlan?JSON.stringify(activePlan):'null')}catch(e){}
+  if(typeof cloudMarkDirty==='function'){cloudMarkDirty('active_plans',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
-function saveCompetitions(){try{localStorage.setItem(CMPK,JSON.stringify(competitions))}catch(e){}}
-function saveResets(){try{localStorage.setItem(RSTK,JSON.stringify(gymResets))}catch(e){}}
+function saveCompetitions(){
+  try{localStorage.setItem(CMPK,JSON.stringify(competitions))}catch(e){}
+  if(typeof cloudMarkDirty==='function'){cloudMarkDirty('competitions',activeProfileId);cloudScheduleSync(activeProfileId);}
+}
+function saveResets(){
+  try{localStorage.setItem(RSTK,JSON.stringify(gymResets))}catch(e){}
+  if(typeof cloudMarkDirty==='function'){cloudMarkDirty('gym_resets',activeProfileId);cloudScheduleSync(activeProfileId);}
+}
 function saveProjects(){
   try{localStorage.setItem(PRK,JSON.stringify(projects))}catch(e){}
+  if(typeof cloudMarkDirty==='function'){cloudMarkDirty('projects',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function loadArr(k,fb){
   try{
@@ -1852,6 +1976,14 @@ function renderFeed(){
       </div>
       <div class="activity-routes">${chips}</div>
       <div class="heat-bar">${heat}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 12px 8px">
+        <button class="session-public-toggle${s.is_public?' is-public':''}"
+          onclick="typeof setSessionPublic==='function'&&setSessionPublic(${s.id},${!s.is_public})"
+          title="${s.is_public?'Openbaar — tik om privé te maken':'Privé — tik om te delen'}">
+          ${s.is_public?'🌐 Openbaar':'🔒 Privé'}
+        </button>
+        ${s._cid?`<button class="social-kudos-btn" id="kudos-sess-${s.id}" style="font-size:12px;padding:4px 10px" onclick="typeof toggleKudos==='function'&&toggleKudos('${s._cid}',this)">🤜 <span class="kudos-n">…</span></button>`:''}
+      </div>
     </div>`;
   }).join('');
 }
@@ -3339,9 +3471,12 @@ function switchFeedTab(tab){
   feedTab=tab;
   document.getElementById('tab-feed').className='feed-toggle-btn'+(tab==='feed'?' active':'');
   document.getElementById('tab-dagboek').className='feed-toggle-btn'+(tab==='dagboek'?' active':'');
+  document.getElementById('tab-social').className='feed-toggle-btn'+(tab==='social'?' active':'');
   document.getElementById('feed-tab-feed').style.display=tab==='feed'?'':'none';
   document.getElementById('feed-tab-dagboek').style.display=tab==='dagboek'?'':'none';
+  document.getElementById('feed-tab-social').style.display=tab==='social'?'':'none';
   if(tab==='dagboek')renderDagboek();
+  if(tab==='social'&&typeof renderSocialFeed==='function'){renderSocialFeed();renderLeaderboard();}
 }
 
 function renderDagboek(){
@@ -4361,6 +4496,25 @@ function initApp(profileId){
     initSwipeNav();
     initPullToRefresh();
     initInstallPrompt();
+    if(typeof cloudInitAuthListener==='function')cloudInitAuthListener();
+  }
+
+  // Register cloud callbacks so cloudSync can write back to locals + localStorage
+  if(typeof cloudMarkDirty==='function'){
+    window._cloudData=()=>({sessions,gyms,goals,hangSessions,projects,injuries,competitions,gymResets,activePlan});
+    window._cloudCallbacks={
+      sessions:    d=>{sessions=d;try{localStorage.setItem(SK,JSON.stringify(d))}catch(e){}},
+      gyms:        d=>{gyms=d;try{localStorage.setItem(GYK,JSON.stringify(d))}catch(e){}},
+      goals:       d=>{goals=d;try{localStorage.setItem(GOK,JSON.stringify(d))}catch(e){}},
+      hangSessions:d=>{hangSessions=d;try{localStorage.setItem(HSK,JSON.stringify(d))}catch(e){}},
+      projects:    d=>{projects=d;try{localStorage.setItem(PRK,JSON.stringify(d))}catch(e){}},
+      injuries:    d=>{injuries=d;try{localStorage.setItem(IJK,JSON.stringify(d))}catch(e){}},
+      competitions:d=>{competitions=d;try{localStorage.setItem(CMPK,JSON.stringify(d))}catch(e){}},
+      gymResets:   d=>{gymResets=d;try{localStorage.setItem(RSTK,JSON.stringify(d))}catch(e){}},
+      activePlan:  d=>{activePlan=d;try{localStorage.setItem(PLK,d?JSON.stringify(d):'null')}catch(e){}},
+    };
+    // Kick off initial sync (debounced — actually fires after 1s)
+    cloudScheduleSync(profileId, 1000);
   }
 
   // Start screen — use profile-scoped seen key
