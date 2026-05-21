@@ -40,6 +40,17 @@ async function cloudCurrentUser() {
   }
 }
 
+async function cloudCheckHasData(uid) {
+  if (!cloudReady()) return null;
+  try {
+    for (const table of ['sessions','gyms','goals','hang_sessions','projects']) {
+      const { data } = await db().from(table).select('profile_id').eq('user_id', uid).limit(1);
+      if (data?.length) return data[0].profile_id;
+    }
+    return null;
+  } catch(e) { return null; }
+}
+
 async function cloudSignIn(email, pw) {
   const { data, error } = await db().auth.signInWithPassword({ email, password: pw });
   if (error) throw error;
@@ -236,6 +247,7 @@ async function _pullAndApply(uid, pid) {
       fn(pulled[key]);
     }
   }
+  window._cloudOnPull?.();
 }
 
 // ── FIRST-LOGIN MIGRATION ────────────────────────────────
@@ -274,7 +286,12 @@ function cloudInitAuthListener() {
   db().auth.onAuthStateChange((event, session) => {
     cloudUpdateAuthBadge(session?.user || null);
     if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user && window.activeProfileId) {
-      cloudSync(window.activeProfileId).catch(() => {});
+      if (window._cloudJustSignedIn) {
+        window._cloudJustSignedIn = false;
+        cloudMigrateLocal(window.activeProfileId).catch(() => {});
+      } else {
+        cloudSync(window.activeProfileId).catch(() => {});
+      }
     }
   });
 }
@@ -493,6 +510,7 @@ async function lfsDoSignIn() {
   lfsShowMsg('Bezig…', false);
   try {
     await cloudSignIn(email, pw);
+    window._cloudJustSignedIn = true;
     lfsShowMsg('Ingelogd!', false);
     setTimeout(() => window._lfsDone?.(), 700);
   } catch(e) {
@@ -510,6 +528,7 @@ async function lfsDoSignUp() {
   lfsShowMsg('Account aanmaken…', false);
   try {
     await cloudSignUp(email, pw);
+    window._cloudJustSignedIn = true;
     lfsShowMsg('Account aangemaakt! Check je e-mail voor verificatie.', false);
     setTimeout(() => window._lfsDone?.(), 1500);
   } catch(e) {

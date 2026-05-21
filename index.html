@@ -4561,6 +4561,7 @@ function initApp(profileId){
   // Register cloud callbacks so cloudSync can write back to locals + localStorage
   if(typeof cloudMarkDirty==='function'){
     window._cloudData=()=>({sessions,gyms,goals,hangSessions,projects,injuries,competitions,gymResets,activePlan});
+    window._cloudOnPull=renderFeed;
     window._cloudCallbacks={
       sessions:    d=>{sessions=d;try{localStorage.setItem(SK,JSON.stringify(d))}catch(e){}},
       gyms:        d=>{gyms=d;try{localStorage.setItem(GYK,JSON.stringify(d))}catch(e){}},
@@ -5168,16 +5169,28 @@ function renderGradeOracle(){
 (function bootstrap(){
   maybeRunMigration();
   if(typeof showLoginFirstScreen==='function'){
-    showLoginFirstScreen(function afterLogin(){
+    showLoginFirstScreen(async function afterLogin(){
       const profiles=loadProfiles();
-      if(profiles.length===1){
-        selectProfile(profiles[0].id);
-      }else if(profiles.length===0){
-        renderProfileScreen();
-        setTimeout(()=>showNewProfileForm(),200);
-      }else{
-        renderProfileScreen();
+      if(profiles.length===1){selectProfile(profiles[0].id);return;}
+      if(profiles.length>1){renderProfileScreen();return;}
+      // No local profiles — check if cloud has existing data for this user
+      if(typeof cloudCurrentUser==='function'&&typeof cloudCheckHasData==='function'){
+        try{
+          const user=await cloudCurrentUser();
+          if(user){
+            const cloudPid=await cloudCheckHasData(user.id);
+            if(cloudPid){
+              const acct=await cloudGetAccount().catch(()=>null);
+              const name=acct?.display_name||acct?.username||(user.email||'').split('@')[0]||'Mijn Profiel';
+              saveProfiles([{id:cloudPid,name,emoji:'🧗',created:new Date().toISOString().split('T')[0]}]);
+              selectProfile(cloudPid);
+              return;
+            }
+          }
+        }catch(e){console.warn('[cloud] restore check failed',e);}
       }
+      renderProfileScreen();
+      setTimeout(()=>showNewProfileForm(),200);
     });
   }else{
     // Fallback als cloud.js niet geladen is
