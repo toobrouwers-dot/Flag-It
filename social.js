@@ -67,19 +67,22 @@ async function socialFollow(targetId, btn) {
   const user = await cloudCurrentUser();
   if (!user) { showAuthScreen(); return; }
   if (user.id === targetId) return;
-  await db().from('follows').upsert(
+  const { error } = await db().from('follows').upsert(
     { follower_id: user.id, following_id: targetId },
     { onConflict: 'follower_id,following_id', ignoreDuplicates: true }
   );
+  if (error) { if (typeof toast === 'function') toast('Volgen mislukt', 'var(--danger)'); return; }
   if (btn) { btn.textContent = 'Gevolgd'; btn.classList.add('btn-following'); btn.onclick = () => socialUnfollow(targetId, btn); }
   if (typeof toast === 'function') toast('Gevolgd!', 'var(--success)');
   if (typeof haptic === 'function') haptic(10);
 }
 
 async function socialUnfollow(targetId, btn) {
+  if (!cloudReady()) return;
   const user = await cloudCurrentUser();
   if (!user) return;
-  await db().from('follows').delete().eq('follower_id', user.id).eq('following_id', targetId);
+  const { error } = await db().from('follows').delete().eq('follower_id', user.id).eq('following_id', targetId);
+  if (error) { if (typeof toast === 'function') toast('Ontvolgen mislukt', 'var(--danger)'); return; }
   if (btn) { btn.textContent = 'Volgen'; btn.classList.remove('btn-following'); btn.onclick = () => socialFollow(targetId, btn); }
 }
 
@@ -166,7 +169,7 @@ async function renderSocialFeed() {
       }).join('');
       return `<div class="social-card">
         <div class="social-card-head">
-          <div class="social-avatar">${acc?.emoji || '🧗'}</div>
+          <div class="social-avatar">${_s(acc?.emoji || '🧗')}</div>
           <div class="social-user-info">
             <div class="social-username">${_s(acc?.display_name || acc?.username || 'klimmer')}</div>
             <div class="social-meta">${fmtDate ? fmtDate(s.date) : s.date}${s.gym ? ' · ' + _s(s.gym) : ''}</div>
@@ -239,7 +242,7 @@ async function showComments(sessionId) {
   ov.id = 'comments-ov';
   const list = (comments || []).map(c => `
     <div class="comment-row">
-      <div class="comment-avatar">${c.accounts?.emoji || '🧗'}</div>
+      <div class="comment-avatar">${_s(c.accounts?.emoji || '🧗')}</div>
       <div class="comment-body">
         <div class="comment-user">${_s(c.accounts?.username || 'klimmer')}</div>
         <div class="comment-text">${_s(c.content)}</div>
@@ -298,7 +301,7 @@ async function showPublicProfile(userId, username) {
   ov.className = 'modal-overlay';
   ov.innerHTML = `<div class="modal-box" style="max-height:80dvh">
     <div style="text-align:center;padding:16px 0 12px">
-      <div style="font-size:44px">${acct?.emoji || '🧗'}</div>
+      <div style="font-size:44px">${_s(acct?.emoji || '🧗')}</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;text-transform:uppercase">${_s(acct?.display_name || acct?.username || username)}</div>
       <div style="color:var(--muted);font-size:13px;margin-top:2px">@${_s(acct?.username || username)}</div>
       ${acct?.bio ? `<div style="font-size:13px;margin-top:6px;color:var(--text)">${_s(acct.bio)}</div>` : ''}
@@ -363,7 +366,7 @@ async function renderLeaderboard() {
       if (!sent.length) continue;
       const best = sent.reduce((b, r) => (window.GRADES||[]).indexOf(r.grade) > (window.GRADES||[]).indexOf(b.grade) ? r : b, sent[0]);
       if (!userBest[uid] || (window.GRADES||[]).indexOf(best.grade) > (window.GRADES||[]).indexOf(userBest[uid].grade)) {
-        userBest[uid] = { grade: best.grade, emoji: acc.emoji||'🧗', username: acc.username||'?', displayName: acc.display_name||acc.username, gym: s.gym||'' };
+        userBest[uid] = { id: uid, grade: best.grade, emoji: acc.emoji||'🧗', username: acc.username||'?', displayName: acc.display_name||acc.username, gym: s.gym||'' };
       }
     }
 
@@ -372,9 +375,9 @@ async function renderLeaderboard() {
 
     el.innerHTML = sorted.slice(0, 25).map((u, i) => {
       const gc = (window.GRADE_COLORS||[])[(window.GRADES||[]).indexOf(u.grade)] || 'var(--accent)';
-      return `<div class="lb-row" onclick="showPublicProfile(null,'${_s(u.username)}')">
+      return `<div class="lb-row" onclick="showPublicProfile('${_s(u.id)}','${_s(u.username)}')">
         <div class="lb-rank">${medals[i] || (i + 1)}</div>
-        <div class="lb-avatar">${u.emoji}</div>
+        <div class="lb-avatar">${_s(u.emoji)}</div>
         <div class="lb-info">
           <div class="lb-name">${_s(u.displayName || u.username)}</div>
           <div class="lb-sub">${_s(u.gym)}</div>
@@ -419,7 +422,7 @@ async function renderUserSearch() {
   el.innerHTML = data.map(u => {
     const following = followingSet.has(u.id);
     return `<div class="user-result">
-      <div class="user-result-avatar">${u.emoji||'🧗'}</div>
+      <div class="user-result-avatar">${_s(u.emoji||'🧗')}</div>
       <div class="user-result-info">
         <div class="user-result-name">${_s(u.display_name || u.username)}</div>
         <div class="user-result-sub">@${_s(u.username)}</div>
@@ -439,7 +442,8 @@ async function setSessionPublic(sessionId, isPublic) {
   if (!user) return;
   const session = (window.sessions || []).find(s => s.id === sessionId);
   if (!session?._cid) return;
-  await db().from('sessions').update({ is_public: isPublic }).eq('id', session._cid);
+  const { error } = await db().from('sessions').update({ is_public: isPublic }).eq('id', session._cid);
+  if (error) { if (typeof toast === 'function') toast('Opslaan mislukt', 'var(--danger)'); return; }
   session.is_public = isPublic;
   if (typeof save === 'function') save();
   if (typeof toast === 'function') toast(isPublic ? 'Sessie openbaar' : 'Sessie privé', 'var(--accent)');
