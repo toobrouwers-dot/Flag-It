@@ -775,6 +775,15 @@ select option{background:#1e1e1e}
 .auth-skip{display:block;width:100%;padding:14px;background:none;border:none;color:var(--muted);font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer;text-align:center;margin-top:16px}
 .auth-skip:active{color:var(--text)}
 
+/* LOGIN FIRST SCREEN */
+#login-first-screen{position:fixed;inset:0;background:var(--bg);z-index:610;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;opacity:0;transform:scale(.97);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+#login-first-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 100% 40% at 50% 0%,rgba(127,119,221,.2) 0%,transparent 65%);pointer-events:none}
+#login-first-screen.lfs-visible{opacity:1;transform:scale(1);pointer-events:auto}
+.lfs-loading{text-align:center;color:var(--muted);font-size:14px;padding:20px 0}
+.lfs-welcome{text-align:center;margin-bottom:24px;padding:16px;background:var(--surface);border-radius:16px;border:.5px solid var(--border)}
+.lfs-welcome-name{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.lfs-welcome-email{font-size:13px;color:var(--muted);margin-top:4px}
+
 /* ── SOCIAL FEED ─────────────────────────────────────── */
 .social-card{margin:0 16px 12px;background:var(--surface);border-radius:16px;border:.5px solid var(--border);overflow:hidden;animation:slideUp .3s ease both}
 .social-card-head{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
@@ -5105,12 +5114,26 @@ function renderGradeOracle(){
   </div>`;
 }
 
-/* ── Bootstrap: show profile screen before anything else ── */
+/* ── Bootstrap: show login screen first, then handle profiles ── */
 (function bootstrap(){
   maybeRunMigration();
-  renderProfileScreen();
-  // Auto-open new-profile form when there are no profiles yet
-  if(!loadProfiles().length)setTimeout(()=>showNewProfileForm(),200);
+  if(typeof showLoginFirstScreen==='function'){
+    showLoginFirstScreen(function afterLogin(){
+      const profiles=loadProfiles();
+      if(profiles.length===1){
+        selectProfile(profiles[0].id);
+      }else if(profiles.length===0){
+        renderProfileScreen();
+        setTimeout(()=>showNewProfileForm(),200);
+      }else{
+        renderProfileScreen();
+      }
+    });
+  }else{
+    // Fallback als cloud.js niet geladen is
+    renderProfileScreen();
+    if(!loadProfiles().length)setTimeout(()=>showNewProfileForm(),200);
+  }
 })();
 </script>
 </body>

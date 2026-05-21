@@ -391,6 +391,129 @@ async function doSignInGoogle() {
   try { await cloudSignInGoogle(); } catch(e) { authShowMsg(e.message || 'Google-login mislukt', true); }
 }
 
+// ── LOGIN FIRST SCREEN ────────────────────────────────────
+
+function showLoginFirstScreen(onDone) {
+  if (!cloudReady()) { onDone(); return; }
+
+  const el = document.createElement('div');
+  el.id = 'login-first-screen';
+  el.innerHTML = `
+    <div class="auth-inner">
+      <div class="auth-logo-wrap">
+        <img src="./icons/icon-192.png" class="auth-logo" alt="Flag It">
+        <div class="auth-title">Flag<span>it</span></div>
+        <div class="auth-sub">Jouw bouldering tracker</div>
+      </div>
+      <div id="lfs-content">
+        <div class="lfs-loading">Laden…</div>
+      </div>
+    </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('lfs-visible'));
+
+  function done() {
+    el.classList.remove('lfs-visible');
+    setTimeout(() => { el.remove(); onDone(); }, 350);
+  }
+  window._lfsDone = done;
+
+  db().auth.getSession().then(({ data: { session } }) => {
+    const user = session?.user;
+    const content = document.getElementById('lfs-content');
+    if (!content) return;
+
+    if (user) {
+      const name = _safeText((user.email || '').split('@')[0]);
+      content.innerHTML = `
+        <div class="lfs-welcome">
+          <div class="lfs-welcome-name">Welkom terug, ${name}!</div>
+          <div class="lfs-welcome-email">${_safeText(user.email)}</div>
+        </div>
+        <button class="auth-btn-primary" onclick="window._lfsDone()">Doorgaan →</button>
+        <div class="auth-divider"><span>of</span></div>
+        <button class="auth-btn-google" onclick="cloudSignOut().then(()=>location.reload())">Uitloggen / ander account</button>
+        <div id="lfs-msg" class="auth-msg"></div>`;
+    } else {
+      content.innerHTML = `
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="lfs-tab-signin" onclick="lfsAuthSwitchTab('signin')">Inloggen</button>
+          <button class="auth-tab" id="lfs-tab-signup" onclick="lfsAuthSwitchTab('signup')">Registreren</button>
+        </div>
+        <div id="lfs-form-signin">
+          <input id="lfs-email" class="auth-input" type="email" placeholder="E-mailadres" autocomplete="email">
+          <input id="lfs-pw" class="auth-input" type="password" placeholder="Wachtwoord" autocomplete="current-password">
+          <button class="auth-btn-primary" onclick="lfsDoSignIn()">Inloggen</button>
+        </div>
+        <div id="lfs-form-signup" style="display:none">
+          <input id="lfs-reg-email" class="auth-input" type="email" placeholder="E-mailadres" autocomplete="email">
+          <input id="lfs-reg-pw" class="auth-input" type="password" placeholder="Wachtwoord (min. 6 tekens)" autocomplete="new-password">
+          <input id="lfs-reg-pw2" class="auth-input" type="password" placeholder="Herhaal wachtwoord" autocomplete="new-password">
+          <button class="auth-btn-primary" onclick="lfsDoSignUp()">Account aanmaken</button>
+        </div>
+        <div class="auth-divider"><span>of</span></div>
+        <button class="auth-btn-google" onclick="lfsDoSignInGoogle()">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.1-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16.1 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34 6.5 29.3 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5L31.8 34c-2.1 1.4-4.7 2-7.8 2-5.2 0-9.6-2.9-11.3-7.2l-6.6 5.1C9.6 39.7 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.4-2.6 4.4-4.8 5.8l5.7 4.9C40.3 35.3 44 30 44 24c0-1.3-.1-2.7-.4-4z"/></svg>
+          Doorgaan met Google
+        </button>
+        <div id="lfs-msg" class="auth-msg"></div>
+        <button class="auth-skip" onclick="window._lfsDone()">Verder zonder account</button>`;
+      document.getElementById('lfs-email')?.focus();
+    }
+  });
+}
+
+function lfsShowMsg(msg, isErr) {
+  const el = document.getElementById('lfs-msg');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = isErr ? 'var(--danger)' : 'var(--success)';
+  el.style.display = msg ? '' : 'none';
+}
+
+function lfsAuthSwitchTab(tab) {
+  document.getElementById('lfs-form-signin').style.display = tab === 'signin' ? '' : 'none';
+  document.getElementById('lfs-form-signup').style.display = tab === 'signup' ? '' : 'none';
+  document.getElementById('lfs-tab-signin').classList.toggle('active', tab === 'signin');
+  document.getElementById('lfs-tab-signup').classList.toggle('active', tab === 'signup');
+}
+
+async function lfsDoSignIn() {
+  const email = document.getElementById('lfs-email')?.value?.trim();
+  const pw = document.getElementById('lfs-pw')?.value;
+  if (!email || !pw) { lfsShowMsg('Vul alle velden in', true); return; }
+  lfsShowMsg('Bezig…', false);
+  try {
+    await cloudSignIn(email, pw);
+    lfsShowMsg('Ingelogd!', false);
+    setTimeout(() => window._lfsDone?.(), 700);
+  } catch(e) {
+    lfsShowMsg(e.message || 'Inloggen mislukt', true);
+  }
+}
+
+async function lfsDoSignUp() {
+  const email = document.getElementById('lfs-reg-email')?.value?.trim();
+  const pw = document.getElementById('lfs-reg-pw')?.value;
+  const pw2 = document.getElementById('lfs-reg-pw2')?.value;
+  if (!email || !pw) { lfsShowMsg('Vul alle velden in', true); return; }
+  if (pw !== pw2) { lfsShowMsg('Wachtwoorden komen niet overeen', true); return; }
+  if (pw.length < 6) { lfsShowMsg('Wachtwoord moet minimaal 6 tekens zijn', true); return; }
+  lfsShowMsg('Account aanmaken…', false);
+  try {
+    await cloudSignUp(email, pw);
+    lfsShowMsg('Account aangemaakt! Check je e-mail voor verificatie.', false);
+    setTimeout(() => window._lfsDone?.(), 1500);
+  } catch(e) {
+    lfsShowMsg(e.message || 'Registreren mislukt', true);
+  }
+}
+
+async function lfsDoSignInGoogle() {
+  lfsShowMsg('Google-login starten…', false);
+  try { await cloudSignInGoogle(); } catch(e) { lfsShowMsg(e.message || 'Google-login mislukt', true); }
+}
+
 // ── ACCOUNT SETTINGS ─────────────────────────────────────
 
 async function showAccountSettings() {
