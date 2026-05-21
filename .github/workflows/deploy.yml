@@ -25,6 +25,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Validate files
+        run: |
+          node -e "
+            const fs = require('fs');
+            const html = fs.readFileSync('./index.html', 'utf8');
+            if (!html.includes('</html>')) { console.error('index.html: missing </html>'); process.exit(1); }
+            const sw = fs.readFileSync('./sw.js', 'utf8');
+            ['cloud.js','social.js','index.html','manifest.json'].forEach(f => {
+              if (!sw.includes(f)) { console.error('sw.js: missing cache entry for ' + f); process.exit(1); }
+            });
+            console.log('File validation passed');
+          "
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

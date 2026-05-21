@@ -32,8 +32,12 @@ function cloudReady() {
 
 async function cloudCurrentUser() {
   if (!cloudReady()) return null;
-  const { data } = await db().auth.getUser();
-  return data?.user || null;
+  try {
+    const { data } = await db().auth.getUser();
+    return data?.user || null;
+  } catch(e) {
+    return null;
+  }
 }
 
 async function cloudSignIn(email, pw) {
@@ -211,7 +215,6 @@ async function cloudSync(pid) {
   } catch(e) {
     console.warn('[cloud] sync error:', e);
     cloudSetStatus('error');
-    setTimeout(() => cloudSetStatus('idle'), 4000);
   }
 }
 
@@ -460,6 +463,11 @@ function showLoginFirstScreen(onDone) {
         <button class="auth-skip" onclick="window._lfsDone()">Verder zonder account</button>`;
       document.getElementById('lfs-email')?.focus();
     }
+  }).catch(() => {
+    const content = document.getElementById('lfs-content');
+    if (content) content.innerHTML = `
+      <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Verbinding mislukt</div>
+      <button class="auth-btn-primary" onclick="window._lfsDone()">Doorgaan →</button>`;
   });
 }
 

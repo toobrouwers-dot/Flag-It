@@ -132,6 +132,7 @@ body.nav-transitioning{overflow:hidden}
 input[type=text],input[type=date],input[type=number],select,textarea{background:var(--surface);border:.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:12px 14px;width:100%;-webkit-appearance:none;appearance:none;outline:none}
 textarea{resize:none;height:80px;line-height:1.4}
 input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 select option{background:#1e1e1e}
 .gym-selector{display:flex;gap:8px;align-items:center}
 .gym-selector select{flex:1}
@@ -1482,6 +1483,7 @@ function promptNewProfileFromGyms(){
 let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1',PRK='flagit_projects_v1',IJK='flagit_injuries_v1',PLK='flagit_plan_v1',CMPK='flagit_comp_v1',RSTK='flagit_resets_v1';
 
 function save(){
+  _routesCache=null;
   try{localStorage.setItem(SK,JSON.stringify(sessions))}
   catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('sessions',activeProfileId);cloudScheduleSync(activeProfileId);}
@@ -1533,7 +1535,8 @@ function loadArr(k,fb){
 const gi=g=>GRADES.indexOf(g);
 function fmtDate(d){if(!d)return'';return new Date(d+'T00:00:00').toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'})}
 function fmtSecs(s){const m=Math.floor(s/60),sec=s%60;return`${m}:${String(sec).padStart(2,'0')}`}
-const allRoutes=()=>sessions.flatMap(s=>s.routes.map(r=>({...r,date:s.date,sid:s.id})));
+let _routesCache=null;
+const allRoutes=()=>{if(!_routesCache)_routesCache=sessions.flatMap(s=>s.routes.map(r=>({...r,date:s.date,sid:s.id})));return _routesCache};
 function getPR(type){const r=allRoutes().filter(x=>type==='flash'?x.result==='flash':(x.result==='top'||x.result==='flash'));if(!r.length)return null;return r.reduce((b,x)=>gi(x.grade)>gi(b.grade)?x:b,r[0])}
 function maxGrade(routes){const t=routes.filter(r=>r.result!=='poging');if(!t.length)return null;return t.reduce((b,r)=>gi(r.grade)>gi(b.grade)?r:b,t[0])}
 function getResultColor(res){return res==='top'?'var(--success)':res==='flash'?'var(--flash)':'var(--attempt)'}
@@ -1966,16 +1969,16 @@ function renderFeed(){
         </div>
         <div style="display:flex;align-items:flex-start;gap:4px">
           <div style="text-align:right;margin-right:8px"><div class="activity-max">${mg?mg.grade:'—'}</div><div class="activity-max-label">max</div></div>
-          <button class="btn-edit-session" onclick="replaySession(${s.id})" title="Sessie replay">
+          <button class="btn-edit-session" onclick="replaySession(${s.id})" title="Sessie replay" aria-label="Sessie replay">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           </button>
-          <button class="btn-edit-session" onclick="repeatSession(${s.id})" title="Herhaal sessie">
+          <button class="btn-edit-session" onclick="repeatSession(${s.id})" title="Herhaal sessie" aria-label="Herhaal sessie">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
           </button>
-          <button class="btn-edit-session" onclick="shareSession(${s.id})" title="Delen">
+          <button class="btn-edit-session" onclick="shareSession(${s.id})" title="Delen" aria-label="Sessie delen">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           </button>
-          <button class="btn-edit-session" onclick="editSession(${s.id})">
+          <button class="btn-edit-session" onclick="editSession(${s.id})" aria-label="Sessie bewerken">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
           <button class="btn-delete-session" onclick="deleteSession(${s.id})">
