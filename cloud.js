@@ -285,23 +285,32 @@ function cloudInitAuthListener() {
   }
   db().auth.onAuthStateChange((event, session) => {
     cloudUpdateAuthBadge(session?.user || null);
-    if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user && window.activeProfileId) {
-      if (window._cloudJustSignedIn) {
-        window._cloudJustSignedIn = false;
-        cloudMigrateLocal(window.activeProfileId).catch(() => {});
-      } else {
-        cloudSync(window.activeProfileId).catch(() => {});
+    if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
+      // Restore Google OAuth migration flag that survived the redirect
+      if (sessionStorage.getItem('flagit_google_migrate') === '1') {
+        sessionStorage.removeItem('flagit_google_migrate');
+        window._cloudJustSignedIn = true;
+      }
+      // Refresh badge with display_name from accounts table
+      cloudGetAccount().then(acct => { if (acct) cloudUpdateAuthBadge(session.user, acct); }).catch(() => {});
+      if (window.activeProfileId) {
+        if (window._cloudJustSignedIn) {
+          window._cloudJustSignedIn = false;
+          cloudMigrateLocal(window.activeProfileId).catch(() => {});
+        } else {
+          cloudSync(window.activeProfileId).catch(() => {});
+        }
       }
     }
   });
 }
 
-function cloudUpdateAuthBadge(user) {
+function cloudUpdateAuthBadge(user, acct = null) {
   const el = document.getElementById('cloud-auth-badge');
   if (!el) return;
   if (user) {
-    const name = (user.email || '').split('@')[0].slice(0, 12);
-    el.innerHTML = `<span class="cloud-badge cloud-badge-in" onclick="showAccountSettings()" title="${user.email}">☁ ${_safeText(name)}</span>`;
+    const name = (acct?.display_name || acct?.username || (user.email || '').split('@')[0]).slice(0, 15);
+    el.innerHTML = `<span class="cloud-badge cloud-badge-in" onclick="showAccountSettings()" title="${_safeText(user.email)}">☁ ${_safeText(name)}</span>`;
   } else {
     el.innerHTML = `<span class="cloud-badge cloud-badge-out" onclick="showAuthScreen()">☁ Inloggen</span>`;
   }
@@ -408,7 +417,13 @@ async function doSignUp() {
 
 async function doSignInGoogle() {
   authShowMsg('Google-login starten…', false);
-  try { await cloudSignInGoogle(); } catch(e) { authShowMsg(e.message || 'Google-login mislukt', true); }
+  try {
+    sessionStorage.setItem('flagit_google_migrate', '1');
+    await cloudSignInGoogle();
+  } catch(e) {
+    sessionStorage.removeItem('flagit_google_migrate');
+    authShowMsg(e.message || 'Google-login mislukt', true);
+  }
 }
 
 // ── LOGIN FIRST SCREEN ────────────────────────────────────
@@ -538,7 +553,13 @@ async function lfsDoSignUp() {
 
 async function lfsDoSignInGoogle() {
   lfsShowMsg('Google-login starten…', false);
-  try { await cloudSignInGoogle(); } catch(e) { lfsShowMsg(e.message || 'Google-login mislukt', true); }
+  try {
+    sessionStorage.setItem('flagit_google_migrate', '1');
+    await cloudSignInGoogle();
+  } catch(e) {
+    sessionStorage.removeItem('flagit_google_migrate');
+    lfsShowMsg(e.message || 'Google-login mislukt', true);
+  }
 }
 
 // ── ACCOUNT SETTINGS ─────────────────────────────────────
@@ -585,6 +606,9 @@ async function saveAccountSettings() {
     await cloudUpdateAccount({ username, display_name: displayName, bio, is_public: isPublic });
     document.querySelector('.modal-overlay')?.remove();
     if (typeof toast === 'function') toast('Account bijgewerkt', 'var(--accent)');
+    // Refresh badge with updated display name
+    const user = await cloudCurrentUser();
+    if (user) cloudUpdateAuthBadge(user, { username, display_name: displayName });
   } catch(e) {
     alert('Opslaan mislukt: ' + (e.message || ''));
   }
