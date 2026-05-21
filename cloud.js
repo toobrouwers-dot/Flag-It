@@ -291,8 +291,8 @@ function cloudInitAuthListener() {
         sessionStorage.removeItem('flagit_google_migrate');
         window._cloudJustSignedIn = true;
       }
-      // Refresh badge with display_name from accounts table
-      cloudGetAccount().then(acct => { if (acct) cloudUpdateAuthBadge(session.user, acct); }).catch(() => {});
+      // Refresh badge with display_name from accounts table, sync to local profile
+      cloudGetAccount().then(acct => { if (acct) { cloudUpdateAuthBadge(session.user, acct); _syncAccountToProfile(acct); } }).catch(() => {});
       if (window.activeProfileId) {
         if (window._cloudJustSignedIn) {
           window._cloudJustSignedIn = false;
@@ -317,6 +317,22 @@ function cloudUpdateAuthBadge(user, acct = null) {
 }
 
 function _safeText(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function _syncAccountToProfile(acct) {
+  const cloudName = acct?.display_name || acct?.username;
+  if (!cloudName || !window.activeProfileId) return;
+  if (typeof loadProfiles !== 'function' || typeof saveProfiles !== 'function') return;
+  const profiles = loadProfiles();
+  const p = profiles.find(pr => pr.id === window.activeProfileId);
+  if (!p || p.name === cloudName) return;
+  p.name = cloudName;
+  saveProfiles(profiles);
+  const heroEl = document.getElementById('hero-profile-name');
+  if (heroEl && typeof activeProfile !== 'undefined' && activeProfile) {
+    heroEl.textContent = (activeProfile.emoji || '') + ' ' + cloudName;
+    activeProfile.name = cloudName;
+  }
+}
 
 // ── AUTH SCREEN ──────────────────────────────────────────
 
@@ -453,13 +469,14 @@ function showLoginFirstScreen(onDone) {
   }
   window._lfsDone = done;
 
-  db().auth.getSession().then(({ data: { session } }) => {
+  db().auth.getSession().then(async ({ data: { session } }) => {
     const user = session?.user;
     const content = document.getElementById('lfs-content');
     if (!content) return;
 
     if (user) {
-      const name = _safeText((user.email || '').split('@')[0]);
+      const acct = await cloudGetAccount().catch(() => null);
+      const name = _safeText(acct?.display_name || acct?.username || (user.email || '').split('@')[0]);
       content.innerHTML = `
         <div class="lfs-welcome">
           <div class="lfs-welcome-name">Welkom terug, ${name}!</div>
@@ -606,9 +623,10 @@ async function saveAccountSettings() {
     await cloudUpdateAccount({ username, display_name: displayName, bio, is_public: isPublic });
     document.querySelector('.modal-overlay')?.remove();
     if (typeof toast === 'function') toast('Account bijgewerkt', 'var(--accent)');
-    // Refresh badge with updated display name
+    // Refresh badge with updated display name, sync to local profile
     const user = await cloudCurrentUser();
     if (user) cloudUpdateAuthBadge(user, { username, display_name: displayName });
+    _syncAccountToProfile({ display_name: displayName, username });
   } catch(e) {
     alert('Opslaan mislukt: ' + (e.message || ''));
   }
