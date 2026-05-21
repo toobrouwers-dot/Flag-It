@@ -103,13 +103,30 @@ function cloudScheduleSync(pid, delayMs = 2500) {
 
 // ── DATA MAPPING ─────────────────────────────────────────
 
-function _toRow(obj, uid, pid) {
+// [localName, dbColumnName] pairs per table
+const _FIELD_MAP = {
+  sessions:   [['sessionStart','session_start'],['sessionEnd','session_end']],
+  goals:      [['createdAt','created_at_date']],
+  projects:   [['betaNotes','beta_notes'],['setterData','setter_data'],['createdAt','created_at_date'],['completedAt','completed_at']],
+  gym_resets: [['gymId','gym_local_id']],
+};
+
+function _toRow(obj, uid, pid, table) {
   const { id, _cid, ...rest } = obj;
-  return { ...rest, local_id: id, user_id: uid, profile_id: pid };
+  const row = { ...rest, local_id: id, user_id: uid, profile_id: pid };
+  for (const [local, dbCol] of (_FIELD_MAP[table] || [])) {
+    if (local in row) { row[dbCol] = row[local]; delete row[local]; }
+  }
+  return row;
 }
 
-function _fromRow({ user_id, profile_id, id: cid, local_id, created_at, updated_at, ...rest }) {
-  return { ...rest, id: local_id, _cid: cid };
+function _fromRow(raw, table) {
+  const { user_id, profile_id, id: cid, local_id, created_at, updated_at, ...rest } = raw;
+  const obj = { ...rest, id: local_id, _cid: cid };
+  for (const [local, dbCol] of (_FIELD_MAP[table] || [])) {
+    if (dbCol in obj) { obj[local] = obj[dbCol]; delete obj[dbCol]; }
+  }
+  return obj;
 }
 
 // ── PUSH ─────────────────────────────────────────────────
@@ -117,7 +134,7 @@ function _fromRow({ user_id, profile_id, id: cid, local_id, created_at, updated_
 async function _pushTable(table, rows, uid, pid) {
   if (!rows?.length) return;
   const { error } = await db().from(table)
-    .upsert(rows.map(r => _toRow(r, uid, pid)), { onConflict: 'user_id,profile_id,local_id' });
+    .upsert(rows.map(r => _toRow(r, uid, pid, table)), { onConflict: 'user_id,profile_id,local_id' });
   if (error) throw error;
   // Store cloud UUIDs back to local objects (needed for kudos/comments references)
   const { data } = await db().from(table).select('id,local_id').eq('user_id', uid).eq('profile_id', pid);
@@ -143,7 +160,7 @@ async function _pushPlan(plan, uid, pid) {
 async function _pullTable(table, uid, pid) {
   const { data, error } = await db().from(table).select('*').eq('user_id', uid).eq('profile_id', pid);
   if (error) throw error;
-  return (data || []).map(_fromRow);
+  return (data || []).map(r => _fromRow(r, table));
 }
 
 async function _pullPlan(uid, pid) {
