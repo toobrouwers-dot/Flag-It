@@ -25,10 +25,11 @@ async function giveKudos(sessionCid, btn) {
 }
 
 async function removeKudos(sessionCid, btn) {
+  if (!cloudReady()) return;
   const user = await cloudCurrentUser();
   if (!user) return;
-  await db().from('kudos').delete().eq('from_user_id', user.id).eq('session_id', sessionCid);
-  if (btn) {
+  const { error } = await db().from('kudos').delete().eq('from_user_id', user.id).eq('session_id', sessionCid);
+  if (!error && btn) {
     btn.classList.remove('kudos-active');
     const cnt = btn.querySelector('.kudos-n');
     if (cnt) cnt.textContent = Math.max(0, parseInt(cnt.textContent || '0') - 1);
@@ -61,19 +62,22 @@ async function socialFollow(targetId, btn) {
   const user = await cloudCurrentUser();
   if (!user) { showAuthScreen(); return; }
   if (user.id === targetId) return;
-  await db().from('follows').upsert(
+  const { error } = await db().from('follows').upsert(
     { follower_id: user.id, following_id: targetId },
     { onConflict: 'follower_id,following_id', ignoreDuplicates: true }
   );
+  if (error) { if (typeof toast === 'function') toast('Volgen mislukt', 'var(--danger)'); return; }
   if (btn) { btn.textContent = 'Gevolgd'; btn.classList.add('btn-following'); btn.onclick = () => socialUnfollow(targetId, btn); }
   if (typeof toast === 'function') toast('Gevolgd!', 'var(--success)');
   if (typeof haptic === 'function') haptic(10);
 }
 
 async function socialUnfollow(targetId, btn) {
+  if (!cloudReady()) return;
   const user = await cloudCurrentUser();
   if (!user) return;
-  await db().from('follows').delete().eq('follower_id', user.id).eq('following_id', targetId);
+  const { error } = await db().from('follows').delete().eq('follower_id', user.id).eq('following_id', targetId);
+  if (error) { if (typeof toast === 'function') toast('Ontvolgen mislukt', 'var(--danger)'); return; }
   if (btn) { btn.textContent = 'Volgen'; btn.classList.remove('btn-following'); btn.onclick = () => socialFollow(targetId, btn); }
 }
 
@@ -179,14 +183,22 @@ async function renderSocialFeed() {
       </div>`;
     }).join('');
 
-    // Load kudos counts asynchronously
-    data.forEach(async s => {
+    // Load kudos counts in één batch-query
+    const sessionIds = data.map(s => s.id);
+    const { data: allKudos } = await db().from('kudos').select('session_id,from_user_id').in('session_id', sessionIds);
+    const kudosMap = {};
+    (allKudos || []).forEach(k => {
+      if (!kudosMap[k.session_id]) kudosMap[k.session_id] = { count: 0, mine: false };
+      kudosMap[k.session_id].count++;
+      if (k.from_user_id === user.id) kudosMap[k.session_id].mine = true;
+    });
+    data.forEach(s => {
       const btn = document.getElementById('kudos-btn-' + s.id);
       if (!btn) return;
-      const { count, mine } = await loadKudosForSession(s.id);
+      const info = kudosMap[s.id] || { count: 0, mine: false };
       const cnt = btn.querySelector('.kudos-n');
-      if (cnt) cnt.textContent = count;
-      if (mine) btn.classList.add('kudos-active');
+      if (cnt) cnt.textContent = info.count;
+      if (info.mine) btn.classList.add('kudos-active');
     });
   } catch(e) {
     console.warn('[social] feed error:', e);
@@ -197,6 +209,7 @@ async function renderSocialFeed() {
 // ── COMMENTS ─────────────────────────────────────────────
 
 async function showComments(sessionId) {
+  if (!cloudReady()) return;
   const user = await cloudCurrentUser();
   const { data: comments } = await db().from('comments')
     .select('id,content,created_at,accounts!comments_user_id_fkey(username,emoji)')
