@@ -183,7 +183,7 @@ async function renderSocialFeed() {
             🤜 <span class="kudos-n">…</span>
           </button>
           <button class="social-comment-btn" onclick="showComments('${s.id}')">💬</button>
-          <button class="social-profile-btn" onclick="showPublicProfile('${acc?.id}','${_s(acc?.username||'')}')">👤 ${_s(acc?.username || '')}</button>
+          ${acc?.id ? `<button class="social-profile-btn" onclick="showPublicProfile('${_s(acc.id)}','${_s(acc.username||'')}')">👤 ${_s(acc.username || '')}</button>` : ''}
         </div>
       </div>`;
     }).join('');
@@ -366,7 +366,7 @@ async function renderLeaderboard() {
       if (!sent.length) continue;
       const best = sent.reduce((b, r) => (window.GRADES||[]).indexOf(r.grade) > (window.GRADES||[]).indexOf(b.grade) ? r : b, sent[0]);
       if (!userBest[uid] || (window.GRADES||[]).indexOf(best.grade) > (window.GRADES||[]).indexOf(userBest[uid].grade)) {
-        userBest[uid] = { id: uid, grade: best.grade, emoji: acc.emoji||'🧗', username: acc.username||'?', displayName: acc.display_name||acc.username, gym: s.gym||'' };
+        userBest[uid] = { id: uid, grade: best.grade, emoji: acc.emoji||'🧗', username: acc.username||'?', displayName: acc.display_name||acc.username||'?', gym: s.gym||'' };
       }
     }
 

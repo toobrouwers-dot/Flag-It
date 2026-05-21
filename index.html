@@ -5186,6 +5186,15 @@ function renderGradeOracle(){
               selectProfile(cloudPid);
               return;
             }
+            // Nieuw account: nog geen cloud data maar wel ingelogd → profiel automatisch aanmaken
+            const acct=await cloudGetAccount().catch(()=>null);
+            if(acct){
+              const name=acct.display_name||acct.username||(user.email||'').split('@')[0]||'Mijn Profiel';
+              const newPid='p_'+Date.now();
+              saveProfiles([{id:newPid,name,emoji:'🧗',created:new Date().toISOString().split('T')[0]}]);
+              selectProfile(newPid);
+              return;
+            }
           }
         }catch(e){console.warn('[cloud] restore check failed',e);}
       }
