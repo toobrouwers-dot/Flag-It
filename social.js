@@ -160,7 +160,7 @@ async function renderSocialFeed() {
       }).join('');
       return `<div class="social-card">
         <div class="social-card-head">
-          <div class="social-avatar">${acc?.emoji || '🧗'}</div>
+          <div class="social-avatar">${_s(acc?.emoji || '🧗')}</div>
           <div class="social-user-info">
             <div class="social-username">${_s(acc?.display_name || acc?.username || 'klimmer')}</div>
             <div class="social-meta">${fmtDate ? fmtDate(s.date) : s.date}${s.gym ? ' · ' + _s(s.gym) : ''}</div>
@@ -208,7 +208,7 @@ async function showComments(sessionId) {
   ov.id = 'comments-ov';
   const list = (comments || []).map(c => `
     <div class="comment-row">
-      <div class="comment-avatar">${c.accounts?.emoji || '🧗'}</div>
+      <div class="comment-avatar">${_s(c.accounts?.emoji || '🧗')}</div>
       <div class="comment-body">
         <div class="comment-user">${_s(c.accounts?.username || 'klimmer')}</div>
         <div class="comment-text">${_s(c.content)}</div>
@@ -265,7 +265,7 @@ async function showPublicProfile(userId, username) {
   ov.className = 'modal-overlay';
   ov.innerHTML = `<div class="modal-box" style="max-height:80dvh">
     <div style="text-align:center;padding:16px 0 12px">
-      <div style="font-size:44px">${acct?.emoji || '🧗'}</div>
+      <div style="font-size:44px">${_s(acct?.emoji || '🧗')}</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;text-transform:uppercase">${_s(acct?.display_name || acct?.username || username)}</div>
       <div style="color:var(--muted);font-size:13px;margin-top:2px">@${_s(acct?.username || username)}</div>
       ${acct?.bio ? `<div style="font-size:13px;margin-top:6px;color:var(--text)">${_s(acct.bio)}</div>` : ''}
@@ -284,7 +284,7 @@ async function showPublicProfile(userId, username) {
       ${sess.slice(0, 5).map(s => {
         const mg = (s.routes||[]).filter(r=>r.result!=='poging').reduce((b,r)=>(window.GRADES||[]).indexOf(r.grade)>(window.GRADES||[]).indexOf(b.grade)?r:b,{grade:''});
         return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:.5px solid var(--border)">
-          <div><div style="font-size:13px;font-weight:600">${s.gym||'Gym'}</div><div style="font-size:12px;color:var(--muted)">${fmtDate?fmtDate(s.date):s.date}</div></div>
+          <div><div style="font-size:13px;font-weight:600">${_s(s.gym||'Gym')}</div><div style="font-size:12px;color:var(--muted)">${_s(fmtDate?fmtDate(s.date):s.date)}</div></div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:var(--accent)">${mg.grade||'—'}</div>
         </div>`;
       }).join('')}
@@ -341,7 +341,7 @@ async function renderLeaderboard() {
       const gc = (window.GRADE_COLORS||[])[(window.GRADES||[]).indexOf(u.grade)] || 'var(--accent)';
       return `<div class="lb-row" onclick="showPublicProfile(null,'${_s(u.username)}')">
         <div class="lb-rank">${medals[i] || (i + 1)}</div>
-        <div class="lb-avatar">${u.emoji}</div>
+        <div class="lb-avatar">${_s(u.emoji)}</div>
         <div class="lb-info">
           <div class="lb-name">${_s(u.displayName || u.username)}</div>
           <div class="lb-sub">${_s(u.gym)}</div>
@@ -374,7 +374,7 @@ async function renderUserSearch() {
   el.innerHTML = (await Promise.all(data.map(async u => {
     const following = await isFollowing(u.id);
     return `<div class="user-result">
-      <div class="user-result-avatar">${u.emoji||'🧗'}</div>
+      <div class="user-result-avatar">${_s(u.emoji||'🧗')}</div>
       <div class="user-result-info">
         <div class="user-result-name">${_s(u.display_name || u.username)}</div>
         <div class="user-result-sub">@${_s(u.username)}</div>
