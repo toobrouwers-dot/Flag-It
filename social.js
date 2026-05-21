@@ -27,8 +27,8 @@ async function giveKudos(sessionCid, btn) {
 async function removeKudos(sessionCid, btn) {
   const user = await cloudCurrentUser();
   if (!user) return;
-  await db().from('kudos').delete().eq('from_user_id', user.id).eq('session_id', sessionCid);
-  if (btn) {
+  const { error } = await db().from('kudos').delete().eq('from_user_id', user.id).eq('session_id', sessionCid);
+  if (!error && btn) {
     btn.classList.remove('kudos-active');
     const cnt = btn.querySelector('.kudos-n');
     if (cnt) cnt.textContent = Math.max(0, parseInt(cnt.textContent || '0') - 1);
@@ -37,12 +37,18 @@ async function removeKudos(sessionCid, btn) {
 
 async function toggleKudos(sessionCid, btn) {
   if (!cloudReady()) { showAuthScreen(); return; }
+  if (btn?.dataset.loading) return;
   const user = await cloudCurrentUser();
   if (!user) { showAuthScreen(); return; }
-  if (btn?.classList.contains('kudos-active')) {
-    await removeKudos(sessionCid, btn);
-  } else {
-    await giveKudos(sessionCid, btn);
+  if (btn) btn.dataset.loading = '1';
+  try {
+    if (btn?.classList.contains('kudos-active')) {
+      await removeKudos(sessionCid, btn);
+    } else {
+      await giveKudos(sessionCid, btn);
+    }
+  } finally {
+    if (btn) delete btn.dataset.loading;
   }
 }
 
@@ -179,15 +185,34 @@ async function renderSocialFeed() {
       </div>`;
     }).join('');
 
-    // Load kudos counts asynchronously
-    data.forEach(async s => {
-      const btn = document.getElementById('kudos-btn-' + s.id);
-      if (!btn) return;
-      const { count, mine } = await loadKudosForSession(s.id);
-      const cnt = btn.querySelector('.kudos-n');
-      if (cnt) cnt.textContent = count;
-      if (mine) btn.classList.add('kudos-active');
-    });
+    // Batch-load all kudos in one query
+    const currentUser = await cloudCurrentUser();
+    const sessionIds = data.map(s => s.id);
+    try {
+      const { data: kudosData } = await db().from('kudos')
+        .select('session_id,from_user_id')
+        .in('session_id', sessionIds);
+      const kudosMap = {};
+      for (const k of (kudosData || [])) {
+        if (!kudosMap[k.session_id]) kudosMap[k.session_id] = { count: 0, mine: false };
+        kudosMap[k.session_id].count++;
+        if (currentUser && k.from_user_id === currentUser.id) kudosMap[k.session_id].mine = true;
+      }
+      for (const s of data) {
+        const btn = document.getElementById('kudos-btn-' + s.id);
+        if (!btn) continue;
+        const info = kudosMap[s.id] || { count: 0, mine: false };
+        const cnt = btn.querySelector('.kudos-n');
+        if (cnt) cnt.textContent = info.count;
+        if (info.mine) btn.classList.add('kudos-active');
+      }
+    } catch(e) {
+      console.warn('[social] kudos batch error:', e);
+      for (const s of data) {
+        const cnt = document.getElementById('kudos-btn-' + s.id)?.querySelector('.kudos-n');
+        if (cnt) cnt.textContent = '0';
+      }
+    }
   } catch(e) {
     console.warn('[social] feed error:', e);
     el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger);font-size:13px">Laden mislukt</div>';
@@ -198,10 +223,16 @@ async function renderSocialFeed() {
 
 async function showComments(sessionId) {
   const user = await cloudCurrentUser();
-  const { data: comments } = await db().from('comments')
-    .select('id,content,created_at,accounts!comments_user_id_fkey(username,emoji)')
-    .eq('session_id', sessionId)
-    .order('created_at', { ascending: true });
+  let comments = [];
+  try {
+    const { data } = await db().from('comments')
+      .select('id,content,created_at,accounts!comments_user_id_fkey(username,emoji)')
+      .eq('session_id', sessionId)
+      .order('created_at', { ascending: true });
+    comments = data || [];
+  } catch(e) {
+    console.warn('[social] comments load error:', e);
+  }
 
   const ov = document.createElement('div');
   ov.className = 'modal-overlay';
@@ -234,12 +265,14 @@ async function postComment(sessionId) {
   const user = await cloudCurrentUser();
   if (!user) return;
   const { error } = await db().from('comments').insert({ user_id: user.id, session_id: sessionId, content });
-  if (!error) {
-    input.value = '';
-    document.getElementById('comments-ov')?.remove();
-    showComments(sessionId);
-    if (typeof haptic === 'function') haptic(10);
+  if (error) {
+    if (typeof toast === 'function') toast('Reactie opslaan mislukt', 'var(--danger)');
+    return;
   }
+  input.value = '';
+  document.getElementById('comments-ov')?.remove();
+  showComments(sessionId);
+  if (typeof haptic === 'function') haptic(10);
 }
 
 // ── PUBLIC PROFILE ────────────────────────────────────────
@@ -284,7 +317,7 @@ async function showPublicProfile(userId, username) {
       ${sess.slice(0, 5).map(s => {
         const mg = (s.routes||[]).filter(r=>r.result!=='poging').reduce((b,r)=>(window.GRADES||[]).indexOf(r.grade)>(window.GRADES||[]).indexOf(b.grade)?r:b,{grade:''});
         return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:.5px solid var(--border)">
-          <div><div style="font-size:13px;font-weight:600">${s.gym||'Gym'}</div><div style="font-size:12px;color:var(--muted)">${fmtDate?fmtDate(s.date):s.date}</div></div>
+          <div><div style="font-size:13px;font-weight:600">${_s(s.gym)||'Gym'}</div><div style="font-size:12px;color:var(--muted)">${fmtDate?fmtDate(s.date):s.date}</div></div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:var(--accent)">${mg.grade||'—'}</div>
         </div>`;
       }).join('')}
@@ -346,7 +379,7 @@ async function renderLeaderboard() {
           <div class="lb-name">${_s(u.displayName || u.username)}</div>
           <div class="lb-sub">${_s(u.gym)}</div>
         </div>
-        <div class="lb-grade" style="color:${gc}">${u.grade}</div>
+        <div class="lb-grade" style="color:${gc}">${_s(u.grade)}</div>
       </div>`;
     }).join('');
   } catch(e) {
@@ -371,8 +404,20 @@ async function renderUserSearch() {
 
   if (!data?.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px">Geen klimmers gevonden</div>'; return; }
 
-  el.innerHTML = (await Promise.all(data.map(async u => {
-    const following = await isFollowing(u.id);
+  // Batch-check follows in one query
+  const me = await cloudCurrentUser();
+  let followingSet = new Set();
+  if (me) {
+    const userIds = data.map(u => u.id);
+    const { data: followData } = await db().from('follows')
+      .select('following_id')
+      .eq('follower_id', me.id)
+      .in('following_id', userIds);
+    followingSet = new Set((followData || []).map(f => f.following_id));
+  }
+
+  el.innerHTML = data.map(u => {
+    const following = followingSet.has(u.id);
     return `<div class="user-result">
       <div class="user-result-avatar">${u.emoji||'🧗'}</div>
       <div class="user-result-info">
@@ -384,7 +429,7 @@ async function renderUserSearch() {
         ${following ? 'Gevolgd' : 'Volgen'}
       </button>
     </div>`;
-  }))).join('');
+  }).join('');
 }
 
 // ── SESSION: PUBLIC TOGGLE ────────────────────────────────

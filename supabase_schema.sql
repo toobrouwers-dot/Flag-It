@@ -280,3 +280,23 @@ end; $$;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- ════════════════════════════════════════════════════════════
+-- INDEXES
+-- ════════════════════════════════════════════════════════════
+
+create index on public.sessions(user_id, profile_id);
+create index on public.sessions(date desc);
+create index on public.sessions(is_public) where is_public = true;
+create index on public.gyms(user_id, profile_id);
+create index on public.goals(user_id, profile_id);
+create index on public.hang_sessions(user_id, profile_id);
+create index on public.hang_sessions(date desc);
+create index on public.projects(user_id, profile_id);
+create index on public.injuries(user_id, profile_id);
+create index on public.competitions(user_id, profile_id);
+create index on public.gym_resets(user_id, profile_id);
+create index on public.kudos(session_id);
+create index on public.comments(session_id);
+create index on public.follows(follower_id);
+create index on public.follows(following_id);

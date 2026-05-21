@@ -3,22 +3,44 @@
   "short_name": "Flag it",
   "description": "Bouldering sessie tracker",
   "start_url": "/Flag-It/",
+  "scope": "/Flag-It/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
   "orientation": "portrait",
+  "categories": ["sports", "productivity"],
   "icons": [
     {
       "src": "/Flag-It/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/Flag-It/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/Flag-It/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/Flag-It/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Sessie loggen",
+      "short_name": "Log",
+      "url": "/Flag-It/",
+      "icons": [{ "src": "/Flag-It/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
