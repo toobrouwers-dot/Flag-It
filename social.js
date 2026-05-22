@@ -439,14 +439,49 @@ async function renderUserSearch() {
 
 async function setSessionPublic(sessionId, isPublic) {
   const user = await cloudCurrentUser();
-  if (!user) return;
+  if (!user) { if (typeof showAuthScreen === 'function') showAuthScreen(); return; }
   const session = (window.sessions || []).find(s => s.id === sessionId);
-  if (!session?._cid) return;
-  const { error } = await db().from('sessions').update({ is_public: isPublic }).eq('id', session._cid);
-  if (error) { if (typeof toast === 'function') toast('Opslaan mislukt', 'var(--danger)'); return; }
+  if (!session) return;
   session.is_public = isPublic;
   if (typeof save === 'function') save();
+  if (typeof cloudMarkDirty === 'function' && window.activeProfileId) cloudMarkDirty('sessions', window.activeProfileId);
+  if (typeof cloudScheduleSync === 'function' && window.activeProfileId) cloudScheduleSync(window.activeProfileId, 1000);
   if (typeof toast === 'function') toast(isPublic ? 'Sessie openbaar' : 'Sessie privé', 'var(--accent)');
+  if (typeof renderFeed === 'function') renderFeed();
+}
+
+async function loadFeedKudos() {
+  if (!cloudReady()) return;
+  const btns = document.querySelectorAll('[id^="kudos-sess-"]');
+  if (!btns.length) return;
+  const cids = Array.from(btns).map(b => b.dataset.cid).filter(Boolean);
+  if (!cids.length) return;
+  try {
+    const user = await cloudCurrentUser();
+    const { data: kudosData } = await db().from('kudos')
+      .select('session_id,from_user_id')
+      .in('session_id', cids);
+    const kudosMap = {};
+    for (const k of (kudosData || [])) {
+      if (!kudosMap[k.session_id]) kudosMap[k.session_id] = { count: 0, mine: false };
+      kudosMap[k.session_id].count++;
+      if (user && k.from_user_id === user.id) kudosMap[k.session_id].mine = true;
+    }
+    for (const btn of btns) {
+      const cid = btn.dataset.cid;
+      if (!cid) continue;
+      const info = kudosMap[cid] || { count: 0, mine: false };
+      const cnt = btn.querySelector('.kudos-n');
+      if (cnt) cnt.textContent = info.count;
+      btn.classList.toggle('kudos-active', info.mine);
+    }
+  } catch(e) {
+    console.warn('[social] feed kudos error:', e);
+    for (const btn of btns) {
+      const cnt = btn.querySelector('.kudos-n');
+      if (cnt) cnt.textContent = '0';
+    }
+  }
 }
 
 // ── HELPERS ──────────────────────────────────────────────
