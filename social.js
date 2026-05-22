@@ -469,6 +469,40 @@ async function setSessionPublic(sessionId, isPublic) {
   if (typeof renderFeed === 'function') renderFeed();
 }
 
+async function loadFeedKudos() {
+  if (!cloudReady()) return;
+  const btns = document.querySelectorAll('[id^="kudos-sess-"]');
+  if (!btns.length) return;
+  const cids = Array.from(btns).map(b => b.dataset.cid).filter(Boolean);
+  if (!cids.length) return;
+  try {
+    const user = await cloudCurrentUser();
+    const { data: kudosData } = await db().from('kudos')
+      .select('session_id,from_user_id')
+      .in('session_id', cids);
+    const kudosMap = {};
+    for (const k of (kudosData || [])) {
+      if (!kudosMap[k.session_id]) kudosMap[k.session_id] = { count: 0, mine: false };
+      kudosMap[k.session_id].count++;
+      if (user && k.from_user_id === user.id) kudosMap[k.session_id].mine = true;
+    }
+    for (const btn of btns) {
+      const cid = btn.dataset.cid;
+      if (!cid) continue;
+      const info = kudosMap[cid] || { count: 0, mine: false };
+      const cnt = btn.querySelector('.kudos-n');
+      if (cnt) cnt.textContent = info.count;
+      btn.classList.toggle('kudos-active', info.mine);
+    }
+  } catch(e) {
+    console.warn('[social] feed kudos error:', e);
+    for (const btn of btns) {
+      const cnt = btn.querySelector('.kudos-n');
+      if (cnt) cnt.textContent = '0';
+    }
+  }
+}
+
 // ── HELPERS ──────────────────────────────────────────────
 
 function _s(v) { return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }

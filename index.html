@@ -2014,10 +2014,11 @@ function renderFeed(){
           title="${s.is_public?'Openbaar — tik om privé te maken':'Privé — tik om te delen'}">
           ${s.is_public?'🌐 Openbaar':'🔒 Privé'}
         </button>
-        ${s._cid?`<button class="social-kudos-btn" id="kudos-sess-${s.id}" style="font-size:12px;padding:4px 10px" onclick="typeof toggleKudos==='function'&&toggleKudos('${s._cid}',this)">🤜 <span class="kudos-n">…</span></button>`:''}
+        ${s._cid?`<button class="social-kudos-btn" id="kudos-sess-${s.id}" data-cid="${s._cid}" style="font-size:12px;padding:4px 10px" onclick="typeof toggleKudos==='function'&&toggleKudos('${s._cid}',this)">🤜 <span class="kudos-n">…</span></button>`:''}
       </div>
     </div>`;
   }).join('');
+  if (typeof loadFeedKudos === 'function') setTimeout(loadFeedKudos, 0);
 }
 
 function fmtDur(secs){if(!secs||secs<60)return secs+'s';const h=Math.floor(secs/3600),m=Math.floor((secs%3600)/60);return h>0?h+'u '+m+'m':m+'m';}
