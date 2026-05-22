@@ -336,6 +336,18 @@ function _syncAccountToProfile(acct) {
 
 // ── AUTH SCREEN ──────────────────────────────────────────
 
+function _translateAuthError(msg) {
+  if (!msg) return null;
+  const m = msg.toLowerCase();
+  if (m.includes('invalid login credentials') || m.includes('invalid credentials')) return 'Ongeldig e-mailadres of wachtwoord.';
+  if (m.includes('email not confirmed')) return 'E-mail nog niet bevestigd. Controleer je inbox en klik op de bevestigingslink.';
+  if (m.includes('user already registered')) return 'Dit e-mailadres is al in gebruik.';
+  if (m.includes('password should be at least')) return 'Wachtwoord moet minimaal 6 tekens zijn.';
+  if (m.includes('rate limit') || m.includes('too many requests')) return 'Te veel pogingen. Probeer het later opnieuw.';
+  if (m.includes('network') || m.includes('fetch')) return 'Netwerkfout. Controleer je internetverbinding.';
+  return msg;
+}
+
 function showAuthScreen() {
   if (document.getElementById('auth-screen')) return;
   const el = document.createElement('div');
@@ -410,7 +422,7 @@ async function doSignIn() {
     setTimeout(hideAuthScreen, 800);
     if (window.activeProfileId) cloudMigrateLocal(window.activeProfileId).catch(() => {});
   } catch(e) {
-    authShowMsg(e.message || 'Inloggen mislukt', true);
+    authShowMsg(_translateAuthError(e.message) || 'Inloggen mislukt', true);
   }
 }
 
@@ -427,7 +439,7 @@ async function doSignUp() {
     authShowMsg('Account aangemaakt! Controleer je e-mail voor verificatie.', false);
     if (window.activeProfileId) setTimeout(() => cloudMigrateLocal(window.activeProfileId).catch(() => {}), 1000);
   } catch(e) {
-    authShowMsg(e.message || 'Registreren mislukt', true);
+    authShowMsg(_translateAuthError(e.message) || 'Registreren mislukt', true);
   }
 }
 
@@ -546,7 +558,7 @@ async function lfsDoSignIn() {
     lfsShowMsg('Ingelogd!', false);
     setTimeout(() => window._lfsDone?.(), 700);
   } catch(e) {
-    lfsShowMsg(e.message || 'Inloggen mislukt', true);
+    lfsShowMsg(_translateAuthError(e.message) || 'Inloggen mislukt', true);
   }
 }
 
@@ -564,7 +576,7 @@ async function lfsDoSignUp() {
     lfsShowMsg('Account aangemaakt! Check je e-mail voor verificatie.', false);
     setTimeout(() => window._lfsDone?.(), 1500);
   } catch(e) {
-    lfsShowMsg(e.message || 'Registreren mislukt', true);
+    lfsShowMsg(_translateAuthError(e.message) || 'Registreren mislukt', true);
   }
 }
 

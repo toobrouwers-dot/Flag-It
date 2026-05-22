@@ -1240,7 +1240,7 @@ let currentFeel=null;
 ══════════════════════════════════════════ */
 const PFK='flagit_profiles_v1';
 const PROFILE_EMOJIS=['🧗','🏔️','💪','⚡','🎯','🏆','🌟','🔥'];
-let activeProfileId=null;
+var activeProfileId=null;
 
 function loadProfiles(){
   try{const r=localStorage.getItem(PFK);if(r){const p=JSON.parse(r);if(Array.isArray(p))return p}}catch(e){}
