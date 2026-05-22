@@ -439,14 +439,34 @@ async function renderUserSearch() {
 
 async function setSessionPublic(sessionId, isPublic) {
   const user = await cloudCurrentUser();
-  if (!user) return;
+  if (!user) {
+    if (typeof toast === 'function') toast('Log in om sessies te delen', 'var(--danger)');
+    return;
+  }
   const session = (window.sessions || []).find(s => s.id === sessionId);
-  if (!session?._cid) return;
-  const { error } = await db().from('sessions').update({ is_public: isPublic }).eq('id', session._cid);
-  if (error) { if (typeof toast === 'function') toast('Opslaan mislukt', 'var(--danger)'); return; }
+  if (!session) return;
+
+  // Update locally first so the UI reflects the change immediately
   session.is_public = isPublic;
   if (typeof save === 'function') save();
+
+  if (session._cid) {
+    // Session already synced — update Supabase directly
+    const { error } = await db().from('sessions').update({ is_public: isPublic }).eq('id', session._cid);
+    if (error) {
+      // Revert local change on failure
+      session.is_public = !isPublic;
+      if (typeof save === 'function') save();
+      if (typeof toast === 'function') toast('Opslaan mislukt', 'var(--danger)');
+      return;
+    }
+  } else {
+    // Session not yet synced — mark dirty so the next sync pushes is_public
+    if (typeof cloudMarkDirty === 'function') cloudMarkDirty('sessions', window.activeProfileId || '');
+  }
+
   if (typeof toast === 'function') toast(isPublic ? 'Sessie openbaar' : 'Sessie privé', 'var(--accent)');
+  if (typeof renderFeed === 'function') renderFeed();
 }
 
 // ── HELPERS ──────────────────────────────────────────────
