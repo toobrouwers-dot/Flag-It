@@ -952,6 +952,13 @@ select option{background:#1e1e1e}
         <button onclick="openSetterModal()" style="padding:13px 16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:12px;color:var(--accent);font-family:'Barlow',sans-serif;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0" onmousedown="this.style.background='rgba(127,119,221,.08)'" onmouseup="this.style.background='none'">🏗️ Setter</button>
       </div>
     </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 16px">
+      <div>
+        <div style="font-size:14px;font-weight:600">🌐 Openbaar op ranglijst</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Verschijnt bij andere klimmers</div>
+      </div>
+      <input type="checkbox" id="inp-public" style="width:20px;height:20px;cursor:pointer;accent-color:var(--accent)">
+    </div>
     <button class="btn-save" onclick="saveSession()">Sessie opslaan</button>
   </div>
 </div>
@@ -2082,6 +2089,7 @@ function editSession(id){
   s.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type));
   document.querySelector('#page-log .page-title').textContent='Sessie bewerken';
   document.querySelector('#page-log .btn-save').textContent='Wijzigingen opslaan';
+  const pubEl=document.getElementById('inp-public');if(pubEl)pubEl.checked=!!(s.is_public);
   showPage('log');
   refreshGymSelect();
   if(s.gym)document.getElementById('inp-gym-select').value=s.gym;
@@ -2247,15 +2255,17 @@ function saveSession(){
       result:document.getElementById('rr-'+id).value
     })
   });
+  const isPublic=document.getElementById('inp-public')?.checked||false;
   const wasEdit=editMode;
   if(wasEdit){
     const idx=sessions.findIndex(s=>s.id===editSessionId);
-    if(idx!==-1)sessions[idx]={...sessions[idx],date,gym,note,routes,feel:currentFeel};
+    if(idx!==-1)sessions[idx]={...sessions[idx],date,gym,note,routes,feel:currentFeel,is_public:isPublic};
   }else{
     const sessionEnd=Date.now();
-    sessions.push({date,gym,note,routes,feel:currentFeel,id:sessionEnd,sessionStart:sessionTimerStart,sessionEnd:sessionTimerStart?sessionEnd:null});
+    sessions.push({date,gym,note,routes,feel:currentFeel,id:sessionEnd,sessionStart:sessionTimerStart,sessionEnd:sessionTimerStart?sessionEnd:null,is_public:isPublic});
   }
   editMode=false;editSessionId=null;
+  const pubEl=document.getElementById('inp-public');if(pubEl)pubEl.checked=false;
   currentFeel=null;
   document.querySelectorAll('.feel-btn').forEach(b=>b.classList.remove('selected'));
   applyVibe(null);
