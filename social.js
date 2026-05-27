@@ -162,9 +162,9 @@ async function renderSocialFeed() {
       const routes = s.routes || [];
       const sent = routes.filter(r => r.result !== 'poging');
       const maxG = sent.length ? sent.reduce((b, r) =>
-        (window.GRADES || []).indexOf(r.grade) > (window.GRADES || []).indexOf(b.grade) ? r : b, sent[0]) : null;
+        GRADES.indexOf(r.grade) > GRADES.indexOf(b.grade) ? r : b, sent[0]) : null;
       const heat = routes.slice(0, 8).map(r => {
-        const gc = (window.GRADE_COLORS || [])[(window.GRADES || []).indexOf(r.grade)] || '#555';
+        const gc = GRADE_COLORS[GRADES.indexOf(r.grade)] || '#555';
         return `<div class="social-heat-block" style="background:${gc}"></div>`;
       }).join('');
       return `<div class="social-card">
@@ -295,7 +295,7 @@ async function showPublicProfile(userId, username) {
   const following = me && me.id !== userId ? await isFollowing(userId) : null;
   const totalRoutes = sess.reduce((n, s) => n + (s.routes?.length || 0), 0);
   const allSent = sess.flatMap(s => (s.routes||[]).filter(r => r.result !== 'poging'));
-  const pr = allSent.length ? allSent.reduce((b, r) => (window.GRADES||[]).indexOf(r.grade) > (window.GRADES||[]).indexOf(b.grade) ? r : b, allSent[0]) : null;
+  const pr = allSent.length ? allSent.reduce((b, r) => GRADES.indexOf(r.grade) > GRADES.indexOf(b.grade) ? r : b, allSent[0]) : null;
 
   const ov = document.createElement('div');
   ov.className = 'modal-overlay';
@@ -318,7 +318,7 @@ async function showPublicProfile(userId, username) {
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:8px 0 6px">Recente sessies</div>
     <div style="overflow-y:auto;max-height:220px">
       ${sess.slice(0, 5).map(s => {
-        const mg = (s.routes||[]).filter(r=>r.result!=='poging').reduce((b,r)=>(window.GRADES||[]).indexOf(r.grade)>(window.GRADES||[]).indexOf(b.grade)?r:b,{grade:''});
+        const mg = (s.routes||[]).filter(r=>r.result!=='poging').reduce((b,r)=>GRADES.indexOf(r.grade)>GRADES.indexOf(b.grade)?r:b,{grade:''});
         return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:.5px solid var(--border)">
           <div><div style="font-size:13px;font-weight:600">${_s(s.gym)||'Gym'}</div><div style="font-size:12px;color:var(--muted)">${fmtDate?fmtDate(s.date):s.date}</div></div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:var(--accent)">${mg.grade||'—'}</div>
@@ -364,18 +364,18 @@ async function renderLeaderboard() {
       const uid = acc.id;
       const sent = (s.routes || []).filter(r => r.result !== 'poging');
       if (!sent.length) continue;
-      const best = sent.reduce((b, r) => (window.GRADES||[]).indexOf(r.grade) > (window.GRADES||[]).indexOf(b.grade) ? r : b, sent[0]);
-      if (!userBest[uid] || (window.GRADES||[]).indexOf(best.grade) > (window.GRADES||[]).indexOf(userBest[uid].grade)) {
+      const best = sent.reduce((b, r) => GRADES.indexOf(r.grade) > GRADES.indexOf(b.grade) ? r : b, sent[0]);
+      if (!userBest[uid] || GRADES.indexOf(best.grade) > GRADES.indexOf(userBest[uid].grade)) {
         userBest[uid] = { id: uid, sessionId: s.id, grade: best.grade, emoji: acc.emoji||'🧗', username: acc.username||'?', displayName: acc.display_name||acc.username||'?', gym: s.gym||'' };
       }
     }
 
-    const sorted = Object.values(userBest).sort((a, b) => (window.GRADES||[]).indexOf(b.grade) - (window.GRADES||[]).indexOf(a.grade));
+    const sorted = Object.values(userBest).sort((a, b) => GRADES.indexOf(b.grade) - GRADES.indexOf(a.grade));
     const medals = ['🥇','🥈','🥉'];
 
     const top25 = sorted.slice(0, 25);
     el.innerHTML = top25.map((u, i) => {
-      const gc = (window.GRADE_COLORS||[])[(window.GRADES||[]).indexOf(u.grade)] || 'var(--accent)';
+      const gc = GRADE_COLORS[GRADES.indexOf(u.grade)] || 'var(--accent)';
       return `<div class="lb-row" onclick="showPublicProfile('${_s(u.id)}','${_s(u.username)}')">
         <div class="lb-rank">${medals[i] || (i + 1)}</div>
         <div class="lb-avatar">${_s(u.emoji)}</div>
@@ -474,7 +474,7 @@ async function setSessionPublic(sessionId, isPublic) {
     if (typeof toast === 'function') toast('Log in om sessies te delen', 'var(--danger)');
     return;
   }
-  const session = (window.sessions || []).find(s => s.id === sessionId);
+  const session = (typeof sessions !== 'undefined' ? sessions : []).find(s => s.id === sessionId);
   if (!session) return;
 
   // Update locally first so the UI reflects the change immediately
@@ -493,7 +493,7 @@ async function setSessionPublic(sessionId, isPublic) {
     }
   } else {
     // Session not yet synced — mark dirty so the next sync pushes is_public
-    if (typeof cloudMarkDirty === 'function') cloudMarkDirty('sessions', window.activeProfileId || '');
+    if (typeof cloudMarkDirty === 'function') cloudMarkDirty('sessions', (typeof activeProfileId !== 'undefined' ? activeProfileId : '') || '');
   }
 
   if (typeof toast === 'function') toast(isPublic ? 'Sessie openbaar' : 'Sessie privé', 'var(--accent)');
