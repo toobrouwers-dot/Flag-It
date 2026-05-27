@@ -346,7 +346,7 @@ async function renderLeaderboard() {
   try {
     const since = new Date(Date.now() - 90 * 86400000).toISOString().split('T')[0];
     const { data } = await db().from('sessions')
-      .select('date,gym,routes,accounts!sessions_user_id_fkey(id,username,emoji,display_name)')
+      .select('id,date,gym,routes,accounts!sessions_user_id_fkey(id,username,emoji,display_name)')
       .eq('is_public', true)
       .gte('date', since)
       .order('date', { ascending: false })
@@ -366,14 +366,15 @@ async function renderLeaderboard() {
       if (!sent.length) continue;
       const best = sent.reduce((b, r) => (window.GRADES||[]).indexOf(r.grade) > (window.GRADES||[]).indexOf(b.grade) ? r : b, sent[0]);
       if (!userBest[uid] || (window.GRADES||[]).indexOf(best.grade) > (window.GRADES||[]).indexOf(userBest[uid].grade)) {
-        userBest[uid] = { id: uid, grade: best.grade, emoji: acc.emoji||'🧗', username: acc.username||'?', displayName: acc.display_name||acc.username||'?', gym: s.gym||'' };
+        userBest[uid] = { id: uid, sessionId: s.id, grade: best.grade, emoji: acc.emoji||'🧗', username: acc.username||'?', displayName: acc.display_name||acc.username||'?', gym: s.gym||'' };
       }
     }
 
     const sorted = Object.values(userBest).sort((a, b) => (window.GRADES||[]).indexOf(b.grade) - (window.GRADES||[]).indexOf(a.grade));
     const medals = ['🥇','🥈','🥉'];
 
-    el.innerHTML = sorted.slice(0, 25).map((u, i) => {
+    const top25 = sorted.slice(0, 25);
+    el.innerHTML = top25.map((u, i) => {
       const gc = (window.GRADE_COLORS||[])[(window.GRADES||[]).indexOf(u.grade)] || 'var(--accent)';
       return `<div class="lb-row" onclick="showPublicProfile('${_s(u.id)}','${_s(u.username)}')">
         <div class="lb-rank">${medals[i] || (i + 1)}</div>
@@ -382,9 +383,39 @@ async function renderLeaderboard() {
           <div class="lb-name">${_s(u.displayName || u.username)}</div>
           <div class="lb-sub">${_s(u.gym)}</div>
         </div>
+        ${u.sessionId ? `<button class="social-kudos-btn" id="lb-kudos-${_s(u.sessionId)}" onclick="event.stopPropagation();toggleKudos('${_s(u.sessionId)}',this)" style="font-size:12px;padding:4px 10px;flex-shrink:0">🤜 <span class="kudos-n">…</span></button>` : ''}
         <div class="lb-grade" style="color:${gc}">${_s(u.grade)}</div>
       </div>`;
     }).join('');
+
+    // Batch-load kudos for the best sessions
+    const currentUser = await cloudCurrentUser();
+    const sessionIds = top25.map(u => u.sessionId).filter(Boolean);
+    try {
+      const { data: kudosData } = await db().from('kudos')
+        .select('session_id,from_user_id')
+        .in('session_id', sessionIds);
+      const kudosMap = {};
+      for (const k of (kudosData || [])) {
+        if (!kudosMap[k.session_id]) kudosMap[k.session_id] = { count: 0, mine: false };
+        kudosMap[k.session_id].count++;
+        if (currentUser && k.from_user_id === currentUser.id) kudosMap[k.session_id].mine = true;
+      }
+      for (const u of top25) {
+        const btn = document.getElementById('lb-kudos-' + u.sessionId);
+        if (!btn) continue;
+        const info = kudosMap[u.sessionId] || { count: 0, mine: false };
+        const cnt = btn.querySelector('.kudos-n');
+        if (cnt) cnt.textContent = info.count;
+        if (info.mine) btn.classList.add('kudos-active');
+      }
+    } catch(e) {
+      console.warn('[social] leaderboard kudos error:', e);
+      for (const u of top25) {
+        const cnt = document.getElementById('lb-kudos-' + u.sessionId)?.querySelector('.kudos-n');
+        if (cnt) cnt.textContent = '0';
+      }
+    }
   } catch(e) {
     console.warn('[social] leaderboard error:', e);
     el.innerHTML = '<div style="color:var(--danger);font-size:13px;text-align:center;padding:16px">Laden mislukt</div>';
