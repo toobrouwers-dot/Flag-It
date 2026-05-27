@@ -293,12 +293,12 @@ function cloudInitAuthListener() {
       }
       // Refresh badge with display_name from accounts table, sync to local profile
       cloudGetAccount().then(acct => { if (acct) { cloudUpdateAuthBadge(session.user, acct); _syncAccountToProfile(acct); } }).catch(() => {});
-      if (window.activeProfileId) {
+      if (typeof activeProfileId !== 'undefined' && activeProfileId) {
         if (window._cloudJustSignedIn) {
           window._cloudJustSignedIn = false;
-          cloudMigrateLocal(window.activeProfileId).catch(() => {});
+          cloudMigrateLocal(activeProfileId).catch(() => {});
         } else {
-          cloudSync(window.activeProfileId).catch(() => {});
+          cloudSync(activeProfileId).catch(() => {});
         }
       }
     }
@@ -320,10 +320,10 @@ function _safeText(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,
 
 function _syncAccountToProfile(acct) {
   const cloudName = acct?.display_name || acct?.username;
-  if (!cloudName || !window.activeProfileId) return;
+  if (!cloudName || typeof activeProfileId === 'undefined' || !activeProfileId) return;
   if (typeof loadProfiles !== 'function' || typeof saveProfiles !== 'function') return;
   const profiles = loadProfiles();
-  const p = profiles.find(pr => pr.id === window.activeProfileId);
+  const p = profiles.find(pr => pr.id === activeProfileId);
   if (!p || p.name === cloudName) return;
   p.name = cloudName;
   saveProfiles(profiles);
@@ -408,7 +408,7 @@ async function doSignIn() {
     await cloudSignIn(email, pw);
     authShowMsg('Ingelogd!', false);
     setTimeout(hideAuthScreen, 800);
-    if (window.activeProfileId) cloudMigrateLocal(window.activeProfileId).catch(() => {});
+    if (typeof activeProfileId !== 'undefined' && activeProfileId) cloudMigrateLocal(activeProfileId).catch(() => {});
   } catch(e) {
     authShowMsg(e.message || 'Inloggen mislukt', true);
   }
@@ -425,7 +425,7 @@ async function doSignUp() {
   try {
     await cloudSignUp(email, pw);
     authShowMsg('Account aangemaakt! Controleer je e-mail voor verificatie.', false);
-    if (window.activeProfileId) setTimeout(() => cloudMigrateLocal(window.activeProfileId).catch(() => {}), 1000);
+    if (typeof activeProfileId !== 'undefined' && activeProfileId) setTimeout(() => cloudMigrateLocal(activeProfileId).catch(() => {}), 1000);
   } catch(e) {
     authShowMsg(e.message || 'Registreren mislukt', true);
   }
