@@ -26,12 +26,14 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 
 /* NAV */
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(14,14,14,.97);backdrop-filter:blur(12px);border-top:.5px solid var(--border);display:flex;padding-bottom:var(--safe-bot);z-index:100}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;background:none;border:none;color:var(--muted);font-family:'Barlow',sans-serif;font-size:9px;font-weight:500;letter-spacing:.3px;cursor:pointer;transition:color .2s,transform .12s;text-transform:uppercase;position:relative}
-.nav-btn:active{transform:scale(.85)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;background:none;border:none;color:var(--muted);font-family:'Barlow',sans-serif;font-size:10px;font-weight:500;letter-spacing:.3px;cursor:pointer;transition:color .2s,transform .12s;text-transform:uppercase;position:relative}
+.nav-btn:active{transform:scale(.9)}
 .nav-btn.active{color:var(--accent)}
 .nav-btn.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:20px;height:3px;background:var(--accent);border-radius:0 0 4px 4px}
 .nav-btn.active svg{filter:drop-shadow(0 0 5px rgba(127,119,221,.45))}
-.nav-btn svg{width:21px;height:21px}
+.nav-btn svg{width:22px;height:22px}
+@keyframes navTap{0%{transform:scale(1)}40%{transform:scale(.9)}70%{transform:scale(1.05)}100%{transform:scale(1)}}
+.nav-btn.tapped{animation:navTap .22s cubic-bezier(.4,0,.2,1) both}
 
 /* PAGES */
 .page{display:none;padding-bottom:calc(70px + var(--safe-bot))}
@@ -897,6 +899,7 @@ select option{background:#1e1e1e}
   <div class="feed-toggle">
     <button class="feed-toggle-btn active" id="tab-feed" onclick="switchFeedTab('feed')">Sessies</button>
     <button class="feed-toggle-btn" id="tab-dagboek" onclick="switchFeedTab('dagboek')">Dagboek</button>
+    <button class="feed-toggle-btn" id="tab-home-sociaal" onclick="switchFeedTab('sociaal')">Sociaal</button>
   </div>
   <div id="feed-tab-feed">
     <div id="filter-bar" class="filter-bar">
@@ -910,6 +913,22 @@ select option{background:#1e1e1e}
   </div>
   <div id="feed-tab-dagboek" style="display:none">
     <div id="dagboek-feed"></div>
+  </div>
+  <div id="feed-tab-sociaal" style="display:none">
+    <div class="feed-toggle">
+      <button class="feed-toggle-btn active" id="tab-sociaal-feed" onclick="switchSociaalTab('feed')">Feed</button>
+      <button class="feed-toggle-btn" id="tab-sociaal-search" onclick="switchSociaalTab('search')">Zoeken</button>
+      <button class="feed-toggle-btn" id="tab-sociaal-lb" onclick="switchSociaalTab('lb')">Ranglijst</button>
+    </div>
+    <div id="sociaal-tab-feed"><div id="social-feed"></div></div>
+    <div id="sociaal-tab-search" style="display:none">
+      <div style="padding:16px 20px 0"><input id="user-search-input" class="form-input" placeholder="🔍 Zoek klimmer..." oninput="renderUserSearch()" style="font-size:14px;width:100%;box-sizing:border-box"></div>
+      <div id="user-search-results" style="padding:0 20px"></div>
+    </div>
+    <div id="sociaal-tab-lb" style="display:none">
+      <div class="section-title" style="padding-top:12px">Ranglijst (90 dagen)</div>
+      <div id="leaderboard-list"></div>
+    </div>
   </div>
 </div>
 
@@ -965,7 +984,12 @@ select option{background:#1e1e1e}
 
 <!-- STATS -->
 <div id="page-stats" class="page">
-  <div class="page-header" style="display:flex;justify-content:space-between;align-items:center"><div class="page-title">Voortgang</div><button onclick="generateShareCard()" style="background:rgba(127,119,221,.15);border:.5px solid rgba(127,119,221,.4);border-radius:10px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;padding:8px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .15s" onmousedown="this.style.background='rgba(127,119,221,.25)'" onmouseup="this.style.background='rgba(127,119,221,.15)'">Deel kaart</button></div>
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:center"><div class="page-title">Analyse</div><button onclick="generateShareCard()" style="background:rgba(127,119,221,.15);border:.5px solid rgba(127,119,221,.4);border-radius:10px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;padding:8px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .15s" onmousedown="this.style.background='rgba(127,119,221,.25)'" onmouseup="this.style.background='rgba(127,119,221,.15)'">Deel kaart</button></div>
+  <div class="feed-toggle">
+    <button class="feed-toggle-btn active" id="tab-analyse-stats" onclick="switchAnalyseTab('stats')">Stats</button>
+    <button class="feed-toggle-btn" id="tab-analyse-coach" onclick="switchAnalyseTab('coach')">Coach</button>
+  </div>
+  <div id="analyse-tab-stats">
   <div class="stats-content">
     <div id="insights-section"></div>
     <div class="pr-row">
@@ -992,6 +1016,10 @@ select option{background:#1e1e1e}
     <div id="weakness-section"></div>
     <div id="oracle-section"></div>
     <div id="rival-section"></div>
+  </div>
+  </div><!-- /analyse-tab-stats -->
+  <div id="analyse-tab-coach" style="display:none">
+    <div class="coach-content" id="coach-content"></div>
   </div>
 </div>
 
@@ -1051,10 +1079,47 @@ select option{background:#1e1e1e}
   </div>
 </div>
 
-<!-- HANGBOARD -->
-<div id="page-hang" class="page">
-  <div class="page-header"><div class="page-title">Hangboard</div><div class="page-sub">Log je hang-sets en volg je PR's</div></div>
-  <div class="hang-content">
+<!-- HANGBOARD (lege shell — content zit in meer-tab-hang) -->
+<div id="page-hang" class="page"></div>
+
+<!-- GYMS -->
+<div id="page-gyms" class="page">
+  <div class="page-header"><div class="page-title">Meer</div><div class="page-sub">Gyms &amp; Hangboard</div></div>
+  <div class="feed-toggle">
+    <button class="feed-toggle-btn active" id="tab-meer-gyms" onclick="switchMeerTab('gyms')">Gyms</button>
+    <button class="feed-toggle-btn" id="tab-meer-hang" onclick="switchMeerTab('hang')">Hangboard</button>
+  </div>
+  <div id="meer-tab-gyms">
+  <div class="gyms-content">
+    <div id="gym-list" style="margin-bottom:16px"></div>
+    <div class="form-section-title" style="padding:0 0 10px">Gym toevoegen</div>
+    <div class="add-gym-row">
+      <input type="text" id="inp-new-gym" placeholder="bijv. Monk, ClimbUp, Bjoeks...">
+      <button class="btn-add-gym" onclick="addGym()">Voeg toe</button>
+    </div>
+    <div class="form-section-title" style="padding:16px 0 10px">Gym Resets</div>
+    <div id="reset-section"></div>
+    <div class="form-section-title" style="padding:8px 0 10px">Bezoekpatroon</div>
+    <div id="quiet-time-section"></div>
+    <div class="form-section-title" style="padding:8px 0 10px">Back-up</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-export" onclick="exportData()">↓ Exporteer</button>
+      <label class="btn-import-label" for="import-file-input">↑ Importeer</label>
+      <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="importFile(event)">
+    </div>
+    <div class="form-section-title" style="padding:14px 0 10px">Rivaal modus</div>
+    <div style="display:flex;gap:8px;margin-bottom:4px">
+      <label class="btn-export" for="rival-file-input" style="border-color:rgba(233,30,140,.4);color:var(--hang);text-align:center">⚔️ Rivaal importeren</label>
+      <input type="file" id="rival-file-input" accept=".json" style="display:none" onchange="importRival(event)">
+      <button class="btn-export" id="btn-clear-rival" onclick="clearRival()" style="display:none">Wis rivaal</button>
+    </div>
+    <div id="rival-info-bar" style="font-size:12px;color:var(--muted);padding:2px 0 4px"></div>
+    <div class="form-section-title" style="padding:20px 0 10px">Profiel</div>
+    <div id="profile-mgmt-section"></div>
+  </div>
+  </div><!-- /meer-tab-gyms -->
+  <div id="meer-tab-hang" style="display:none">
+    <div class="hang-content">
 
     <div class="form-section-title" style="padding:0 0 10px">Vinger Gezondheid</div>
     <div id="finger-health-section"></div>
@@ -1115,68 +1180,14 @@ select option{background:#1e1e1e}
     <div class="section-title" style="padding:24px 0 10px">Recente hangsessies</div>
     <div id="hang-feed"></div>
   </div>
+  </div><!-- /meer-tab-hang -->
 </div>
 
-<!-- GYMS -->
-<div id="page-gyms" class="page">
-  <div class="page-header"><div class="page-title">Mijn Gyms</div><div class="page-sub">Stel een favoriet in als standaard</div></div>
-  <div class="gyms-content">
-    <div id="gym-list" style="margin-bottom:16px"></div>
-    <div class="form-section-title" style="padding:0 0 10px">Gym toevoegen</div>
-    <div class="add-gym-row">
-      <input type="text" id="inp-new-gym" placeholder="bijv. Monk, ClimbUp, Bjoeks...">
-      <button class="btn-add-gym" onclick="addGym()">Voeg toe</button>
-    </div>
-    <div class="form-section-title" style="padding:16px 0 10px">Gym Resets</div>
-    <div id="reset-section"></div>
-    <div class="form-section-title" style="padding:8px 0 10px">Bezoekpatroon</div>
-    <div id="quiet-time-section"></div>
-    <div class="form-section-title" style="padding:8px 0 10px">Back-up</div>
-    <div style="display:flex;gap:8px">
-      <button class="btn-export" onclick="exportData()">↓ Exporteer</button>
-      <label class="btn-import-label" for="import-file-input">↑ Importeer</label>
-      <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="importFile(event)">
-    </div>
-    <div class="form-section-title" style="padding:14px 0 10px">Rivaal modus</div>
-    <div style="display:flex;gap:8px;margin-bottom:4px">
-      <label class="btn-export" for="rival-file-input" style="border-color:rgba(233,30,140,.4);color:var(--hang);text-align:center">⚔️ Rivaal importeren</label>
-      <input type="file" id="rival-file-input" accept=".json" style="display:none" onchange="importRival(event)">
-      <button class="btn-export" id="btn-clear-rival" onclick="clearRival()" style="display:none">Wis rivaal</button>
-    </div>
-    <div id="rival-info-bar" style="font-size:12px;color:var(--muted);padding:2px 0 4px"></div>
-    <div class="form-section-title" style="padding:20px 0 10px">Profiel</div>
-    <div id="profile-mgmt-section"></div>
-  </div>
-</div>
+<!-- SOCIAAL (lege shell — content zit in feed-tab-sociaal) -->
+<div id="page-sociaal" class="page"></div>
 
-<!-- SOCIAAL -->
-<div id="page-sociaal" class="page">
-  <div class="page-header"><div class="page-title">Sociaal</div><div class="page-sub">Vrienden, ranglijst &amp; zoeken</div></div>
-  <div class="feed-toggle">
-    <button class="feed-toggle-btn active" id="tab-sociaal-feed" onclick="switchSociaalTab('feed')">Feed</button>
-    <button class="feed-toggle-btn" id="tab-sociaal-search" onclick="switchSociaalTab('search')">Zoeken</button>
-    <button class="feed-toggle-btn" id="tab-sociaal-lb" onclick="switchSociaalTab('lb')">Ranglijst</button>
-  </div>
-  <div id="sociaal-tab-feed">
-    <div id="social-feed"></div>
-  </div>
-  <div id="sociaal-tab-search" style="display:none">
-    <div style="padding:16px 20px 0">
-      <input id="user-search-input" class="form-input" placeholder="🔍 Zoek klimmer..." oninput="renderUserSearch()" style="font-size:14px;width:100%;box-sizing:border-box">
-    </div>
-    <div id="user-search-results" style="padding:0 20px"></div>
-  </div>
-  <div id="sociaal-tab-lb" style="display:none">
-    <div class="section-title" style="padding-top:12px">Ranglijst (90 dagen)</div>
-    <div id="leaderboard-list"></div>
-  </div>
-</div>
-
-<!-- COACH -->
-<div id="page-coach" class="page">
-  <div class="page-header"><div class="page-title">Coach</div><div class="page-sub">Persoonlijk trainingsadvies</div></div>
-  <div class="coach-content" id="coach-content"></div>
-</div>
+<!-- COACH (lege shell — content zit in analyse-tab-coach) -->
+<div id="page-coach" class="page"></div>
 
 <!-- NAV -->
 <nav class="bottom-nav" role="navigation" aria-label="Hoofdnavigatie">
@@ -1186,23 +1197,14 @@ select option{background:#1e1e1e}
   <button class="nav-btn" onclick="showPage('log')" id="nav-log" aria-label="Sessie loggen">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Loggen
   </button>
-  <button class="nav-btn" onclick="showPage('stats')" id="nav-stats" aria-label="Statistieken">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Stats
+  <button class="nav-btn" onclick="showPage('stats')" id="nav-stats" aria-label="Analyse">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analyse
   </button>
   <button class="nav-btn" onclick="showPage('goals')" id="nav-goals" aria-label="Doelen &amp; Projecten">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Doelen
   </button>
-  <button class="nav-btn" onclick="showPage('hang')" id="nav-hang" aria-label="Hangboard">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Hang
-  </button>
-  <button class="nav-btn" onclick="showPage('gyms')" id="nav-gyms" aria-label="Gyms beheren">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/><line x1="9" y1="12" x2="15" y2="12"/></svg>Gyms
-  </button>
-  <button class="nav-btn" onclick="showPage('sociaal')" id="nav-sociaal" aria-label="Sociaal">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Sociaal
-  </button>
-  <button class="nav-btn" onclick="showPage('coach')" id="nav-coach" aria-label="Coach">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 1 0 0 10A5 5 0 0 0 12 2z"/><path d="M12 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z"/><path d="M17 8l2 2 4-4"/></svg>Coach
+  <button class="nav-btn" onclick="showPage('gyms')" id="nav-gyms" aria-label="Meer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Meer
   </button>
 </nav>
 
@@ -1233,6 +1235,8 @@ let activePlan=null;
 let feedTab='feed';
 let doelenTab='goals';
 let sociaalTab='feed';
+let analyseTab='stats';
+let meerTab='gyms';
 let chartP=null,chartG=null,chartH=null,tliChart=null,stokeRadarChart=null;
 let routeCount=0,hangSetCount=0;
 let editMode=false,editSessionId=null;
@@ -1597,20 +1601,34 @@ function calcStreak(){
 /* ══════════════════════════════════════════
    NAVIGATION
 ══════════════════════════════════════════ */
-const PAGE_ORDER=['home','log','stats','goals','hang','gyms','sociaal','coach'];
+const PAGE_ORDER=['home','log','stats','goals','gyms'];
 
 function _doPageRender(id){
-  if(id==='home')renderFeed();
-  if(id==='stats')renderStats();
+  if(id==='home'){renderFeed();if(feedTab==='sociaal')renderSociaalPage();}
+  if(id==='stats'){if(analyseTab==='stats')renderStats();else renderCoach();}
   if(id==='goals'){renderGoals();if(doelenTab==='projects')renderProjects();}
+  if(id==='gyms'){if(meerTab==='gyms'){renderGymsPage();renderProfileMgmt();}else renderHangPage();}
+  if(id==='log'){refreshGymSelect();refreshNotePlaceholder();}
+  // Legacy: werking bij directe showPage calls naar verwijderde tabs
   if(id==='sociaal')renderSociaalPage();
   if(id==='hang')renderHangPage();
-  if(id==='gyms'){renderGymsPage();renderProfileMgmt();}
-  if(id==='log'){refreshGymSelect();refreshNotePlaceholder();}
   if(id==='coach')renderCoach();
 }
 
+function _animateNavBtn(id){
+  const btn=document.getElementById('nav-'+id);
+  if(!btn)return;
+  btn.classList.remove('tapped');
+  void btn.offsetWidth;
+  btn.classList.add('tapped');
+  btn.addEventListener('animationend',()=>btn.classList.remove('tapped'),{once:true});
+}
+
 function showPage(id,direction){
+  // Verwijderde tabs redirecten naar hun nieuwe host
+  if(id==='sociaal'){feedTab='sociaal';id='home';}
+  if(id==='coach'){analyseTab='coach';id='stats';}
+  if(id==='hang'){meerTab='hang';id='gyms';}
   if(_navTransitioning)return;
   // Guard: intercept navigation away from log page when routes have been entered
   const onLogPage=document.querySelector('.page.active')?.id==='page-log';
@@ -1618,7 +1636,8 @@ function showPage(id,direction){
     pendingNavTarget=id;showNavLeaveConfirm();return;
   }
   haptic();
-  // Stop hang-page timers when navigating away
+  _animateNavBtn(id);
+  // Stop hang-page timers when navigating away (page-hang is now a shell; timer cleanup handled by switchMeerTab)
   if(id!=='hang'&&document.querySelector('.page.active')?.id==='page-hang'){
     if(timerRunning){clearInterval(timerInterval);timerInterval=null;timerRunning=false;const tb=document.getElementById('btn-timer');if(tb){tb.textContent='Hervatten';tb.className='btn-timer-start';}}
     if(restTimerRunning){clearInterval(restTimerInterval);restTimerInterval=null;restTimerRunning=false;const rb=document.getElementById('btn-rest-timer');if(rb){rb.textContent='▶ Start rust';rb.className='btn-rest-start';}}
@@ -3514,9 +3533,12 @@ function switchFeedTab(tab){
   feedTab=tab;
   document.getElementById('tab-feed').className='feed-toggle-btn'+(tab==='feed'?' active':'');
   document.getElementById('tab-dagboek').className='feed-toggle-btn'+(tab==='dagboek'?' active':'');
+  document.getElementById('tab-home-sociaal').className='feed-toggle-btn'+(tab==='sociaal'?' active':'');
   document.getElementById('feed-tab-feed').style.display=tab==='feed'?'':'none';
   document.getElementById('feed-tab-dagboek').style.display=tab==='dagboek'?'':'none';
+  document.getElementById('feed-tab-sociaal').style.display=tab==='sociaal'?'':'none';
   if(tab==='dagboek')renderDagboek();
+  if(tab==='sociaal')renderSociaalPage();
 }
 
 function switchDoelenTab(tab){
@@ -3545,6 +3567,30 @@ function switchSociaalTab(tab){
 function renderSociaalPage(){
   if(sociaalTab==='feed'&&typeof renderSocialFeed==='function')renderSocialFeed();
   if(sociaalTab==='lb'&&typeof renderLeaderboard==='function')renderLeaderboard();
+}
+
+function switchAnalyseTab(tab){
+  analyseTab=tab;
+  document.getElementById('tab-analyse-stats').className='feed-toggle-btn'+(tab==='stats'?' active':'');
+  document.getElementById('tab-analyse-coach').className='feed-toggle-btn'+(tab==='coach'?' active':'');
+  document.getElementById('analyse-tab-stats').style.display=tab==='stats'?'':'none';
+  document.getElementById('analyse-tab-coach').style.display=tab==='coach'?'':'none';
+  if(tab==='stats')renderStats();
+  if(tab==='coach')renderCoach();
+}
+
+function switchMeerTab(tab){
+  if(tab!=='hang'){
+    if(timerRunning){clearInterval(timerInterval);timerInterval=null;timerRunning=false;const tb=document.getElementById('btn-timer');if(tb){tb.textContent='Hervatten';tb.className='btn-timer-start';}}
+    if(restTimerRunning){clearInterval(restTimerInterval);restTimerInterval=null;restTimerRunning=false;const rb=document.getElementById('btn-rest-timer');if(rb){rb.textContent='▶ Start rust';rb.className='btn-rest-start';}}
+  }
+  meerTab=tab;
+  document.getElementById('tab-meer-gyms').className='feed-toggle-btn'+(tab==='gyms'?' active':'');
+  document.getElementById('tab-meer-hang').className='feed-toggle-btn'+(tab==='hang'?' active':'');
+  document.getElementById('meer-tab-gyms').style.display=tab==='gyms'?'':'none';
+  document.getElementById('meer-tab-hang').style.display=tab==='hang'?'':'none';
+  if(tab==='gyms'){renderGymsPage();renderProfileMgmt();}
+  if(tab==='hang')renderHangPage();
 }
 
 function renderDagboek(){
