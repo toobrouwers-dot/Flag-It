@@ -208,3 +208,119 @@ function loadNewThings() {
 ```
 
 Call `loadNewThings()` inside the profile-load flow alongside the other load calls. If the data should sync to Supabase, add a corresponding table to `supabase_schema.sql` and wire it into the push/pull logic in `cloud.js`.
+
+## Optimization Guidelines
+
+These guidelines exist to streamline the PWA — no new features, only improving what's already there.
+
+### Navigation Consolidation
+
+The app has 8 tabs; target is 6. Merge these:
+
+| Verwijder | Samenvoegen in | Reden |
+|---|---|---|
+| `page-gyms` | Nieuw: `page-instellingen` | Gymmen + backup + profielen = instellingen, geen dagelijks-gebruik tab |
+| `page-coach` | `page-stats` (als subtab) | AI-inzichten horen bij analytics, niet als aparte tab |
+
+**Doelstructuur (6 tabs):** Home · Loggen · Stats · Doelen · Hang · Instellingen
+
+Bij het samenvoegen: verplaats Coach-inhoud naar een tab-toggle in Stats naast bestaande tabs. Verplaats gym-lijst, gym-resets, backup/restore en profielbeheer naar een nieuwe `page-instellingen`.
+
+### Visuele Consistentie
+
+Gebruik uitsluitend deze waarden — geen uitzonderingen bij nieuwe of gewijzigde stijlen.
+
+**Spacing-schaal:**
+- `8px` — ruimte binnen componenten (bijv. icon + label)
+- `12px` — standaard `margin-bottom` tussen kaarten
+- `16px` — `padding` voor kaarten, ruimte tussen secties
+- `20px` — ruimte tussen pagina-secties
+- `24px` — bovenmarge van een pagina
+
+**Border-radius (3 vaste maten):**
+- `12px` — knoppen, inputs, chips
+- `14px` — kaarten (`.goal-card`, `.project-card`, `.hang-card`, `.comp-card`, etc.)
+- `16px` — modals, bottom sheets
+
+**Knop-lettertypes (2 groottes):**
+- `14px` — secundaire/utility-knoppen
+- `17px` — primaire actieknoppen (`.btn-save`, `.btn-add-*`)
+
+**CSS-consolidatie (pas toe bij aanraken van betreffende regels):**
+
+1. Extraheer één `.card-base` rule en laat alle kaartklassen die overnemen:
+   ```css
+   .card-base {
+     padding: 16px;
+     border-radius: 14px;
+     background: var(--surface);
+     border: 0.5px solid var(--border);
+     margin-bottom: 12px;
+   }
+   ```
+   Voeg `card-base` toe als extra klasse aan `.goal-card`, `.project-card`, `.comp-card`, `.hang-card` in plaats van dubbele declaraties.
+
+2. Consolideer de 7 vrijwel identieke `.btn-delete-*` rules tot één `.btn-delete` klasse.
+
+3. Zet `margin-bottom` van alle kaarten op `12px` (`.comp-card` gebruikt nu afwijkend `10px`).
+
+### UX-verbeteringen
+
+**Tab-switching patroon:**
+
+De functies `switchFeedTab()`, `switchDoelenTab()` en `switchSociaalTab()` zijn structureel identiek. Vervang bij aanpassing door één generieke functie:
+
+```js
+function switchTab(containerId, tabName) {
+  document.querySelectorAll(`#${containerId} .tab-btn`).forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === tabName));
+  document.querySelectorAll(`#${containerId} .tab-section`).forEach(s =>
+    s.style.display = s.dataset.tab === tabName ? '' : 'none');
+}
+```
+
+**Feedbackstaten (voeg toe aan CSS, gebruik consequent):**
+
+```css
+.is-loading { opacity: 0.6; pointer-events: none; }
+.field-error input, .field-error select { border-color: var(--danger); }
+.field-error-msg { font-size: 12px; color: var(--danger); margin-top: 4px; }
+```
+
+- Elke knop die een async actie start krijgt `.is-loading` tijdens de operatie.
+- Elke `save*()`-functie moet na afloop `toast('...')` aanroepen. Audit bestaande save-functies en voeg ontbrekende toast-calls toe.
+
+**Lege staten:**
+
+De klasse `.empty-state` bestaat maar wordt inconsistent gebruikt. Elke `render*()`-functie die een lijst toont **moet** een `.empty-state`-blok renderen als de array leeg is:
+
+```js
+if (!items.length) {
+  el.innerHTML = '<div class="empty-state">Nog niets hier.</div>';
+  return;
+}
+```
+
+**Quick-log shortcut:**
+
+Het `.btn-quick-top` / `.quick-top-sheet`-patroon bestaat al. Zorg dat het zichtbaar aanwezig is op de Home-pagina zodat gebruikers snel een toproute kunnen loggen zonder naar de Log-pagina te navigeren.
+
+### Code-consolidatiepatronen
+
+Pas deze patronen toe bij aanraking van bestaande code — geen grootschalige refactor in één keer.
+
+**Delete-functies:** 7 vrijwel identieke `deleteX(id)`-functies bestaan. Gebruik bij aanpassing het patroon:
+
+```js
+function deleteItem(arr, id, saveFn, renderFn) {
+  const idx = arr.findIndex(x => x.id === id);
+  if (idx === -1) return;
+  arr.splice(idx, 1);
+  saveFn();
+  renderFn();
+}
+```
+
+**Kaartrendering:** elke `render*()`-functie bouwt HTML via template literals. De buitenste wrapper gebruikt altijd de basisklasse + typemodifier (bijv. `class="card-base goal-card"`), niet afzonderlijke conflicterende stijlen.
+
+**Dirty-tracking na mutaties:** elke datamutatie roept zowel `save*()` als `markDirty(tableName)` aan (uit `cloud.js`) als de tabel synct naar Supabase.
