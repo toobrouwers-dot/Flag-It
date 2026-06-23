@@ -132,7 +132,7 @@ body.nav-transitioning{overflow:hidden}
 .input-row{display:flex;gap:10px;margin-bottom:10px}
 .field{flex:1;display:flex;flex-direction:column;gap:6px}
 .field label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-input[type=text],input[type=date],input[type=number],select,textarea{background:var(--surface);border:.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:12px 14px;width:100%;-webkit-appearance:none;appearance:none;outline:none}
+input[type=text],input[type=date],input[type=number],select,textarea{background:var(--surface);border:.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:16px;padding:12px 14px;width:100%;-webkit-appearance:none;appearance:none;outline:none}
 textarea{resize:none;height:80px;line-height:1.4}
 input:focus,select:focus,textarea:focus{border-color:var(--accent)}
 button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -187,6 +187,12 @@ select option{background:#1e1e1e}
 /* QUICK-TOP SHEET */
 .btn-quick-top{padding:13px 16px;background:rgba(76,175,80,.12);border:.5px solid rgba(76,175,80,.4);border-radius:12px;color:var(--success);font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s}
 .btn-quick-top:active{background:rgba(76,175,80,.22)}
+.home-quick-actions{display:flex;gap:10px;padding:0 20px 16px}
+.home-qa-btn{flex:1;padding:12px 14px;border-radius:12px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:all .15s;border:.5px solid}
+.home-qa-log{background:var(--accent);border-color:var(--accent);color:#fff}
+.home-qa-log:active{opacity:.85}
+.home-qa-top{background:rgba(76,175,80,.12);border-color:rgba(76,175,80,.4);color:var(--success)}
+.home-qa-top:active{background:rgba(76,175,80,.22)}
 .quick-top-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-radius:24px 24px 0 0;border-top:.5px solid var(--border);padding:20px 24px calc(var(--safe-bot) + 90px);z-index:310;animation:sheetUp .3s cubic-bezier(.34,1.3,.64,1) both}
 .qt-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;text-transform:uppercase;margin-bottom:16px}
 .qt-grade-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:20px}
@@ -769,7 +775,7 @@ select option{background:#1e1e1e}
 .auth-tabs{display:flex;background:var(--surface);border-radius:12px;padding:3px;margin-bottom:20px}
 .auth-tab{flex:1;padding:10px;background:none;border:none;border-radius:9px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);cursor:pointer;transition:background .2s,color .2s}
 .auth-tab.active{background:var(--surface2);color:var(--text)}
-.auth-input{width:100%;background:var(--surface);border:.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:14px 16px;margin-bottom:10px;outline:none;transition:border-color .2s;display:block}
+.auth-input{width:100%;background:var(--surface);border:.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Barlow',sans-serif;font-size:16px;padding:14px 16px;margin-bottom:10px;outline:none;transition:border-color .2s;display:block}
 .auth-input:focus{border-color:var(--accent)}
 .auth-btn-primary{width:100%;padding:15px;background:var(--accent);border:none;border-radius:12px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:opacity .15s;margin-top:4px}
 .auth-btn-primary:active{opacity:.85}
@@ -780,6 +786,13 @@ select option{background:#1e1e1e}
 .auth-msg{font-size:13px;text-align:center;margin-top:12px;min-height:20px;display:none}
 .auth-skip{display:block;width:100%;padding:14px;background:none;border:none;color:var(--muted);font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer;text-align:center;margin-top:16px}
 .auth-skip:active{color:var(--text)}
+.auth-pw-wrap{position:relative;margin-bottom:10px}
+.auth-pw-wrap .auth-input{margin-bottom:0;padding-right:46px}
+.auth-pw-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;line-height:1;font-size:18px;opacity:.45;transition:opacity .15s}
+.auth-pw-toggle:active{color:var(--text)}
+.auth-btn-primary:disabled{opacity:.55;cursor:not-allowed}
+.auth-forgot{display:block;background:none;border:none;color:var(--muted);font-family:'Barlow',sans-serif;font-size:13px;cursor:pointer;text-align:center;width:100%;padding:10px 0 0;transition:color .15s}
+.auth-forgot:active{color:var(--text)}
 
 /* LOGIN FIRST SCREEN */
 #login-first-screen{position:fixed;inset:0;background:var(--bg);z-index:610;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;opacity:0;transform:scale(.97);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
@@ -893,6 +906,10 @@ select option{background:#1e1e1e}
       <div class="stat-box"><div class="stat-num" id="hs-pr">—</div><div class="stat-label">PR Top</div></div>
       <div class="stat-box"><div class="stat-num" id="hs-streak">0</div><div class="stat-label">🔥 Streak</div></div>
     </div>
+  </div>
+  <div class="home-quick-actions">
+    <button class="home-qa-btn home-qa-log" onclick="showPage('log')">+ Sessie loggen</button>
+    <button class="home-qa-btn home-qa-top" onclick="openQuickTop()">⚡ Snel toppen</button>
   </div>
   <div id="streak-banner-area"></div>
   <div id="reaper-area"></div>
@@ -1635,7 +1652,7 @@ function showPage(id,direction){
   if(_navTransitioning)return;
   // Guard: intercept navigation away from log page when routes have been entered
   const onLogPage=document.querySelector('.page.active')?.id==='page-log';
-  if(id!=='log'&&onLogPage&&!editMode&&document.querySelector('#route-cards .route-card')){
+  if(id!=='log'&&onLogPage&&!editMode&&document.querySelectorAll('#route-cards .route-card').length>1){
     pendingNavTarget=id;showNavLeaveConfirm();return;
   }
   haptic();
@@ -1692,7 +1709,7 @@ function showNavLeaveConfirm(){
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='nav-leave-ov';
   ov.innerHTML=`<div class="confirm-box">
     <div class="confirm-title">Sessie verlaten?</div>
-    <div class="confirm-sub">Je hebt ${count} route${count!==1?'s':''} gelogd. Deze gaan verloren als je nu weggaat.</div>
+    <div class="confirm-sub">Je hebt ${count} route${count!==1?'s':''} gelogd — deze gaan verloren als je nu weggaat.</div>
     <div class="confirm-btns">
       <button class="confirm-cancel" onclick="document.getElementById('nav-leave-ov').remove();pendingNavTarget=null">Doorgaan</button>
       <button class="confirm-delete" onclick="confirmNavLeave()">Verlaten</button>
