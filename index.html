@@ -143,7 +143,9 @@ select option{background:#1e1e1e}
 .btn-manage-gyms:active{color:var(--accent);border-color:var(--accent)}
 
 /* ROUTE CARDS */
-.route-card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:border-color .2s}
+.route-card-wrap{position:relative;margin-bottom:8px;border-radius:12px;overflow:hidden}
+.route-card-swipe-del{position:absolute;inset:0;left:auto;width:90px;background:var(--danger);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:0;border-radius:0 12px 12px 0}
+.route-card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;transition:transform .18s ease,border-color .2s;will-change:transform}
 .route-card.expanded{border-color:rgba(127,119,221,.3)}
 .route-card-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;user-select:none}
 .rc-left{display:flex;align-items:center;gap:10px}
@@ -211,6 +213,11 @@ select option{background:#1e1e1e}
 .sess-stats-bar.has-routes{display:block}
 .btn-save{width:100%;padding:16px;background:linear-gradient(135deg,#9088e8,var(--accent));border:none;border-radius:14px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:transform .1s,opacity .1s;box-shadow:0 4px 20px rgba(127,119,221,.35)}
 .btn-save:active{transform:scale(.98);opacity:.9}
+.btn-save-new{flex:1;padding:14px;background:none;border:.5px solid var(--accent);border-radius:14px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:all .15s}
+.btn-save-new:active{background:rgba(127,119,221,.12)}
+.save-row{display:flex;gap:10px;margin-bottom:4px}
+.save-row .btn-save{flex:2}
+/* PULL-TO-REFRESH */
 
 /* STATS */
 .stats-content{padding:16px 20px}
@@ -998,7 +1005,10 @@ select option{background:#1e1e1e}
       </div>
       <input type="checkbox" id="inp-public" style="width:20px;height:20px;cursor:pointer;accent-color:var(--accent)">
     </div>
-    <button class="btn-save" onclick="saveSession()">Sessie opslaan</button>
+    <div class="save-row">
+      <button class="btn-save" onclick="saveSession()">Sessie opslaan</button>
+      <button class="btn-save-new" onclick="saveAndNew()">+ Nieuw</button>
+    </div>
   </div>
 </div>
 
@@ -2149,8 +2159,10 @@ function refreshGymSelect(){
   sel.innerHTML='<option value="">— Kies een gym —</option>';
   gyms.forEach(g=>{const o=document.createElement('option');o.value=g.name;o.textContent=g.name+(g.fav?' ★':'');sel.appendChild(o)});
   const fav=getFavGym();
+  const lastUsed=[...sessions].reverse().find(s=>s.gym)?.gym;
   if(cur&&gyms.find(g=>g.name===cur))sel.value=cur;
-  else if(fav)sel.value=fav
+  else if(lastUsed&&gyms.find(g=>g.name===lastUsed))sel.value=lastUsed;
+  else if(fav)sel.value=fav;
 }
 function addGym(){
   const inp=document.getElementById('inp-new-gym'),name=inp.value.trim();
@@ -2219,6 +2231,8 @@ function addRouteCard(grade='6a',attempts=1,result='poging',type=''){
   if(!editMode&&routeCount===0)startSessionTimer();
   document.querySelectorAll('#route-cards .route-card.expanded').forEach(c=>c.classList.remove('expanded'));
   routeCount++;const id=routeCount;
+  const wrap=document.createElement('div');wrap.className='route-card-wrap';wrap.id='rcw-'+id;
+  const delBg=document.createElement('div');delBg.className='route-card-swipe-del';delBg.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>Weg';
   const div=document.createElement('div');div.className='route-card expanded';div.id='rc-'+id;
   div.innerHTML=`<div class="route-card-header" onclick="toggleRC(${id})">
     <div class="rc-left">
@@ -2236,7 +2250,7 @@ function addRouteCard(grade='6a',attempts=1,result='poging',type=''){
       </div>
       <svg class="route-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="6 9 12 15 18 9"/></svg>
       <button class="btn-dup-route" onclick="event.stopPropagation();duplicateRouteCard(${id})" title="Dupliceer route">⧉</button>
-      <button class="btn-remove-route" onclick="event.stopPropagation();removeRouteCard('rc-${id}')">×</button>
+      <button class="btn-remove-route" onclick="event.stopPropagation();removeRouteCard('rcw-${id}')">×</button>
     </div>
   </div>
   <div class="route-body">
@@ -2247,8 +2261,48 @@ function addRouteCard(grade='6a',attempts=1,result='poging',type=''){
     </div>
   </div>
   <input type="hidden" id="rr-${id}" value="${result}">`;
-  document.getElementById('route-cards').appendChild(div);
+  wrap.appendChild(delBg);
+  wrap.appendChild(div);
+  document.getElementById('route-cards').appendChild(wrap);
+  _initCardSwipe(div,wrap,delBg);
   haptic();updateSessStatsBar();
+}
+function _initCardSwipe(card,wrap,delBg){
+  const THRESHOLD=72;
+  let sx=null,sy=null,dx=0,swiping=false;
+  card.addEventListener('touchstart',e=>{
+    if(e.target.closest('button,select,input'))return;
+    sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;swiping=false;
+  },{passive:true});
+  card.addEventListener('touchmove',e=>{
+    if(sx===null)return;
+    const cx=e.touches[0].clientX,cy=e.touches[0].clientY;
+    const ddx=cx-sx,ddy=cy-sy;
+    if(!swiping&&Math.abs(ddx)<8&&Math.abs(ddy)<8)return;
+    if(!swiping){
+      if(Math.abs(ddy)>Math.abs(ddx)){sx=null;return;}
+      swiping=true;
+    }
+    dx=Math.min(0,ddx);
+    const t=Math.max(dx,-THRESHOLD-16);
+    card.style.transition='none';card.style.transform=`translateX(${t}px)`;
+    const ratio=Math.min(Math.abs(dx)/THRESHOLD,1);
+    delBg.style.opacity=ratio;
+    e.preventDefault();
+  },{passive:false});
+  card.addEventListener('touchend',e=>{
+    if(!swiping){sx=null;return;}
+    card.style.transition='';
+    if(dx<-THRESHOLD){
+      card.style.transform='translateX(-110%)';card.style.opacity='0';
+      delBg.style.opacity='1';
+      setTimeout(()=>{wrap.remove();updateSessStatsBar();haptic(8);},180);
+    }else{
+      card.style.transform='';delBg.style.opacity='0';
+    }
+    sx=null;dx=0;swiping=false;
+    e.stopPropagation();
+  },{passive:false});
 }
 function toggleRC(id){document.getElementById('rc-'+id).classList.toggle('expanded')}
 function stepAttempts(id,delta){const el=document.getElementById('ra-'+id);if(!el)return;const v=Math.min(99,Math.max(1,(parseInt(el.textContent)||1)+delta));el.textContent=v;const rsa=document.getElementById('rsa-'+id);if(rsa)rsa.textContent=v>1?`· ${v}×`:'';haptic();}
@@ -2261,7 +2315,7 @@ function setResult(id,val,btn){
   document.querySelectorAll('#rc-'+id+' .rc-res-btn').forEach(b=>{b.className='rc-res-btn';if(b.dataset.res===newVal)b.classList.add('sel-'+newVal);});
   updRS(id);haptic();
 }
-function removeRouteCard(elemId){document.getElementById(elemId)?.remove();updateSessStatsBar();}
+function removeRouteCard(elemId){document.getElementById(elemId)?.remove();updateSessStatsBar();haptic(8);}
 function duplicateRouteCard(id){
   const g=document.getElementById('rg-'+id)?.value||'6a';
   const t=document.getElementById('rt-'+id)?.value||'';
@@ -2279,11 +2333,8 @@ function updateSessStatsBar(){
   bar.textContent=`${cards.length} route${cards.length!==1?'s':''} · Max: ${GRADES[maxIdx]||'—'} · ${topped} gelukt`;
 }
 
-function saveSession(){
-  const date=document.getElementById('inp-date').value,gym=document.getElementById('inp-gym-select').value,note=document.getElementById('inp-note').value.trim();
-  if(!date){toast('Vul een datum in','#e53935');return}
-  const cards=document.querySelectorAll('.route-card');
-  if(!cards.length){toast('Voeg een route toe','#e53935');return}
+function _collectRoutes(){
+  const cards=document.querySelectorAll('#route-cards .route-card');
   const routes=[];
   cards.forEach(c=>{
     const id=c.id.replace('rc-','');
@@ -2292,8 +2343,32 @@ function saveSession(){
       type:document.getElementById('rt-'+id).value,
       attempts:parseInt(document.getElementById('ra-'+id).textContent)||1,
       result:document.getElementById('rr-'+id).value
-    })
+    });
   });
+  return routes;
+}
+function _resetLogForm(keepGym){
+  const gym=keepGym||document.getElementById('inp-gym-select').value;
+  editMode=false;editSessionId=null;
+  const pubEl=document.getElementById('inp-public');if(pubEl)pubEl.checked=false;
+  currentFeel=null;
+  document.querySelectorAll('.feel-btn').forEach(b=>b.classList.remove('selected'));
+  applyVibe(null);
+  document.querySelector('#page-log .page-title').textContent='Nieuwe sessie';
+  document.querySelector('#page-log .btn-save').textContent='Sessie opslaan';
+  document.getElementById('route-cards').innerHTML='';
+  document.getElementById('inp-note').value='';
+  document.getElementById('inp-date').value=new Date().toISOString().slice(0,10);
+  routeCount=0;
+  resetSessionTimer();
+  addRouteCard();
+  if(gym)document.getElementById('inp-gym-select').value=gym;
+}
+function saveSession(){
+  const date=document.getElementById('inp-date').value,gym=document.getElementById('inp-gym-select').value,note=document.getElementById('inp-note').value.trim();
+  if(!date){toast('Vul een datum in','#e53935');return}
+  const routes=_collectRoutes();
+  if(!routes.length){toast('Voeg een route toe','#e53935');return}
   const isPublic=document.getElementById('inp-public')?.checked||false;
   const wasEdit=editMode;
   if(wasEdit){
@@ -2303,21 +2378,26 @@ function saveSession(){
     const sessionEnd=Date.now();
     sessions.push({date,gym,note,routes,feel:currentFeel,id:sessionEnd,sessionStart:sessionTimerStart,sessionEnd:sessionTimerStart?sessionEnd:null,is_public:isPublic});
   }
-  editMode=false;editSessionId=null;
-  const pubEl=document.getElementById('inp-public');if(pubEl)pubEl.checked=false;
-  currentFeel=null;
-  document.querySelectorAll('.feel-btn').forEach(b=>b.classList.remove('selected'));
-  applyVibe(null);
-  document.querySelector('#page-log .page-title').textContent='Nieuwe sessie';
-  document.querySelector('#page-log .btn-save').textContent='Sessie opslaan';
   sessions.sort((a,b)=>a.date.localeCompare(b.date));
   save();
   const sessionDurSecs=sessionTimerStart?sessionTimerElapsed+Math.floor((Date.now()-sessionTimerStart)/1000):null;
-  document.getElementById('route-cards').innerHTML='';
-  document.getElementById('inp-note').value='';
-  routeCount=0;addRouteCard();
-  resetSessionTimer();
+  _resetLogForm();
   showPage('home');showSessionSummary(routes,wasEdit,sessionDurSecs);
+}
+function saveAndNew(){
+  const date=document.getElementById('inp-date').value,gym=document.getElementById('inp-gym-select').value,note=document.getElementById('inp-note').value.trim();
+  if(!date){toast('Vul een datum in','#e53935');return}
+  const routes=_collectRoutes();
+  if(!routes.length){toast('Voeg een route toe','#e53935');return}
+  const isPublic=document.getElementById('inp-public')?.checked||false;
+  const sessionEnd=Date.now();
+  sessions.push({date,gym,note,routes,feel:currentFeel,id:sessionEnd,sessionStart:sessionTimerStart,sessionEnd:sessionTimerStart?sessionEnd:null,is_public:isPublic});
+  sessions.sort((a,b)=>a.date.localeCompare(b.date));
+  save();
+  const sessionDurSecs=sessionTimerStart?sessionTimerElapsed+Math.floor((Date.now()-sessionTimerStart)/1000):null;
+  showSessionSummary(routes,false,sessionDurSecs);
+  _resetLogForm(gym);
+  toast('Sessie opgeslagen — nieuwe sessie gestart!','var(--accent)');
 }
 
 /* ══════════════════════════════════════════
