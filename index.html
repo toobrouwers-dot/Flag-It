@@ -195,6 +195,25 @@ select option{background:#1e1e1e}
 .home-qa-log:active{opacity:.85}
 .home-qa-top{background:rgba(76,175,80,.12);border-color:rgba(76,175,80,.4);color:var(--success)}
 .home-qa-top:active{background:rgba(76,175,80,.22)}
+/* ADS */
+.ad-unit{display:flex;align-items:center;justify-content:center;background:var(--surface);border:.5px solid var(--border);border-radius:12px;margin:0 20px 12px;min-height:50px;overflow:hidden;position:relative}
+.ad-unit.ad-banner{min-height:60px}
+.ad-unit.ad-rect{min-height:260px}
+.ad-label{position:absolute;top:4px;right:8px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;opacity:.6}
+.sponsored-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;margin:0 20px 12px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:background .15s;text-decoration:none;color:inherit}
+.sponsored-card:active{background:var(--surface2)}
+.sponsored-logo{width:44px;height:44px;border-radius:10px;object-fit:contain;background:var(--surface2);flex-shrink:0}
+.sponsored-logo-placeholder{width:44px;height:44px;border-radius:10px;background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px}
+.sponsored-body{flex:1;min-width:0}
+.sponsored-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}
+.sponsored-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;margin-bottom:2px}
+.sponsored-cta{font-size:13px;color:var(--accent)}
+.admin-panel{margin:20px 20px 0;padding:16px;background:rgba(127,119,221,.07);border-radius:14px;border:.5px solid rgba(127,119,221,.25)}
+.admin-panel-title{font-size:11px;color:rgba(127,119,221,.7);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:14px}
+.admin-row{display:flex;align-items:center;justify-content:space-between;font-size:14px;padding:10px 0;border-bottom:.5px solid var(--border)}
+.admin-row:last-child{border-bottom:none}
+.admin-row-label{color:var(--text)}
+.admin-row-sub{font-size:12px;color:var(--muted);margin-top:1px}
 .quick-top-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-radius:24px 24px 0 0;border-top:.5px solid var(--border);padding:20px 24px calc(var(--safe-bot) + 90px);z-index:310;animation:sheetUp .3s cubic-bezier(.34,1.3,.64,1) both}
 .qt-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;text-transform:uppercase;margin-bottom:16px}
 .qt-grade-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:20px}
@@ -918,6 +937,7 @@ select option{background:#1e1e1e}
     <button class="home-qa-btn home-qa-log" onclick="showPage('log')">+ Sessie loggen</button>
     <button class="home-qa-btn home-qa-top" onclick="openQuickTop()">⚡ Snel toppen</button>
   </div>
+  <div id="ad-home-banner" class="ad-unit ad-banner" style="display:none"><span class="ad-label">Advertentie</span></div>
   <div id="streak-banner-area"></div>
   <div id="reaper-area"></div>
   <div id="plateau-banner-area"></div>
@@ -1038,6 +1058,7 @@ select option{background:#1e1e1e}
     <div class="chart-card"><div class="chart-card-title">Max graad per sessie</div><div style="position:relative;height:180px"><canvas id="chart-progress"></canvas></div></div>
     <div id="tli-section"></div>
     <div class="chart-card"><div class="chart-card-title">Routes per graad (geslaagd)</div><div style="position:relative;height:180px"><canvas id="chart-grades"></canvas></div></div>
+    <div id="ad-stats-rect" class="ad-unit ad-rect" style="display:none"><span class="ad-label">Advertentie</span></div>
     <div id="pyramid-section"></div>
     <div id="pyramid-audit-section"></div>
     <div id="stoke-radar-section"></div>
@@ -1146,6 +1167,7 @@ select option{background:#1e1e1e}
     <div id="rival-info-bar" style="font-size:12px;color:var(--muted);padding:2px 0 4px"></div>
     <div class="form-section-title" style="padding:20px 0 10px">Profiel</div>
     <div id="profile-mgmt-section"></div>
+    <div id="owner-controls"></div>
   </div>
   </div><!-- /meer-tab-gyms -->
   <div id="meer-tab-hang" style="display:none">
@@ -1270,6 +1292,7 @@ let meerTab='gyms';
 let chartP=null,chartG=null,chartH=null,tliChart=null,stokeRadarChart=null;
 let routeCount=0,hangSetCount=0;
 let editMode=false,editSessionId=null;
+let ADS_ENABLED=true;
 let pendingNavTarget=null;
 let _navTransitioning=false;
 let sessionTimerStart=null,sessionTimerTick=null,sessionTimerElapsed=0,sessionTimerPaused=false;
@@ -1637,7 +1660,7 @@ function _doPageRender(id){
   if(id==='home'){renderFeed();if(feedTab==='sociaal')renderSociaalPage();}
   if(id==='stats'){if(analyseTab==='stats')renderStats();else renderCoach();}
   if(id==='goals'){renderGoals();if(doelenTab==='projects')renderProjects();}
-  if(id==='gyms'){if(meerTab==='gyms'){renderGymsPage();renderProfileMgmt();}else renderHangPage();}
+  if(id==='gyms'){if(meerTab==='gyms'){renderGymsPage();renderProfileMgmt();renderOwnerControls();}else renderHangPage();}
   if(id==='log'){refreshGymSelect();refreshNotePlaceholder();}
   // Legacy: werking bij directe showPage calls naar verwijderde tabs
   if(id==='sociaal')renderSociaalPage();
@@ -2074,7 +2097,8 @@ function renderFeed(){
       </div>
     </div>`;
   }).join('');
-  if (typeof loadFeedKudos === 'function') setTimeout(loadFeedKudos, 0);
+  if(typeof loadFeedKudos==='function')setTimeout(loadFeedKudos,0);
+  _injectSponsoredCardInFeed(feed);
 }
 
 function fmtDur(secs){if(!secs||secs<60)return secs+'s';const h=Math.floor(secs/3600),m=Math.floor((secs%3600)/60);return h>0?h+'u '+m+'m':m+'m';}
@@ -4622,6 +4646,144 @@ function renderCoach(){
 }
 
 /* ══════════════════════════════════════════
+   ADS
+══════════════════════════════════════════ */
+async function initAdsState(){
+  if(typeof cloudGetAdsSetting==='function'){
+    ADS_ENABLED=await cloudGetAdsSetting();
+  }
+  // Toon of verberg de home-banner op basis van ads-status
+  const homeBanner=document.getElementById('ad-home-banner');
+  if(homeBanner)homeBanner.style.display=ADS_ENABLED?'':'none';
+}
+
+// Injecteer ad-HTML in een container (no-op als ads uit staan of container niet bestaat)
+function renderAdUnit(containerId,adHtml){
+  if(!ADS_ENABLED)return;
+  const el=document.getElementById(containerId);
+  if(el){el.style.display='';el.innerHTML=adHtml+'<span class="ad-label">Advertentie</span>';}
+}
+
+// Toont gesponsorde kaart-data (gevalideerde velden, geen raw innerHTML van externe bron)
+function _renderSponsoredCardEl(card){
+  const wrap=document.createElement('a');
+  wrap.className='sponsored-card';
+  wrap.href='#';
+  wrap.rel='noopener noreferrer';
+  wrap.addEventListener('click',e=>{
+    e.preventDefault();
+    // URL veilig openen na validatie
+    try{
+      const u=new URL(card.cta_url);
+      if(u.protocol==='https:'||u.protocol==='http:')window.open(u.href,'_blank','noopener');
+    }catch{}
+  });
+
+  const logo=document.createElement('div');
+  if(card.logo_url){
+    const img=document.createElement('img');
+    img.className='sponsored-logo';
+    img.alt='';
+    // Geen innerHTML — gebruik src-attribuut direct
+    img.src=card.logo_url;
+    logo.appendChild(img);
+  }else{
+    logo.className='sponsored-logo-placeholder';
+    logo.textContent='🏔';
+  }
+
+  const body=document.createElement('div');
+  body.className='sponsored-body';
+  const label=document.createElement('div');label.className='sponsored-label';label.textContent='Gesponsord';
+  const title=document.createElement('div');title.className='sponsored-title';title.textContent=card.title||'';
+  const cta=document.createElement('div');cta.className='sponsored-cta';cta.textContent=card.cta_text||'';
+  body.append(label,title,cta);
+  wrap.append(logo,body);
+  return wrap;
+}
+
+// Prik de sponsored card in de feed na elke 10e kaart
+let _sponsoredCard=null;
+async function _loadSponsoredCard(){
+  if(typeof cloudGetSponsoredCard==='function'){
+    _sponsoredCard=await cloudGetSponsoredCard();
+  }
+}
+
+function _injectSponsoredCardInFeed(feedEl){
+  if(!ADS_ENABLED||!_sponsoredCard)return;
+  const cards=feedEl.querySelectorAll('.activity-card');
+  if(cards.length<10)return;
+  const anchor=cards[9]; // na de 10e kaart
+  if(anchor&&anchor.parentNode){
+    anchor.parentNode.insertBefore(_renderSponsoredCardEl(_sponsoredCard),anchor.nextSibling);
+  }
+}
+
+async function renderOwnerControls(){
+  const el=document.getElementById('owner-controls');
+  if(!el)return;
+  const isAdmin=typeof cloudIsAdmin==='function'&&await cloudIsAdmin();
+  if(!isAdmin){el.innerHTML='';return;}
+  const adsOn=typeof cloudGetAdsSetting==='function'&&await cloudGetAdsSetting();
+  const sponsor=typeof cloudGetSponsoredCard==='function'&&await cloudGetSponsoredCard();
+  el.innerHTML='';
+  const panel=document.createElement('div');
+  panel.className='admin-panel';
+  panel.innerHTML=`<div class="admin-panel-title">Beheer</div>
+    <div class="admin-row">
+      <div>
+        <div class="admin-row-label">Advertenties</div>
+        <div class="admin-row-sub">Voor alle gebruikers tegelijk</div>
+      </div>
+      <input type="checkbox" id="ads-master-toggle" ${adsOn?'checked':''}
+        onchange="ownerToggleAds(this.checked)"
+        style="width:22px;height:22px;accent-color:var(--accent);flex-shrink:0">
+    </div>
+    <div class="admin-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+      <div class="admin-row-label">Gesponsorde kaart</div>
+      <input id="sp-title" class="form-input" placeholder="Naam sponsor" value="${escHtml(sponsor?.title||'')}" style="font-size:14px;width:100%;box-sizing:border-box">
+      <input id="sp-cta" class="form-input" placeholder="CTA tekst (bijv. Bekijk de nieuwe Otaki →)" value="${escHtml(sponsor?.cta_text||'')}" style="font-size:14px;width:100%;box-sizing:border-box">
+      <input id="sp-url" class="form-input" placeholder="URL (https://...)" value="${escHtml(sponsor?.cta_url||'')}" style="font-size:14px;width:100%;box-sizing:border-box">
+      <input id="sp-logo" class="form-input" placeholder="Logo URL (https://...)" value="${escHtml(sponsor?.logo_url||'')}" style="font-size:14px;width:100%;box-sizing:border-box">
+      <label style="display:flex;align-items:center;gap:10px;font-size:14px">
+        <input type="checkbox" id="sp-active" ${sponsor?.active?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)">
+        Actief tonen in feed
+      </label>
+      <button class="btn-save" style="width:100%;padding:12px;font-size:15px" onclick="ownerSaveSponsor()">Opslaan</button>
+    </div>`;
+  el.appendChild(panel);
+}
+
+async function ownerToggleAds(enabled){
+  if(typeof cloudSetAdsSetting!=='function')return;
+  const toggle=document.getElementById('ads-master-toggle');
+  if(toggle)toggle.disabled=true;
+  await cloudSetAdsSetting(enabled);
+  ADS_ENABLED=enabled;
+  if(toggle)toggle.disabled=false;
+  toast(enabled?'Advertenties ingeschakeld voor iedereen':'Advertenties uitgeschakeld voor iedereen','var(--accent)');
+}
+
+async function ownerSaveSponsor(){
+  if(typeof cloudSetSponsoredCard!=='function')return;
+  const title=document.getElementById('sp-title')?.value.trim()||'';
+  const ctaText=document.getElementById('sp-cta')?.value.trim()||'';
+  let ctaUrl=document.getElementById('sp-url')?.value.trim()||'';
+  let logoUrl=document.getElementById('sp-logo')?.value.trim()||'';
+  const active=document.getElementById('sp-active')?.checked||false;
+
+  // Valideer URLs vóór opslaan
+  const _validUrl=u=>{try{const p=new URL(u);return p.protocol==='https:'||p.protocol==='http:';}catch{return false;}};
+  if(ctaUrl&&!_validUrl(ctaUrl)){toast('Ongeldige CTA URL','var(--danger)');return;}
+  if(logoUrl&&!_validUrl(logoUrl)){toast('Ongeldige logo URL','var(--danger)');return;}
+
+  await cloudSetSponsoredCard({active,title,cta_text:ctaText,cta_url:ctaUrl,logo_url:logoUrl});
+  _sponsoredCard=active?{active,title,cta_text:ctaText,cta_url:ctaUrl,logo_url:logoUrl}:null;
+  toast('Gesponsorde kaart opgeslagen','var(--success)');
+}
+
+/* ══════════════════════════════════════════
    INIT
 ══════════════════════════════════════════ */
 function initApp(profileId){
@@ -5325,6 +5487,9 @@ function renderGradeOracle(){
 /* ── Bootstrap: show login screen first, then handle profiles ── */
 (function bootstrap(){
   maybeRunMigration();
+  // Laad ads-status en gesponsorde kaart vroegtijdig (non-blocking)
+  initAdsState();
+  _loadSponsoredCard();
   if(typeof showLoginFirstScreen==='function'){
     showLoginFirstScreen(async function afterLogin(){
       const profiles=loadProfiles();

@@ -374,6 +374,12 @@ async function renderLeaderboard() {
     const medals = ['🥇','🥈','🥉'];
 
     const top25 = sorted.slice(0, 25);
+
+    // Ad-banner na rang 5
+    const adBannerHtml = (typeof ADS_ENABLED !== 'undefined' && ADS_ENABLED)
+      ? '<div id="ad-lb-banner" class="ad-unit ad-banner"><span class="ad-label">Advertentie</span></div>'
+      : '';
+
     el.innerHTML = top25.map((u, i) => {
       const gc = GRADE_COLORS[GRADES.indexOf(u.grade)] || 'var(--accent)';
       return `<div class="lb-row" onclick="showPublicProfile('${_s(u.id)}','${_s(u.username)}')">
@@ -385,7 +391,7 @@ async function renderLeaderboard() {
         </div>
         ${u.sessionId ? `<button class="social-kudos-btn" id="lb-kudos-${_s(u.sessionId)}" onclick="event.stopPropagation();toggleKudos('${_s(u.sessionId)}',this)" style="font-size:12px;padding:4px 10px;flex-shrink:0">🤜 <span class="kudos-n">…</span></button>` : ''}
         <div class="lb-grade" style="color:${gc}">${_s(u.grade)}</div>
-      </div>`;
+      </div>${i === 4 ? adBannerHtml : ''}`;
     }).join('');
 
     // Batch-load kudos for the best sessions
