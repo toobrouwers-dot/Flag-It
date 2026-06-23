@@ -1,4 +1,4 @@
-const CACHE = 'flagit-v16';
+const CACHE = 'flagit-v17';
 const ASSETS = [
   './',
   './index.html',

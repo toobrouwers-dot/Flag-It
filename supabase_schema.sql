@@ -307,3 +307,68 @@ create index on public.kudos(session_id);
 create index on public.comments(session_id);
 create index on public.follows(follower_id);
 create index on public.follows(following_id);
+
+-- ════════════════════════════════════════════════════════════
+-- ADS INFRASTRUCTURE
+-- Voer dit uit in de Supabase SQL Editor als add-on migratie
+-- ════════════════════════════════════════════════════════════
+
+-- Voeg is_admin toe aan accounts (eigenaar zet dit handmatig via dashboard)
+alter table public.accounts
+  add column if not exists is_admin boolean default false;
+
+-- Globale app-instellingen (key/value)
+create table if not exists public.app_settings (
+  key        text primary key,
+  value      text not null,
+  updated_at timestamptz default now()
+);
+
+-- RLS: iedereen leest, alleen admins schrijven
+alter table public.app_settings enable row level security;
+
+create policy "Anyone reads settings"
+  on public.app_settings for select using (true);
+
+create policy "Admin writes settings"
+  on public.app_settings for all
+  using (
+    exists (
+      select 1 from public.accounts
+      where id = auth.uid() and is_admin = true
+    )
+  );
+
+-- Standaardwaarde: ads aan
+insert into public.app_settings (key, value)
+  values ('ads_enabled', 'true')
+  on conflict (key) do nothing;
+
+-- Gesponsorde kaart config (één rij = actieve sponsor)
+create table if not exists public.sponsored_card (
+  id         int primary key default 1,
+  active     boolean default false,
+  logo_url   text default '',
+  title      text default '',
+  cta_text   text default '',
+  cta_url    text default '',
+  updated_at timestamptz default now(),
+  check (id = 1)           -- slechts één rij toegestaan
+);
+
+alter table public.sponsored_card enable row level security;
+
+create policy "Anyone reads sponsor"
+  on public.sponsored_card for select using (true);
+
+create policy "Admin writes sponsor"
+  on public.sponsored_card for all
+  using (
+    exists (
+      select 1 from public.accounts
+      where id = auth.uid() and is_admin = true
+    )
+  );
+
+insert into public.sponsored_card (id, active) values (1, false)
+  on conflict (id) do nothing;

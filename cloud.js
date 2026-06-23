@@ -707,3 +707,42 @@ async function doSignOut() {
   await cloudSignOut();
   if (typeof toast === 'function') toast('Uitgelogd', 'var(--muted)');
 }
+
+// ── ADS INFRASTRUCTURE ────────────────────────────────────
+
+async function cloudGetAdsSetting() {
+  if (!cloudReady()) return true;
+  try {
+    const { data } = await db().from('app_settings')
+      .select('value').eq('key', 'ads_enabled').maybeSingle();
+    return data?.value !== 'false';
+  } catch(e) { return true; }
+}
+
+async function cloudSetAdsSetting(enabled) {
+  if (!cloudReady()) return;
+  await db().from('app_settings')
+    .upsert({ key: 'ads_enabled', value: String(enabled), updated_at: new Date().toISOString() },
+             { onConflict: 'key' });
+}
+
+async function cloudIsAdmin() {
+  const acct = await cloudGetAccount().catch(() => null);
+  return acct?.is_admin === true;
+}
+
+async function cloudGetSponsoredCard() {
+  if (!cloudReady()) return null;
+  try {
+    const { data } = await db().from('sponsored_card')
+      .select('*').eq('id', 1).maybeSingle();
+    return (data?.active) ? data : null;
+  } catch(e) { return null; }
+}
+
+async function cloudSetSponsoredCard(fields) {
+  if (!cloudReady()) return;
+  await db().from('sponsored_card')
+    .upsert({ id: 1, ...fields, updated_at: new Date().toISOString() },
+             { onConflict: 'id' });
+}
