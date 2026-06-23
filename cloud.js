@@ -336,6 +336,27 @@ function _syncAccountToProfile(acct) {
 
 // ── AUTH SCREEN ──────────────────────────────────────────
 
+function _togglePw(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.style.opacity = inp.type === 'text' ? '1' : '0.45';
+}
+
+async function doForgotPassword(emailInputId, msgFn) {
+  const email = document.getElementById(emailInputId)?.value?.trim();
+  if (!email) { msgFn('Vul eerst je e-mailadres in', true); return; }
+  try {
+    const { error } = await db().auth.resetPasswordForEmail(email, {
+      redirectTo: location.origin + location.pathname
+    });
+    if (error) throw error;
+    msgFn('Reset-link verzonden! Controleer je e-mail.', false);
+  } catch(e) {
+    msgFn(_translateAuthError(e.message) || 'Verzenden mislukt', true);
+  }
+}
+
 function _translateAuthError(msg) {
   if (!msg) return null;
   const m = msg.toLowerCase();
@@ -366,13 +387,14 @@ function showAuthScreen() {
       <div id="auth-form-area">
         <div id="auth-form-signin">
           <input id="auth-email" class="auth-input" type="email" placeholder="E-mailadres" autocomplete="email">
-          <input id="auth-pw" class="auth-input" type="password" placeholder="Wachtwoord" autocomplete="current-password">
+          <div class="auth-pw-wrap"><input id="auth-pw" class="auth-input" type="password" placeholder="Wachtwoord" autocomplete="current-password"><button class="auth-pw-toggle" type="button" onclick="_togglePw('auth-pw',this)" tabindex="-1">👁</button></div>
           <button class="auth-btn-primary" onclick="doSignIn()">Inloggen</button>
+          <button class="auth-forgot" type="button" onclick="doForgotPassword('auth-email',authShowMsg)">Wachtwoord vergeten?</button>
         </div>
         <div id="auth-form-signup" style="display:none">
           <input id="auth-reg-email" class="auth-input" type="email" placeholder="E-mailadres" autocomplete="email">
-          <input id="auth-reg-pw" class="auth-input" type="password" placeholder="Wachtwoord (min. 6 tekens)" autocomplete="new-password">
-          <input id="auth-reg-pw2" class="auth-input" type="password" placeholder="Herhaal wachtwoord" autocomplete="new-password">
+          <div class="auth-pw-wrap"><input id="auth-reg-pw" class="auth-input" type="password" placeholder="Wachtwoord (min. 6 tekens)" autocomplete="new-password"><button class="auth-pw-toggle" type="button" onclick="_togglePw('auth-reg-pw',this)" tabindex="-1">👁</button></div>
+          <div class="auth-pw-wrap"><input id="auth-reg-pw2" class="auth-input" type="password" placeholder="Herhaal wachtwoord" autocomplete="new-password"><button class="auth-pw-toggle" type="button" onclick="_togglePw('auth-reg-pw2',this)" tabindex="-1">👁</button></div>
           <button class="auth-btn-primary" onclick="doSignUp()">Account aanmaken</button>
         </div>
       </div>
@@ -415,14 +437,17 @@ async function doSignIn() {
   const email = document.getElementById('auth-email')?.value?.trim();
   const pw    = document.getElementById('auth-pw')?.value;
   if (!email || !pw) { authShowMsg('Vul alle velden in', true); return; }
-  authShowMsg('Bezig…', false);
+  const btn = document.querySelector('#auth-form-signin .auth-btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
+  authShowMsg('', false);
   try {
     await cloudSignIn(email, pw);
     authShowMsg('Ingelogd!', false);
-    setTimeout(hideAuthScreen, 800);
+    setTimeout(hideAuthScreen, 500);
     if (typeof activeProfileId !== 'undefined' && activeProfileId) cloudMigrateLocal(activeProfileId).catch(() => {});
   } catch(e) {
     authShowMsg(_translateAuthError(e.message) || 'Inloggen mislukt', true);
+    if (btn) { btn.disabled = false; btn.textContent = 'Inloggen'; }
   }
 }
 
@@ -433,17 +458,32 @@ async function doSignUp() {
   if (!email || !pw) { authShowMsg('Vul alle velden in', true); return; }
   if (pw !== pw2) { authShowMsg('Wachtwoorden komen niet overeen', true); return; }
   if (pw.length < 6) { authShowMsg('Wachtwoord moet minimaal 6 tekens zijn', true); return; }
-  authShowMsg('Account aanmaken…', false);
+  const btn = document.querySelector('#auth-form-signup .auth-btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
+  authShowMsg('', false);
   try {
-    await cloudSignUp(email, pw);
-    authShowMsg('Account aangemaakt! Controleer je e-mail voor verificatie.', false);
-    if (typeof activeProfileId !== 'undefined' && activeProfileId) setTimeout(() => cloudMigrateLocal(activeProfileId).catch(() => {}), 1000);
+    const user = await cloudSignUp(email, pw);
+    // If a session exists immediately, email confirmation is disabled — auto-proceed
+    const { data: { session } } = await db().auth.getSession();
+    if (session) {
+      authShowMsg('Account aangemaakt!', false);
+      setTimeout(hideAuthScreen, 500);
+      if (typeof activeProfileId !== 'undefined' && activeProfileId) cloudMigrateLocal(activeProfileId).catch(() => {});
+    } else {
+      // Email confirmation required — switch to sign-in with a hint
+      authShowMsg('Account aangemaakt! Controleer je e-mail en log dan in.', false);
+      setTimeout(() => authSwitchTab('signin'), 2000);
+      if (btn) { btn.disabled = false; btn.textContent = 'Account aanmaken'; }
+    }
   } catch(e) {
     authShowMsg(_translateAuthError(e.message) || 'Registreren mislukt', true);
+    if (btn) { btn.disabled = false; btn.textContent = 'Account aanmaken'; }
   }
 }
 
 async function doSignInGoogle() {
+  const btn = document.querySelector('.auth-btn-google');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; }
   authShowMsg('Google-login starten…', false);
   try {
     sessionStorage.setItem('flagit_google_migrate', '1');
@@ -451,6 +491,7 @@ async function doSignInGoogle() {
   } catch(e) {
     sessionStorage.removeItem('flagit_google_migrate');
     authShowMsg(e.message || 'Google-login mislukt', true);
+    if (btn) { btn.disabled = false; btn.style.opacity = ''; }
   }
 }
 
@@ -506,13 +547,14 @@ function showLoginFirstScreen(onDone) {
         </div>
         <div id="lfs-form-signin">
           <input id="lfs-email" class="auth-input" type="email" placeholder="E-mailadres" autocomplete="email">
-          <input id="lfs-pw" class="auth-input" type="password" placeholder="Wachtwoord" autocomplete="current-password">
+          <div class="auth-pw-wrap"><input id="lfs-pw" class="auth-input" type="password" placeholder="Wachtwoord" autocomplete="current-password"><button class="auth-pw-toggle" type="button" onclick="_togglePw('lfs-pw',this)" tabindex="-1">👁</button></div>
           <button class="auth-btn-primary" onclick="lfsDoSignIn()">Inloggen</button>
+          <button class="auth-forgot" type="button" onclick="doForgotPassword('lfs-email',lfsShowMsg)">Wachtwoord vergeten?</button>
         </div>
         <div id="lfs-form-signup" style="display:none">
           <input id="lfs-reg-email" class="auth-input" type="email" placeholder="E-mailadres" autocomplete="email">
-          <input id="lfs-reg-pw" class="auth-input" type="password" placeholder="Wachtwoord (min. 6 tekens)" autocomplete="new-password">
-          <input id="lfs-reg-pw2" class="auth-input" type="password" placeholder="Herhaal wachtwoord" autocomplete="new-password">
+          <div class="auth-pw-wrap"><input id="lfs-reg-pw" class="auth-input" type="password" placeholder="Wachtwoord (min. 6 tekens)" autocomplete="new-password"><button class="auth-pw-toggle" type="button" onclick="_togglePw('lfs-reg-pw',this)" tabindex="-1">👁</button></div>
+          <div class="auth-pw-wrap"><input id="lfs-reg-pw2" class="auth-input" type="password" placeholder="Herhaal wachtwoord" autocomplete="new-password"><button class="auth-pw-toggle" type="button" onclick="_togglePw('lfs-reg-pw2',this)" tabindex="-1">👁</button></div>
           <button class="auth-btn-primary" onclick="lfsDoSignUp()">Account aanmaken</button>
         </div>
         <div class="auth-divider"><span>of</span></div>
@@ -551,14 +593,17 @@ async function lfsDoSignIn() {
   const email = document.getElementById('lfs-email')?.value?.trim();
   const pw = document.getElementById('lfs-pw')?.value;
   if (!email || !pw) { lfsShowMsg('Vul alle velden in', true); return; }
-  lfsShowMsg('Bezig…', false);
+  const btn = document.querySelector('#lfs-form-signin .auth-btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
+  lfsShowMsg('', false);
   try {
     await cloudSignIn(email, pw);
     window._cloudJustSignedIn = true;
     lfsShowMsg('Ingelogd!', false);
-    setTimeout(() => window._lfsDone?.(), 700);
+    setTimeout(() => window._lfsDone?.(), 400);
   } catch(e) {
     lfsShowMsg(_translateAuthError(e.message) || 'Inloggen mislukt', true);
+    if (btn) { btn.disabled = false; btn.textContent = 'Inloggen'; }
   }
 }
 
@@ -569,18 +614,30 @@ async function lfsDoSignUp() {
   if (!email || !pw) { lfsShowMsg('Vul alle velden in', true); return; }
   if (pw !== pw2) { lfsShowMsg('Wachtwoorden komen niet overeen', true); return; }
   if (pw.length < 6) { lfsShowMsg('Wachtwoord moet minimaal 6 tekens zijn', true); return; }
-  lfsShowMsg('Account aanmaken…', false);
+  const btn = document.querySelector('#lfs-form-signup .auth-btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
+  lfsShowMsg('', false);
   try {
     await cloudSignUp(email, pw);
-    window._cloudJustSignedIn = true;
-    lfsShowMsg('Account aangemaakt! Check je e-mail voor verificatie.', false);
-    setTimeout(() => window._lfsDone?.(), 1500);
+    const { data: { session } } = await db().auth.getSession();
+    if (session) {
+      window._cloudJustSignedIn = true;
+      lfsShowMsg('Account aangemaakt!', false);
+      setTimeout(() => window._lfsDone?.(), 400);
+    } else {
+      lfsShowMsg('Account aangemaakt! Controleer je e-mail en log dan in.', false);
+      setTimeout(() => lfsAuthSwitchTab('signin'), 2000);
+      if (btn) { btn.disabled = false; btn.textContent = 'Account aanmaken'; }
+    }
   } catch(e) {
     lfsShowMsg(_translateAuthError(e.message) || 'Registreren mislukt', true);
+    if (btn) { btn.disabled = false; btn.textContent = 'Account aanmaken'; }
   }
 }
 
 async function lfsDoSignInGoogle() {
+  const btn = document.querySelector('#lfs-content .auth-btn-google');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; }
   lfsShowMsg('Google-login starten…', false);
   try {
     sessionStorage.setItem('flagit_google_migrate', '1');
@@ -588,6 +645,7 @@ async function lfsDoSignInGoogle() {
   } catch(e) {
     sessionStorage.removeItem('flagit_google_migrate');
     lfsShowMsg(e.message || 'Google-login mislukt', true);
+    if (btn) { btn.disabled = false; btn.style.opacity = ''; }
   }
 }
 
