@@ -727,8 +727,11 @@ async function cloudSetAdsSetting(enabled) {
 }
 
 async function cloudIsAdmin() {
-  const acct = await cloudGetAccount().catch(() => null);
-  return acct?.is_admin === true;
+  if (!cloudReady()) return false;
+  try {
+    const { data } = await db().rpc('check_is_admin');
+    return data === true;
+  } catch(e) { return false; }
 }
 
 async function cloudGetSponsoredCard() {
