@@ -749,3 +749,37 @@ async function cloudSetSponsoredCard(fields) {
     .upsert({ id: 1, ...fields, updated_at: new Date().toISOString() },
              { onConflict: 'id' });
 }
+
+// ── FEEDBACK ──────────────────────────────────────────────
+
+async function submitFeedback(message, email) {
+  if (!cloudReady()) return { ok: false, error: 'Cloud niet beschikbaar' };
+  const trimmed = (message || '').trim();
+  if (!trimmed) return { ok: false, error: 'Bericht is verplicht' };
+  try {
+    const user = await cloudCurrentUser();
+    const { error } = await db().from('feedback').insert({
+      user_id: user ? user.id : null,
+      message: trimmed,
+      contact_email: (email || '').trim() || null
+    });
+    if (error) return { ok: false, error: error.message || 'Versturen mislukt' };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message || 'Versturen mislukt' };
+  }
+}
+
+async function cloudGetFeedback() {
+  if (!cloudReady()) return [];
+  try {
+    const { data, error } = await db().from('feedback')
+      .select('id,message,contact_email,created_at')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.warn('[cloud] feedback load error:', e);
+    return [];
+  }
+}

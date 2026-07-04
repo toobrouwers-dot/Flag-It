@@ -372,3 +372,56 @@ create policy "Admin writes sponsor"
 
 insert into public.sponsored_card (id, active) values (1, false)
   on conflict (id) do nothing;
+
+-- ════════════════════════════════════════════════════════════
+-- FEEDBACK
+-- Privé kanaal: iedereen mag indienen (ook uitgelogd),
+-- alleen de eigenaar (is_admin) mag lezen.
+-- ════════════════════════════════════════════════════════════
+
+create table if not exists public.feedback (
+  id             uuid default gen_random_uuid() primary key,
+  user_id        uuid references public.accounts(id) on delete set null,
+  message        text not null,
+  contact_email  text,
+  created_at     timestamptz default now()
+);
+
+alter table public.feedback enable row level security;
+
+create policy "feedback_insert_anyone"
+  on public.feedback for insert
+  with check (true);
+
+create policy "feedback_select_admin_only"
+  on public.feedback for select
+  using (
+    exists (
+      select 1 from public.accounts
+      where id = auth.uid() and is_admin = true
+    )
+  );
+
+create index on public.feedback(created_at desc);
+
+-- ════════════════════════════════════════════════════════════
+-- ADMIN CHECK RPC
+-- Ontbrak in dit schema-bestand terwijl cloud.js er al naar
+-- verwijst (rpc('check_is_admin')) — hier alsnog toegevoegd
+-- zodat het schema consistent is met de live database.
+-- ════════════════════════════════════════════════════════════
+
+create or replace function public.check_is_admin()
+returns boolean
+language sql
+security definer
+set search_path = ''
+stable
+as $$
+  select coalesce(
+    (select is_admin from public.accounts where id = auth.uid()),
+    false
+  );
+$$;
+
+grant execute on function public.check_is_admin() to anon, authenticated;
