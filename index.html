@@ -94,6 +94,7 @@ body.nav-transitioning{overflow:hidden}
 .btn-delete-session:active{color:var(--danger);background:rgba(229,57,53,.12)}
 
 .empty-state{text-align:center;padding:48px 20px 40px;color:var(--muted)}
+.is-loading{opacity:.6;pointer-events:none}
 .empty-state .big{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase}
 .empty-icon{font-size:52px;margin-bottom:14px;line-height:1}
 .empty-title{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--text);margin-bottom:8px;text-transform:uppercase}
@@ -1167,7 +1168,13 @@ select option{background:#1e1e1e}
     <div id="rival-info-bar" style="font-size:12px;color:var(--muted);padding:2px 0 4px"></div>
     <div class="form-section-title" style="padding:20px 0 10px">Profiel</div>
     <div id="profile-mgmt-section"></div>
+    <div class="form-section-title" style="padding:20px 0 10px">Feedback</div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">Een bug gevonden, een idee, of een vraag? Laat het weten — je bericht komt direct bij de ontwikkelaar terecht.</div>
+      <button class="btn-export" style="width:100%;border-color:var(--accent);color:var(--accent)" onclick="showFeedbackModal()">💬 Feedback versturen</button>
+    </div>
     <div id="owner-controls"></div>
+    <div id="feedback-admin-section"></div>
   </div>
   </div><!-- /meer-tab-gyms -->
   <div id="meer-tab-hang" style="display:none">
@@ -1561,6 +1568,66 @@ function promptNewProfileFromGyms(){
 }
 
 /* ══════════════════════════════════════════
+   FEEDBACK
+══════════════════════════════════════════ */
+function showFeedbackModal(){
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='feedback-ov';
+  ov.innerHTML=`<div class="modal-box">
+    <div class="modal-title">Feedback versturen</div>
+    <div style="padding:0 4px 12px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Je bericht</div>
+      <textarea id="fb-message" class="form-input" placeholder="Bug, idee, vraag..." style="height:110px;margin-bottom:16px;width:100%;box-sizing:border-box"></textarea>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">E-mail (optioneel, voor een reactie)</div>
+      <input type="text" id="fb-email" class="form-input" placeholder="jij@voorbeeld.nl" style="width:100%;box-sizing:border-box;margin-bottom:4px">
+    </div>
+    <button class="btn-save" id="btn-fb-submit" onclick="submitFeedbackHandler()">Versturen</button>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+  document.getElementById('fb-message').focus();
+}
+async function submitFeedbackHandler(){
+  const msgEl=document.getElementById('fb-message');
+  const emailEl=document.getElementById('fb-email');
+  const message=msgEl?msgEl.value.trim():'';
+  const email=emailEl?emailEl.value.trim():'';
+  if(!message){toast('Vul een bericht in','var(--danger)');return;}
+  const btn=document.getElementById('btn-fb-submit');
+  if(btn){btn.disabled=true;btn.classList.add('is-loading');}
+  const result=await submitFeedback(message,email);
+  if(btn){btn.disabled=false;btn.classList.remove('is-loading');}
+  if(result.ok){
+    document.getElementById('feedback-ov')?.remove();
+    toast('Bedankt voor je feedback!');
+  } else {
+    toast(result.error||'Versturen mislukt','var(--danger)');
+  }
+}
+async function renderFeedbackAdmin(){
+  const el=document.getElementById('feedback-admin-section');
+  if(!el)return;
+  const isAdmin=typeof cloudIsAdmin==='function'&&await cloudIsAdmin();
+  if(!isAdmin){el.innerHTML='';return;}
+  const items=typeof cloudGetFeedback==='function'?await cloudGetFeedback():[];
+  if(!items.length){
+    el.innerHTML=`<div class="admin-panel">
+      <div class="admin-panel-title">Feedback</div>
+      <div class="empty-state" style="padding:20px 0">Nog geen feedback ontvangen.</div>
+    </div>`;
+    return;
+  }
+  const rows=items.map(f=>`
+    <div class="admin-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+      <div style="font-size:14px;white-space:pre-wrap">${esc(f.message)}</div>
+      <div class="admin-row-sub">${f.contact_email?esc(f.contact_email)+' · ':''}${new Date(f.created_at).toLocaleString('nl-NL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+    </div>`).join('');
+  el.innerHTML=`<div class="admin-panel">
+    <div class="admin-panel-title">Feedback (${items.length})</div>
+    ${rows}
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
    STORAGE
    — sessies en hangsessies worden elk apart opgeslagen
 ══════════════════════════════════════════ */
@@ -1660,7 +1727,7 @@ function _doPageRender(id){
   if(id==='home'){renderFeed();if(feedTab==='sociaal')renderSociaalPage();}
   if(id==='stats'){if(analyseTab==='stats')renderStats();else renderCoach();}
   if(id==='goals'){renderGoals();if(doelenTab==='projects')renderProjects();}
-  if(id==='gyms'){if(meerTab==='gyms'){renderGymsPage();renderProfileMgmt();renderOwnerControls();}else renderHangPage();}
+  if(id==='gyms'){if(meerTab==='gyms'){renderGymsPage();renderProfileMgmt();renderOwnerControls();renderFeedbackAdmin();}else renderHangPage();}
   if(id==='log'){refreshGymSelect();refreshNotePlaceholder();}
   // Legacy: werking bij directe showPage calls naar verwijderde tabs
   if(id==='sociaal')renderSociaalPage();
