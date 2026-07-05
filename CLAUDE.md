@@ -6,16 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Flag-It is a **vanilla HTML/CSS/JS Progressive Web App (PWA)** for tracking bouldering sessions and hangboard training on mobile. There is no build system, no package manager, and no test framework. The UI language is **Dutch**.
 
-The app has a **Supabase backend** for cloud sync and social features. Core application logic lives in `index.html` (~5,117 lines), with cloud and social logic split into separate files.
+The app has a **Supabase backend** for cloud sync and social features. Core application logic lives in `index.html` (~5,600 lines), with cloud and social logic split into separate files.
 
 ## File Structure
 
 | File | Purpose |
 |---|---|
-| `index.html` | Entire app — CSS, HTML, main JS (~5,117 lines) |
-| `cloud.js` | Supabase auth + multi-device sync (~448 lines) |
-| `social.js` | Kudos, follows, public profiles, feed, leaderboard, comments |
-| `sw.js` | Service worker — offline caching (cache: `flagit-v11`) |
+| `index.html` | Entire app — CSS, HTML, main JS (~5,600 lines) |
+| `cloud.js` | Supabase auth + multi-device sync (~785 lines) |
+| `social.js` | Kudos, follows, public profiles, feed, leaderboard, comments (~545 lines) |
+| `sw.js` | Service worker — offline caching (cache: `flagit-v18`) |
 | `manifest.json` | PWA manifest |
 | `supabase_schema.sql` | Postgres schema + RLS policies for the Supabase backend |
 | `icons/` | PWA icons (192px, 512px) |
@@ -26,7 +26,7 @@ The app has a **Supabase backend** for cloud sync and social features. Core appl
 
 **To deploy:** Push to `main` — GitHub Actions (`.github/workflows/deploy.yml`) automatically deploys to GitHub Pages.
 
-**Service worker cache:** Bump the cache name in `sw.js` (`flagit-v11` → `flagit-v12`, etc.) whenever making changes that need to invalidate cached assets for existing users. Also add any new static files to the cache array.
+**Service worker cache:** Bump the cache name in `sw.js` (`flagit-v18` → `flagit-v19`, etc.) whenever making changes that need to invalidate cached assets for existing users. Also add any new static files to the cache array.
 
 ## Architecture
 
@@ -34,9 +34,9 @@ The app has a **Supabase backend** for cloud sync and social features. Core appl
 
 | Section | Lines | Contents |
 |---|---|---|
-| `<style>` block | ~15–830 | All CSS, dark theme, accent color `#7f77dd` |
-| HTML markup | ~832–1,172 | Page `<div>` sections + start/profile screens |
-| `<script>` block | ~1,179–5,115 | All application logic (~188 functions) |
+| `<style>` block | ~15–885 | All CSS, dark theme, accent color `#7f77dd` |
+| HTML markup | ~887–1,274 | Page `<div>` sections + start/profile screens |
+| `<script>` block | ~1,275–5,599 | All application logic (~200 functions) |
 
 External dependencies loaded from CDN:
 - **Chart.js v4.4.1** — `cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js`
@@ -45,18 +45,19 @@ External dependencies loaded from CDN:
 
 ### Pages (bottom nav)
 
-| Page | Element ID | Purpose |
-|---|---|---|
-| Home/Feed | `#page-home` | Recent sessions, filtering, streaks, milestones, social feed |
-| Log Session | `#page-log` | Record bouldering sessions |
-| Stats | `#page-stats` | Analytics, PRs, charts, heatmap, TLI |
-| Goals | `#page-goals` | Grade goals, count goals, competitions countdown |
-| Hangboard | `#page-hang` | Hang training logging + timer + PR tracking |
-| Gyms | `#page-gyms` | Manage gyms, backup/restore, rival mode |
-| Projects | `#page-projects` | Track boulder projects (status, attempts, highpoint, notes) |
-| Coach | `#page-coach` | AI-powered insights, training plans, stroke radar chart |
+Nav is consolidated to **5 tabs**. Several former top-level pages now live as subtabs inside another page; their original `<div id="page-*">` shells still exist but are empty (content moved into the parent page's subtab containers).
 
-Navigation is driven by `showPage(pageId)`.
+| Nav label | Element ID | Purpose | Subtabs |
+|---|---|---|---|
+| Feed | `#page-home` | Recent sessions, filtering, streaks, milestones | `switchFeedTab()`: Feed · **Sociaal** (social feed/search/leaderboard, itself split via `switchSociaalTab()`) |
+| Loggen | `#page-log` | Record bouldering sessions | — |
+| Analyse | `#page-stats` | Analytics, PRs, charts, heatmap, TLI | `switchAnalyseTab()`: Stats · **Coach** (AI insights, training plans, stroke radar) |
+| Doelen | `#page-goals` | Grade/count goals, competitions countdown | `switchDoelenTab()`: Doelen · **Projecten** (boulder project tracking) |
+| Meer | `#page-gyms` | Manage gyms, backup/restore, rival mode | `switchMeerTab()`: Gyms · **Hangboard** (hang training logging + timer + PR tracking) |
+
+Empty legacy shells kept for compatibility: `#page-hang`, `#page-coach`, `#page-sociaal` (all rendered via the subtab containers above, not directly navigated to).
+
+Navigation is driven by `showPage(pageId)`; subtab switching within a page uses one of the five `switch*Tab()` functions above (see [Tab-switching pattern](#code-consolidatiepatronen)).
 
 ### Data model
 
@@ -112,11 +113,11 @@ Social features require a Supabase account and operate on the cloud tables.
 
 ### Supabase Schema (supabase_schema.sql)
 
-13 tables with Row Level Security (RLS):
+16 tables with Row Level Security (RLS):
 
 | Table | Purpose |
 |---|---|
-| `accounts` | User profile — display name, bio, emoji |
+| `accounts` | User profile — display name, bio, emoji, `is_admin` flag |
 | `sessions` | Climbing sessions with routes, feel, `is_public` flag |
 | `gyms` | Gym locations |
 | `goals` | Grade + count goals with deadlines |
@@ -129,8 +130,15 @@ Social features require a Supabase account and operate on the cloud tables.
 | `follows` | User follow relationships |
 | `kudos` | Per-session appreciation (anonymous-safe, deduped) |
 | `comments` | Comments on sessions |
+| `app_settings` | Global key/value config (e.g. `ads_enabled`) — anyone reads, admin-only writes |
+| `sponsored_card` | Single-row active sponsor config (logo/title/CTA) — anyone reads, admin-only writes |
+| `feedback` | Private feedback channel — anyone can insert (incl. logged out), admin-only select |
 
 Triggers: auto `updated_at` on sessions/goals/projects; auto account creation on signup.
+
+**Admin check:** `is_admin` on `accounts` is not publicly readable directly — use the `check_is_admin` RPC (wrapped by `cloudIsAdmin()` in cloud.js) rather than querying the column.
+
+**Ads/admin feature:** `ADS_ENABLED` + `_sponsoredCard` in index.html gate a sponsored-card unit shown on Stats; admin-only UI (toggle ads, edit sponsor, read feedback) is gated behind `cloudIsAdmin()`.
 
 ### Multi-profile support
 
@@ -164,7 +172,7 @@ Uses two globals: `editMode` (boolean) and `editSessionId` (string). The save fo
 
 ### Finding functions
 
-With ~188 functions in a single file, use grep/search to locate them by name. Functions are grouped loosely by feature area in the script block:
+With ~200 functions in a single file, use grep/search to locate them by name. Functions are grouped loosely by feature area in the script block:
 
 profile management → data persistence → feed rendering → forms → charts → goals → hangboard → coach → projects → advanced features → competitions → injuries
 
@@ -213,18 +221,9 @@ Call `loadNewThings()` inside the profile-load flow alongside the other load cal
 
 These guidelines exist to streamline the PWA — no new features, only improving what's already there.
 
-### Navigation Consolidation
+### Navigation Consolidation — voltooid
 
-The app has 8 tabs; target is 6. Merge these:
-
-| Verwijder | Samenvoegen in | Reden |
-|---|---|---|
-| `page-gyms` | Nieuw: `page-instellingen` | Gymmen + backup + profielen = instellingen, geen dagelijks-gebruik tab |
-| `page-coach` | `page-stats` (als subtab) | AI-inzichten horen bij analytics, niet als aparte tab |
-
-**Doelstructuur (6 tabs):** Home · Loggen · Stats · Doelen · Hang · Instellingen
-
-Bij het samenvoegen: verplaats Coach-inhoud naar een tab-toggle in Stats naast bestaande tabs. Verplaats gym-lijst, gym-resets, backup/restore en profielbeheer naar een nieuwe `page-instellingen`.
+De nav is teruggebracht van 8 naar **5 tabs**: Feed · Loggen · Analyse · Doelen · Meer. Coach zit als subtab in Analyse, Hangboard + Gyms zijn samengevoegd in Meer, Projecten zit als subtab in Doelen, en Sociaal zit als subtab in Feed. Zie de [Pages-tabel](#pages-bottom-nav) voor de actuele structuur. Geen verdere actie nodig hier — voeg nieuwe subtabs toe met hetzelfde `switch*Tab()`-patroon in plaats van nieuwe top-level pagina's, tenzij een feature echt dagelijks-gebruik verdient.
 
 ### Visuele Consistentie
 
@@ -268,7 +267,7 @@ Gebruik uitsluitend deze waarden — geen uitzonderingen bij nieuwe of gewijzigd
 
 **Tab-switching patroon:**
 
-De functies `switchFeedTab()`, `switchDoelenTab()` en `switchSociaalTab()` zijn structureel identiek. Vervang bij aanpassing door één generieke functie:
+De functies `switchFeedTab()`, `switchDoelenTab()`, `switchSociaalTab()`, `switchAnalyseTab()` en `switchMeerTab()` zijn structureel identiek (vijf stuks inmiddels, nog steeds niet geconsolideerd). Vervang bij aanpassing door één generieke functie:
 
 ```js
 function switchTab(containerId, tabName) {
@@ -301,9 +300,9 @@ if (!items.length) {
 }
 ```
 
-**Quick-log shortcut:**
+**Quick-log shortcut — voltooid:**
 
-Het `.btn-quick-top` / `.quick-top-sheet`-patroon bestaat al. Zorg dat het zichtbaar aanwezig is op de Home-pagina zodat gebruikers snel een toproute kunnen loggen zonder naar de Log-pagina te navigeren.
+De quick-actionrow op Home (`.home-qa-btn` — "+ Sessie loggen" / "⚡ Snel toppen") en het `.quick-top-sheet`-patroon (`openQuickTop()`) zijn aanwezig en zichtbaar op de Home-pagina.
 
 ### Code-consolidatiepatronen
 
