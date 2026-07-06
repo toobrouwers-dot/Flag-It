@@ -215,6 +215,13 @@ select option{background:#1e1e1e}
 .admin-row:last-child{border-bottom:none}
 .admin-row-label{color:var(--text)}
 .admin-row-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.spotify-card{background:linear-gradient(135deg,rgba(29,185,84,.14),rgba(29,185,84,.05));border:.5px solid rgba(29,185,84,.35);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;transition:background .15s}
+.spotify-card:active{background:rgba(29,185,84,.2)}
+.spotify-icon{width:44px;height:44px;border-radius:50%;background:#1DB954;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.spotify-body{flex:1;min-width:0}
+.spotify-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;margin-bottom:2px}
+.spotify-sub{font-size:12px;color:var(--muted)}
+.spotify-arrow{font-size:18px;color:#1DB954;flex-shrink:0}
 .quick-top-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-radius:24px 24px 0 0;border-top:.5px solid var(--border);padding:20px 24px calc(var(--safe-bot) + 90px);z-index:310;animation:sheetUp .3s cubic-bezier(.34,1.3,.64,1) both}
 .qt-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;text-transform:uppercase;margin-bottom:16px}
 .qt-grade-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:20px}
@@ -1166,6 +1173,18 @@ select option{background:#1e1e1e}
       <button class="btn-export" id="btn-clear-rival" onclick="clearRival()" style="display:none">Wis rivaal</button>
     </div>
     <div id="rival-info-bar" style="font-size:12px;color:var(--muted);padding:2px 0 4px"></div>
+    <div class="form-section-title" style="padding:20px 0 10px">Muziek</div>
+    <a class="spotify-card" href="https://open.spotify.com/playlist/1cNnlIRCWWHkNrc6lD8Uth?si=spMTH21gT_a-sZROY_NVeg&amp;pi=BXenQietTWuPc" target="_blank" rel="noopener noreferrer" style="margin-bottom:16px">
+      <div class="spotify-icon">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="#fff"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.52 17.34a.75.75 0 0 1-1.03.25c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 1 1-.33-1.46c4.58-1.04 8.5-.6 11.66 1.34.36.22.47.69.25 1.03zm1.47-3.27a.94.94 0 0 1-1.29.31c-3.23-1.98-8.15-2.56-11.97-1.4a.94.94 0 1 1-.55-1.8c4.37-1.32 9.8-.68 13.5 1.6.44.27.58.85.31 1.29zm.13-3.4C15.98 8.4 9.6 8.19 5.9 9.32a1.13 1.13 0 1 1-.66-2.16c4.25-1.29 11.32-1.04 15.8 1.62a1.13 1.13 0 1 1-1.15 1.94z"/></svg>
+      </div>
+      <div class="spotify-body">
+        <div class="spotify-title">Klim-playlist</div>
+        <div class="spotify-sub">Beluister op Spotify</div>
+      </div>
+      <div class="spotify-arrow">→</div>
+    </a>
+
     <div class="form-section-title" style="padding:20px 0 10px">Profiel</div>
     <div id="profile-mgmt-section"></div>
     <div class="form-section-title" style="padding:20px 0 10px">Feedback</div>
@@ -3780,7 +3799,7 @@ function switchMeerTab(tab){
   document.getElementById('tab-meer-hang').className='feed-toggle-btn'+(tab==='hang'?' active':'');
   document.getElementById('meer-tab-gyms').style.display=tab==='gyms'?'':'none';
   document.getElementById('meer-tab-hang').style.display=tab==='hang'?'':'none';
-  if(tab==='gyms'){renderGymsPage();renderProfileMgmt();}
+  if(tab==='gyms'){renderGymsPage();renderProfileMgmt();renderOwnerControls();renderFeedbackAdmin();}
   if(tab==='hang')renderHangPage();
 }
 
