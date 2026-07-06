@@ -184,6 +184,7 @@ select option{background:#1e1e1e}
 /* ATTEMPTS STEPPER */
 .attempts-stepper{display:flex;align-items:center;gap:0;background:var(--surface);border:.5px solid var(--border);border-radius:10px;overflow:hidden}
 .stepper-btn{background:none;border:none;color:var(--text);font-size:20px;font-weight:300;padding:10px 18px;cursor:pointer;line-height:1;transition:background .1s;flex-shrink:0}
+.stepper-btn-bulk{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;padding:10px 12px;border-left:.5px solid var(--border)}
 .stepper-btn:active{background:rgba(255,255,255,.08)}
 .stepper-val{flex:1;text-align:center;font-family:'Barlow',sans-serif;font-size:15px;color:var(--text);padding:12px 0;min-width:32px}
 
@@ -196,6 +197,8 @@ select option{background:#1e1e1e}
 .home-qa-log:active{opacity:.85}
 .home-qa-top{background:rgba(76,175,80,.12);border-color:rgba(76,175,80,.4);color:var(--success)}
 .home-qa-top:active{background:rgba(76,175,80,.22)}
+.home-qa-fail{background:rgba(158,158,158,.12);border-color:rgba(158,158,158,.4);color:var(--attempt)}
+.home-qa-fail:active{background:rgba(158,158,158,.22)}
 /* ADS */
 .ad-unit{display:flex;align-items:center;justify-content:center;background:var(--surface);border:.5px solid var(--border);border-radius:12px;margin:0 20px 12px;min-height:50px;overflow:hidden;position:relative}
 .ad-unit.ad-banner{min-height:60px}
@@ -227,6 +230,7 @@ select option{background:#1e1e1e}
 .qt-grade-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:20px}
 .qt-grade-btn{padding:10px 4px;border-radius:9px;border:.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s}
 .qt-grade-btn.qt-sel{background:rgba(76,175,80,.2);border-color:var(--success);color:var(--success)}
+.route-fields .rc-grade-grid{margin-bottom:0}
 .qt-confirm{width:100%;padding:15px;background:var(--success);border:none;border-radius:13px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;text-transform:uppercase;cursor:pointer;transition:opacity .15s}
 .qt-confirm:active{opacity:.8}
 
@@ -330,6 +334,10 @@ select option{background:#1e1e1e}
 .btn-timer-use{display:none;width:100%;margin-top:10px;padding:10px;background:rgba(233,30,140,.1);border:.5px solid rgba(233,30,140,.4);border-radius:10px;color:var(--hang);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:all .15s}
 .btn-timer-use.visible{display:block}
 .btn-timer-use:active{background:rgba(233,30,140,.2)}
+
+/* DRAFT BANNER */
+.draft-banner{display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(127,119,221,.1);border:.5px solid rgba(127,119,221,.3);border-radius:12px;padding:12px 16px;margin:16px 20px 0;font-size:13px;color:var(--accent)}
+.draft-banner button{background:none;border:none;color:var(--accent);font-weight:700;font-size:13px;text-decoration:underline;cursor:pointer;padding:0;white-space:nowrap}
 
 /* SESSION TIMER */
 .sess-timer-wrap{display:flex;align-items:center;justify-content:space-between;background:rgba(127,119,221,.08);border:.5px solid rgba(127,119,221,.25);border-radius:12px;padding:10px 16px;margin-bottom:12px}
@@ -943,7 +951,8 @@ select option{background:#1e1e1e}
   </div>
   <div class="home-quick-actions">
     <button class="home-qa-btn home-qa-log" onclick="showPage('log')">+ Sessie loggen</button>
-    <button class="home-qa-btn home-qa-top" onclick="openQuickTop()">⚡ Snel toppen</button>
+    <button class="home-qa-btn home-qa-top" onclick="openQuickTop('top')">⚡ Snel toppen</button>
+    <button class="home-qa-btn home-qa-fail" onclick="openQuickTop('poging')">📝 Snel poging</button>
   </div>
   <div id="ad-home-banner" class="ad-unit ad-banner" style="display:none"><span class="ad-label">Advertentie</span></div>
   <div id="streak-banner-area"></div>
@@ -990,19 +999,23 @@ select option{background:#1e1e1e}
 <!-- LOG -->
 <div id="page-log" class="page">
   <div class="page-header"><div class="page-title">Nieuwe sessie</div></div>
+  <div id="draft-banner" class="draft-banner" style="display:none">
+    <span>Concept hersteld — nog niet opgeslagen</span>
+    <button onclick="discardDraft()">Nieuw beginnen</button>
+  </div>
   <div class="log-form">
     <div class="form-section">
       <div class="form-section-title">Sessie info</div>
-      <div class="input-row"><div class="field"><label>Datum</label><input type="date" id="inp-date"></div></div>
+      <div class="input-row"><div class="field"><label>Datum</label><input type="date" id="inp-date" onchange="saveDraft()"></div></div>
       <div class="input-row">
         <div class="field"><label>Gym</label>
           <div class="gym-selector">
-            <select id="inp-gym-select"><option value="">— Kies een gym —</option></select>
+            <select id="inp-gym-select" onchange="saveDraft()"><option value="">— Kies een gym —</option></select>
             <button class="btn-manage-gyms" onclick="openGymPickerModal()">⚙ Gyms</button>
           </div>
         </div>
       </div>
-      <div class="input-row"><div class="field"><label>Notitie (optioneel)</label><textarea id="inp-note" placeholder="Uitdagingen, tips voor jezelf, bijzonderheden..."></textarea></div></div>
+      <div class="input-row"><div class="field"><label>Notitie (optioneel)</label><textarea id="inp-note" placeholder="Uitdagingen, tips voor jezelf, bijzonderheden..." oninput="_saveDraftDebounced()"></textarea></div></div>
       <div class="feel-section">
         <div class="feel-label">Hoe voelde de sessie?</div>
         <div class="feel-row">
@@ -1022,7 +1035,7 @@ select option{background:#1e1e1e}
       <div id="route-cards"></div>
       <div class="sess-stats-bar" id="sess-stats-bar"></div>
       <div style="display:flex;gap:8px;margin-bottom:12px">
-        <button class="btn-add-route" style="flex:1;margin-bottom:0" onclick="addRouteCard(getSmartDefaultGrade())">+ Route toevoegen</button>
+        <button class="btn-add-route" style="flex:1;margin-bottom:0" onclick="addRouteCard(getSmartDefaultGrade());saveDraft()">+ Route toevoegen</button>
         <button onclick="openSetterModal()" style="padding:13px 16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:12px;color:var(--accent);font-family:'Barlow',sans-serif;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0" onmousedown="this.style.background='rgba(127,119,221,.08)'" onmouseup="this.style.background='none'">🏗️ Setter</button>
       </div>
     </div>
@@ -1031,7 +1044,7 @@ select option{background:#1e1e1e}
         <div style="font-size:14px;font-weight:600">🌐 Openbaar op ranglijst</div>
         <div style="font-size:12px;color:var(--muted);margin-top:2px">Verschijnt bij andere klimmers</div>
       </div>
-      <input type="checkbox" id="inp-public" style="width:20px;height:20px;cursor:pointer;accent-color:var(--accent)">
+      <input type="checkbox" id="inp-public" style="width:20px;height:20px;cursor:pointer;accent-color:var(--accent)" onchange="saveDraft()">
     </div>
     <div class="save-row">
       <button class="btn-save" onclick="saveSession()">Sessie opslaan</button>
@@ -1340,7 +1353,7 @@ function saveProfiles(profiles){
   try{localStorage.setItem(PFK,JSON.stringify(profiles))}catch(e){}
 }
 function profileStorageKeys(id){
-  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id,prk:'flagit_projects_v1_'+id,ijk:'flagit_injuries_v1_'+id,plk:'flagit_plan_v1_'+id,cmpk:'flagit_comp_v1_'+id,rstk:'flagit_resets_v1_'+id};
+  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id,prk:'flagit_projects_v1_'+id,ijk:'flagit_injuries_v1_'+id,plk:'flagit_plan_v1_'+id,cmpk:'flagit_comp_v1_'+id,rstk:'flagit_resets_v1_'+id,ldk:'flagit_log_draft_v1_'+id};
 }
 function maybeRunMigration(){
   const profiles=loadProfiles();
@@ -1650,7 +1663,7 @@ async function renderFeedbackAdmin(){
    STORAGE
    — sessies en hangsessies worden elk apart opgeslagen
 ══════════════════════════════════════════ */
-let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1',PRK='flagit_projects_v1',IJK='flagit_injuries_v1',PLK='flagit_plan_v1',CMPK='flagit_comp_v1',RSTK='flagit_resets_v1';
+let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1',PRK='flagit_projects_v1',IJK='flagit_injuries_v1',PLK='flagit_plan_v1',CMPK='flagit_comp_v1',RSTK='flagit_resets_v1',LDK='flagit_log_draft_v1';
 
 function save(){
   _routesCache=null;
@@ -1747,7 +1760,7 @@ function _doPageRender(id){
   if(id==='stats'){if(analyseTab==='stats')renderStats();else renderCoach();}
   if(id==='goals'){renderGoals();if(doelenTab==='projects')renderProjects();}
   if(id==='gyms'){if(meerTab==='gyms'){renderGymsPage();renderProfileMgmt();renderOwnerControls();renderFeedbackAdmin();}else renderHangPage();}
-  if(id==='log'){refreshGymSelect();refreshNotePlaceholder();}
+  if(id==='log'){refreshGymSelect();refreshNotePlaceholder();_ensureLogFormSeeded();}
   // Legacy: werking bij directe showPage calls naar verwijderde tabs
   if(id==='sociaal')renderSociaalPage();
   if(id==='hang')renderHangPage();
@@ -1771,7 +1784,7 @@ function showPage(id,direction){
   if(_navTransitioning)return;
   // Guard: intercept navigation away from log page when routes have been entered
   const onLogPage=document.querySelector('.page.active')?.id==='page-log';
-  if(id!=='log'&&onLogPage&&!editMode&&document.querySelectorAll('#route-cards .route-card').length>1){
+  if(id!=='log'&&onLogPage&&!editMode&&document.querySelectorAll('#route-cards .route-card').length>0){
     pendingNavTarget=id;showNavLeaveConfirm();return;
   }
   haptic();
@@ -1782,9 +1795,7 @@ function showPage(id,direction){
     if(restTimerRunning){clearInterval(restTimerInterval);restTimerInterval=null;restTimerRunning=false;const rb=document.getElementById('btn-rest-timer');if(rb){rb.textContent='▶ Start rust';rb.className='btn-rest-start';}}
   }
   if(id!=='log'&&editMode){
-    editMode=false;editSessionId=null;
-    document.querySelector('#page-log .page-title').textContent='Nieuwe sessie';
-    document.querySelector('#page-log .btn-save').textContent='Sessie opslaan';
+    _resetLogForm();
   }
 
   const currentPage=document.querySelector('.page.active');
@@ -1828,7 +1839,7 @@ function showNavLeaveConfirm(){
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='nav-leave-ov';
   ov.innerHTML=`<div class="confirm-box">
     <div class="confirm-title">Sessie verlaten?</div>
-    <div class="confirm-sub">Je hebt ${count} route${count!==1?'s':''} gelogd — deze gaan verloren als je nu weggaat.</div>
+    <div class="confirm-sub">Je hebt ${count} route${count!==1?'s':''} gelogd. Dit concept blijft bewaard tot je het opslaat of expliciet opnieuw begint.</div>
     <div class="confirm-btns">
       <button class="confirm-cancel" onclick="document.getElementById('nav-leave-ov').remove();pendingNavTarget=null">Doorgaan</button>
       <button class="confirm-delete" onclick="confirmNavLeave()">Verlaten</button>
@@ -2245,7 +2256,7 @@ function editSession(id){
   currentFeel=s.feel!=null?s.feel:null;
   document.querySelectorAll('.feel-btn').forEach((b,i)=>b.classList.toggle('selected',i===currentFeel));
   document.getElementById('route-cards').innerHTML='';routeCount=0;
-  s.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type));
+  s.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type,r.projectId));
   document.querySelector('#page-log .page-title').textContent='Sessie bewerken';
   document.querySelector('#page-log .btn-save').textContent='Wijzigingen opslaan';
   const pubEl=document.getElementById('inp-public');if(pubEl)pubEl.checked=!!(s.is_public);
@@ -2331,16 +2342,31 @@ function addGymFromModal(){
 /* ══════════════════════════════════════════
    ROUTE CARDS — kleur veld verwijderd
 ══════════════════════════════════════════ */
+function _gradeChipStyle(grade){const c=GRADE_COLORS[GRADES.indexOf(grade)]||'var(--success)';return `border-color:${c};background:${c}33;color:${c}`;}
+function selectRouteGrade(id,grade,btn){
+  document.getElementById('rg-'+id).value=grade;
+  const grid=document.getElementById('rgg-'+id);
+  grid.querySelectorAll('.qt-grade-btn').forEach(b=>{b.classList.remove('qt-sel');b.style.cssText='';});
+  btn.classList.add('qt-sel');
+  btn.style.cssText=_gradeChipStyle(grade);
+  updRS(id);
+  haptic();
+  saveDraft();
+}
 function getSmartDefaultGrade(){
   const cards=document.querySelectorAll('#route-cards .route-card');
   if(cards.length){const lastId=cards[cards.length-1].id.replace('rc-','');const sel=document.getElementById('rg-'+lastId);if(sel)return sel.value;}
   if(sessions.length){const freq={};[...sessions].slice(-5).forEach(s=>s.routes.forEach(r=>{freq[r.grade]=(freq[r.grade]||0)+1}));const best=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];if(best)return best[0];}
   return'6a';
 }
-function addRouteCard(grade='6a',attempts=1,result='poging',type=''){
+function addRouteCard(grade='6a',attempts=1,result='poging',type='',projectId=null){
   if(!editMode&&routeCount===0)startSessionTimer();
   document.querySelectorAll('#route-cards .route-card.expanded').forEach(c=>c.classList.remove('expanded'));
   routeCount++;const id=routeCount;
+  const activeProjects=projects.filter(p=>p.status==='project');
+  const gymVal=document.getElementById('inp-gym-select')?.value;
+  const relevantProjects=activeProjects.filter(p=>!p.gym||!gymVal||p.gym===gymVal);
+  const projectRow=activeProjects.length?`<div class="field full"><label>Project (optioneel)</label><select id="rp-${id}" onchange="saveDraft()"><option value="">— geen —</option>${relevantProjects.map(p=>`<option value="${p.id}" ${String(p.id)===String(projectId||'')?'selected':''}>${esc(p.grade+(p.name?' · '+p.name:''))}</option>`).join('')}</select></div>`:'';
   const wrap=document.createElement('div');wrap.className='route-card-wrap';wrap.id='rcw-'+id;
   const delBg=document.createElement('div');delBg.className='route-card-swipe-del';delBg.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>Weg';
   const div=document.createElement('div');div.className='route-card expanded';div.id='rc-'+id;
@@ -2365,9 +2391,14 @@ function addRouteCard(grade='6a',attempts=1,result='poging',type=''){
   </div>
   <div class="route-body">
     <div class="route-fields">
-      <div class="field"><label>Graad</label><select id="rg-${id}" onchange="updRS(${id})">${GRADES.map(g=>`<option ${g===grade?'selected':''}>${g}</option>`).join('')}</select></div>
-      <div class="field"><label>Type</label><select id="rt-${id}"><option value="">— type —</option>${TYPES.map(t=>`<option ${t===type?'selected':''}>${t}</option>`).join('')}</select></div>
-      <div class="field"><label>Pogingen</label><div class="attempts-stepper"><button class="stepper-btn" onclick="event.stopPropagation();stepAttempts(${id},-1)">−</button><span class="stepper-val" id="ra-${id}">${attempts}</span><button class="stepper-btn" onclick="event.stopPropagation();stepAttempts(${id},1)">+</button></div></div>
+      <div class="field full">
+        <label>Graad</label>
+        <div class="qt-grade-grid rc-grade-grid" id="rgg-${id}">${GRADES.map(g=>`<button type="button" class="qt-grade-btn${g===grade?' qt-sel':''}"${g===grade?` style="${_gradeChipStyle(g)}"`:''} onclick="event.stopPropagation();selectRouteGrade(${id},'${g}',this)">${g}</button>`).join('')}</div>
+        <input type="hidden" id="rg-${id}" value="${grade}">
+      </div>
+      <div class="field"><label>Type</label><select id="rt-${id}" onchange="saveDraft()"><option value="">— type —</option>${TYPES.map(t=>`<option ${t===type?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="field"><label>Pogingen</label><div class="attempts-stepper"><button class="stepper-btn" onclick="event.stopPropagation();stepAttempts(${id},-1)">−</button><span class="stepper-val" id="ra-${id}">${attempts}</span><button class="stepper-btn" onclick="event.stopPropagation();stepAttempts(${id},1)">+</button><button class="stepper-btn stepper-btn-bulk" onclick="event.stopPropagation();stepAttempts(${id},5)">+5</button></div></div>
+      ${projectRow}
     </div>
   </div>
   <input type="hidden" id="rr-${id}" value="${result}">`;
@@ -2406,7 +2437,7 @@ function _initCardSwipe(card,wrap,delBg){
     if(dx<-THRESHOLD){
       card.style.transform='translateX(-110%)';card.style.opacity='0';
       delBg.style.opacity='1';
-      setTimeout(()=>{wrap.remove();updateSessStatsBar();haptic(8);},180);
+      setTimeout(()=>{wrap.remove();updateSessStatsBar();haptic(8);saveDraft();},180);
     }else{
       card.style.transform='';delBg.style.opacity='0';
     }
@@ -2415,23 +2446,38 @@ function _initCardSwipe(card,wrap,delBg){
   },{passive:false});
 }
 function toggleRC(id){document.getElementById('rc-'+id).classList.toggle('expanded')}
-function stepAttempts(id,delta){const el=document.getElementById('ra-'+id);if(!el)return;const v=Math.min(99,Math.max(1,(parseInt(el.textContent)||1)+delta));el.textContent=v;const rsa=document.getElementById('rsa-'+id);if(rsa)rsa.textContent=v>1?`· ${v}×`:'';haptic();}
+function stepAttempts(id,delta){const el=document.getElementById('ra-'+id);if(!el)return;const v=Math.min(99,Math.max(1,(parseInt(el.textContent)||1)+delta));el.textContent=v;const rsa=document.getElementById('rsa-'+id);if(rsa)rsa.textContent=v>1?`· ${v}×`:'';haptic();saveDraft();}
 function updRS(id){const g=document.getElementById('rg-'+id).value,res=document.getElementById('rr-'+id).value,s=document.getElementById('rs-'+id);s.querySelector('.rs-grade').textContent=g;s.querySelector('.rs-dot').style.background=getResultColor(res);updateSessStatsBar();}
+function _isNewGradeRecord(grade,result){
+  const routes=allRoutes();
+  if(result==='flash')return !routes.some(r=>r.grade===grade&&r.result==='flash');
+  if(result==='top')return !routes.some(r=>r.grade===grade&&(r.result==='top'||r.result==='flash'));
+  return false;
+}
 function setResult(id,val,btn){
   const hidden=document.getElementById('rr-'+id);
   const curr=hidden.value;
   const newVal=curr===val?'poging':val;
   hidden.value=newVal;
   document.querySelectorAll('#rc-'+id+' .rc-res-btn').forEach(b=>{b.className='rc-res-btn';if(b.dataset.res===newVal)b.classList.add('sel-'+newVal);});
-  updRS(id);haptic();
+  updRS(id);haptic();saveDraft();
+  if(newVal==='top'||newVal==='flash'){
+    const grade=document.getElementById('rg-'+id).value;
+    if(_isNewGradeRecord(grade,newVal)){
+      haptic(20);
+      toast(`🎯 Eerste ${grade} ${newVal==='flash'?'flash':'top'}!`,'var(--accent)');
+    }
+  }
 }
-function removeRouteCard(elemId){document.getElementById(elemId)?.remove();updateSessStatsBar();haptic(8);}
+function removeRouteCard(elemId){document.getElementById(elemId)?.remove();updateSessStatsBar();haptic(8);saveDraft();}
 function duplicateRouteCard(id){
   const g=document.getElementById('rg-'+id)?.value||'6a';
   const t=document.getElementById('rt-'+id)?.value||'';
   const a=parseInt(document.getElementById('ra-'+id)?.textContent)||1;
   const r=document.getElementById('rr-'+id)?.value||'top';
-  addRouteCard(g,a,r,t);
+  const p=document.getElementById('rp-'+id)?.value||null;
+  addRouteCard(g,a,r,t,p);
+  saveDraft();
 }
 function updateSessStatsBar(){
   const bar=document.getElementById('sess-stats-bar');if(!bar)return;
@@ -2452,10 +2498,86 @@ function _collectRoutes(){
       grade:document.getElementById('rg-'+id).value,
       type:document.getElementById('rt-'+id).value,
       attempts:parseInt(document.getElementById('ra-'+id).textContent)||1,
-      result:document.getElementById('rr-'+id).value
+      result:document.getElementById('rr-'+id).value,
+      projectId:document.getElementById('rp-'+id)?.value||null
     });
   });
   return routes;
+}
+/* ══════════════════════════════════════════
+   LOG DRAFT — autosave in-progress (unsaved) session
+══════════════════════════════════════════ */
+function _isLogFormBlank(){
+  const cards=document.querySelectorAll('#route-cards .route-card');
+  if(cards.length>1)return false;
+  if(document.getElementById('inp-note')?.value.trim())return false;
+  if(document.getElementById('inp-gym-select')?.value)return false;
+  if(currentFeel!=null)return false;
+  if(!cards.length)return true;
+  const id=cards[0].id.replace('rc-','');
+  const g=document.getElementById('rg-'+id)?.value,t=document.getElementById('rt-'+id)?.value,a=parseInt(document.getElementById('ra-'+id)?.textContent)||1,r=document.getElementById('rr-'+id)?.value;
+  return g==='6a'&&t===''&&a===1&&r==='poging';
+}
+let _draftSaveTimer=null;
+function _saveDraftDebounced(){clearTimeout(_draftSaveTimer);_draftSaveTimer=setTimeout(saveDraft,400);}
+function saveDraft(){
+  if(editMode)return;
+  if(_isLogFormBlank()){try{localStorage.removeItem(LDK)}catch(e){}return;}
+  const draft={
+    date:document.getElementById('inp-date').value,
+    gym:document.getElementById('inp-gym-select').value,
+    note:document.getElementById('inp-note').value,
+    feel:currentFeel,
+    routes:_collectRoutes(),
+    is_public:document.getElementById('inp-public')?.checked||false,
+    sessionTimerStart,sessionTimerElapsed,sessionTimerPaused
+  };
+  try{localStorage.setItem(LDK,JSON.stringify(draft))}catch(e){}
+}
+function showDraftBanner(){const b=document.getElementById('draft-banner');if(b)b.style.display='';}
+function hideDraftBanner(){const b=document.getElementById('draft-banner');if(b)b.style.display='none';}
+function restoreDraftIfAny(){
+  let draft=null;
+  try{const r=localStorage.getItem(LDK);if(r)draft=JSON.parse(r);}catch(e){}
+  if(!draft||!draft.routes||!draft.routes.length)return false;
+  document.getElementById('inp-date').value=draft.date||new Date().toISOString().slice(0,10);
+  if(draft.gym)document.getElementById('inp-gym-select').value=draft.gym;
+  document.getElementById('inp-note').value=draft.note||'';
+  currentFeel=draft.feel!=null?draft.feel:null;
+  document.querySelectorAll('.feel-btn').forEach((b,i)=>b.classList.toggle('selected',i===currentFeel));
+  applyVibe(currentFeel);
+  const pubEl=document.getElementById('inp-public');if(pubEl)pubEl.checked=!!draft.is_public;
+  document.getElementById('route-cards').innerHTML='';routeCount=0;
+  draft.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type,r.projectId));
+  sessionTimerStart=draft.sessionTimerStart||null;
+  sessionTimerElapsed=draft.sessionTimerElapsed||0;
+  sessionTimerPaused=!!draft.sessionTimerPaused;
+  clearInterval(sessionTimerTick);sessionTimerTick=null;
+  const bar=document.getElementById('sess-timer-bar'),btn=document.getElementById('sess-timer-pause'),tEl=document.getElementById('sess-timer-time');
+  if(sessionTimerStart){
+    if(bar)bar.style.display='';
+    if(sessionTimerPaused){
+      if(tEl)tEl.textContent=fmtSecs(sessionTimerElapsed);
+      if(btn){btn.textContent='▶';btn.classList.add('paused');}
+    }else{
+      sessionTimerTick=setInterval(()=>{if(tEl)tEl.textContent=fmtSecs(sessionTimerElapsed+Math.floor((Date.now()-sessionTimerStart)/1000));},1000);
+      if(btn){btn.textContent='⏸';btn.classList.remove('paused');}
+    }
+  }
+  updateSessStatsBar();
+  showDraftBanner();
+  toast('Concept hersteld','var(--accent)');
+  return true;
+}
+function _ensureLogFormSeeded(){
+  if(editMode)return;
+  if(document.querySelectorAll('#route-cards .route-card').length>0)return;
+  if(!restoreDraftIfAny())addRouteCard();
+}
+function discardDraft(){
+  try{localStorage.removeItem(LDK)}catch(e){}
+  _resetLogForm();
+  toast('Nieuwe sessie gestart');
 }
 function _resetLogForm(keepGym){
   const gym=keepGym||document.getElementById('inp-gym-select').value;
@@ -2471,6 +2593,7 @@ function _resetLogForm(keepGym){
   document.getElementById('inp-date').value=new Date().toISOString().slice(0,10);
   routeCount=0;
   resetSessionTimer();
+  hideDraftBanner();
   addRouteCard();
   if(gym)document.getElementById('inp-gym-select').value=gym;
 }
@@ -2488,8 +2611,10 @@ function saveSession(){
     const sessionEnd=Date.now();
     sessions.push({date,gym,note,routes,feel:currentFeel,id:sessionEnd,sessionStart:sessionTimerStart,sessionEnd:sessionTimerStart?sessionEnd:null,is_public:isPublic});
   }
+  if(!wasEdit)routes.forEach(r=>{if(r.projectId)_incrementProjectAttempts(r.projectId,date);});
   sessions.sort((a,b)=>a.date.localeCompare(b.date));
   save();
+  try{localStorage.removeItem(LDK)}catch(e){}
   const sessionDurSecs=sessionTimerStart?sessionTimerElapsed+Math.floor((Date.now()-sessionTimerStart)/1000):null;
   _resetLogForm();
   showPage('home');showSessionSummary(routes,wasEdit,sessionDurSecs);
@@ -2502,8 +2627,10 @@ function saveAndNew(){
   const isPublic=document.getElementById('inp-public')?.checked||false;
   const sessionEnd=Date.now();
   sessions.push({date,gym,note,routes,feel:currentFeel,id:sessionEnd,sessionStart:sessionTimerStart,sessionEnd:sessionTimerStart?sessionEnd:null,is_public:isPublic});
+  routes.forEach(r=>{if(r.projectId)_incrementProjectAttempts(r.projectId,date);});
   sessions.sort((a,b)=>a.date.localeCompare(b.date));
   save();
+  try{localStorage.removeItem(LDK)}catch(e){}
   const sessionDurSecs=sessionTimerStart?sessionTimerElapsed+Math.floor((Date.now()-sessionTimerStart)/1000):null;
   showSessionSummary(routes,false,sessionDurSecs);
   _resetLogForm(gym);
@@ -2594,14 +2721,17 @@ function renderGoals(){
 ══════════════════════════════════════════ */
 
 /* -- Quick Top -- */
-function openQuickTop(){
+function openQuickTop(result='top'){
   const overlay=document.createElement('div');
   overlay.className='quick-top-sheet';
   let selGrade=getSmartDefaultGrade();
-  overlay.innerHTML=`<div class="summary-handle"></div><div class="qt-title">Snel toppen ⚡</div><div class="qt-grade-grid">${GRADES.map(g=>`<button class="qt-grade-btn${g===selGrade?' qt-sel':''}" onclick="qtSel(this,'${g}')">${g}</button>`).join('')}</div><button class="qt-confirm" onclick="qtConfirm()">Toevoegen als Top</button>`;
+  const title=result==='top'?'Snel toppen ⚡':'Snel poging 📝';
+  const confirmLabel=result==='top'?'Toevoegen als Top':'Toevoegen als poging';
+  overlay.innerHTML=`<div class="summary-handle"></div><div class="qt-title">${title}</div><div class="qt-grade-grid">${GRADES.map(g=>`<button class="qt-grade-btn${g===selGrade?' qt-sel':''}" onclick="qtSel(this,'${g}')">${g}</button>`).join('')}</div><button class="qt-confirm" onclick="qtConfirm()">${confirmLabel}</button>`;
   overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove()});
   document.body.appendChild(overlay);
   overlay._grade=selGrade;
+  overlay._result=result;
 }
 function qtSel(btn,grade){
   btn.closest('.quick-top-sheet')._grade=grade;
@@ -2611,8 +2741,21 @@ function qtSel(btn,grade){
 function qtConfirm(){
   const sheet=document.querySelector('.quick-top-sheet');
   if(!sheet)return;
-  addRouteCard(sheet._grade,1,'top','');
+  quickLogRoute(sheet._grade,sheet._result||'top',1);
   sheet.remove();
+}
+function quickLogRoute(grade,result='top',attempts=1){
+  if(_isLogFormBlank()){
+    document.getElementById('route-cards').innerHTML='';routeCount=0;
+    document.getElementById('inp-date').value=new Date().toISOString().slice(0,10);
+    const lastUsed=[...sessions].reverse().find(s=>s.gym)?.gym;
+    if(lastUsed)document.getElementById('inp-gym-select').value=lastUsed;
+  }
+  addRouteCard(grade,attempts,result,'');
+  saveDraft();
+  const n=document.querySelectorAll('#route-cards .route-card').length;
+  const label=result==='top'?'Top':result==='flash'?'Flash':'Poging';
+  toast(`${label} genoteerd — ${n} route${n!==1?'s':''} vandaag`,getResultColor(result));
 }
 
 /* -- Inline sessie hangsets -- */
@@ -2889,6 +3032,7 @@ function setFeel(val){
   document.querySelectorAll('.feel-btn').forEach((b,i)=>b.classList.toggle('selected',i===currentFeel));
   haptic(6);
   applyVibe(currentFeel);
+  saveDraft();
 }
 
 /* ══════════════════════════════════════════
@@ -3320,11 +3464,15 @@ function renderProjects(){
   container.innerHTML=html;
 }
 
-function logAttempt(id){
-  const p=projects.find(x=>x.id===id);if(!p)return;
+function _incrementProjectAttempts(projectId,dateStr){
+  const p=projects.find(x=>String(x.id)===String(projectId));if(!p)return;
   p.attempts++;
-  p.lastAttemptDate=new Date().toISOString().split('T')[0];
+  p.lastAttemptDate=dateStr||new Date().toISOString().split('T')[0];
   saveProjects();
+}
+function logAttempt(id){
+  _incrementProjectAttempts(id);
+  const p=projects.find(x=>x.id===id);if(!p)return;
   haptic(8);
   toast(p.attempts+' pogingen');
   renderProjects();
@@ -4890,7 +5038,7 @@ function initApp(profileId){
 
   // Point storage keys at this profile's namespace
   const keys=profileStorageKeys(profileId);
-  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;PRK=keys.prk;IJK=keys.ijk;PLK=keys.plk;CMPK=keys.cmpk;RSTK=keys.rstk;
+  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;PRK=keys.prk;IJK=keys.ijk;PLK=keys.plk;CMPK=keys.cmpk;RSTK=keys.rstk;LDK=keys.ldk;
 
   // Load data
   sessions=loadArr(SK,'bsessions');
@@ -4940,7 +5088,7 @@ function initApp(profileId){
   const heroName=document.getElementById('hero-profile-name');
   if(heroName&&activeProfile)heroName.textContent=activeProfile.emoji+' '+activeProfile.name;
 
-  refreshGymSelect();addRouteCard();
+  refreshGymSelect();_ensureLogFormSeeded();
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
     navigator.serviceWorker.addEventListener('message',e=>{
