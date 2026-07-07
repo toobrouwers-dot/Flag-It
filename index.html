@@ -435,6 +435,7 @@ select option{background:#1e1e1e}
 .goal-overdue-badge{font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--danger);text-transform:uppercase;background:rgba(229,57,53,.15);border-radius:20px;padding:3px 10px}
 .btn-export,.btn-import-label{flex:1;padding:14px;background:var(--surface);border:.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;text-align:center;transition:border-color .2s,color .2s;display:block}
 .btn-export:active,.btn-import-label:active{border-color:var(--accent);color:var(--accent)}
+.btn-lang.active{border-color:var(--accent);color:var(--accent);background:rgba(127,119,221,.1)}
 .stats-gym-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:.5px solid var(--border)}
 .stats-gym-row:last-child{border-bottom:none}
 .stats-gym-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase}
@@ -1163,6 +1164,11 @@ select option{background:#1e1e1e}
   </div>
   <div id="meer-tab-gyms">
   <div class="gyms-content">
+    <div class="form-section-title" style="padding:0 0 10px">Taal / Language</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn-export btn-lang" id="btn-lang-nl" onclick="setLang('nl')" style="flex:1;text-align:center">🇳🇱 Nederlands</button>
+      <button class="btn-export btn-lang" id="btn-lang-en" onclick="setLang('en')" style="flex:1;text-align:center">🇬🇧 English</button>
+    </div>
     <div id="gym-list" style="margin-bottom:16px"></div>
     <div class="form-section-title" style="padding:0 0 10px">Gym toevoegen</div>
     <div class="add-gym-row">
@@ -1313,6 +1319,325 @@ const GRADES=['4','4+','5','5+','5a','5b','5c','6a','6a+','6b','6b+','6c','6c+',
 const GRADE_COLORS=['#9FE1CB','#5DCAA5','#1D9E75','#0F6E56','#7EC8A0','#50B090','#2A9480','#B5D4F4','#85B7EB','#378ADD','#185FA5','#CECBF6','#AFA9EC','#7F77DD','#534AB7','#F5C4B3','#F0997B','#D85A30','#993C1D','#F4C0D1','#ED93B1','#D4537E','#993356'];
 const TYPES=['Slab','Verticaal','Overhang','Cave','Dyno','Mantle','Pinch','Crimp','Sloper'];
 const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch','Open hand','Jug'];
+
+/* ══════════════════════════════════════════
+   I18N — EN/NL taalkeuze
+   NL blijft de brontaal (alle bestaande strings ongewijzigd).
+   Vertaling gebeurt live in de DOM zodat geen van de ~200
+   render*()-functies aangeraakt hoeft te worden.
+══════════════════════════════════════════ */
+let currentLang=localStorage.getItem('flagit_lang_v1')||'nl';
+function LOCALE(){return currentLang==='en'?'en-US':'nl-NL'}
+function setLang(lang){
+  if(lang!==currentLang){localStorage.setItem('flagit_lang_v1',lang);location.reload();}
+}
+const I18N_PATTERNS=[
+  [/Over (\d+) dag(en)?/g,(m,n,en)=>`In ${n} day${en?'s':''}`],
+  [/(\d+) dagen geleden gereset/g,(m,n)=>`Reset ${n} days ago`],
+  [/^Rivaal geïmporteerd: (.+)!$/,'Rival imported: $1!'],
+];
+const I18N_PHRASES=[
+  ['Aanmaken','Create'],['Aanpakken →','Tackle it →'],['Aantal keer','Number of times'],
+  ['Account aanmaken','Create account'],['Account verbinden','Connect account'],['Account bijgewerkt','Account updated'],
+  ['Actief profiel','Active profile'],['Activiteitskalender','Activity calendar'],
+  ['Advertenties','Ads'],['Advertentie','Ad'],['Advies voor jou','Advice for you'],
+  ['Alle grips','All grips'],['Alle gyms','All gyms'],['Analyse','Analysis'],['Annuleren','Cancel'],
+  ['Back-upbestand','backup file'],['Back-up','Backup'],['Begin met klimmen','Start climbing'],
+  ['Beheer','Manage'],['Beluister op Spotify','Listen on Spotify'],['Beta-notities','Beta notes'],
+  ['Bewerken','Edit'],['Bezig…','Working…'],['Bezoekpatroon','Visit pattern'],
+  ['Blessure geregistreerd','Injury logged'],['Blessure registreren','Log injury'],
+  ['Blessurerisico deze week','Injury risk this week'],['Blessurelog','Injury log'],
+  ['Blijf zo doorgaan — je bent op de goede weg','Keep it up — you\'re on the right track'],
+  ['Cloud niet geconfigureerd','Cloud not configured'],
+  ['Competitie toegevoegd!','Competition added!'],['Competitie toevoegen','Add competition'],
+  ['Competitie verwijderen?','Delete competition?'],
+  ['Concept hersteld — nog niet opgeslagen','Draft restored — not saved yet'],['Concept hersteld','Draft restored'],
+  ['Dagboek','Journal'],['Data geëxporteerd!','Data exported!'],['Data geïmporteerd!','Data imported!'],
+  ['Data importeren?','Import data?'],
+  ['Datum van reset','Reset date'],['Datum','Date'],
+  ['Deadline (optioneel)','Deadline (optional)'],['Deel kaart','Share card'],
+  ['Deze week','This week'],['Doelen & Projecten','Goals & Projects'],['Doelen','Goals'],
+  ['Doorgaan →','Continue →'],['Doorgaan','Continue'],
+  ['Druk start om te beginnen','Press start to begin'],['Druk start om rusttimer te beginnen','Press start to begin the rest timer'],
+  ['Duur','Duration'],
+  ['E-mailadres','Email address'],['E-mail (optioneel, voor een reactie)','Email (optional, for a reply)'],['E-mail','Email'],
+  ['Eerste sessie loggen','Log your first session'],
+  ['Ernst (1 = licht, 5 = zwaar)','Severity (1 = mild, 5 = severe)'],
+  ['Feedback versturen','Send feedback'],['Feedback','Feedback'],['Feed','Feed'],
+  ['Filters wissen','Clear filters'],['Flash-percentage:','Flash percentage:'],['Flash','Flash'],
+  ['Gebruikersnaam is verplicht','Username is required'],['Gebruikersnaam','Username'],
+  ['Geen hogere graden — je hebt de top bereikt!','No higher grades — you\'ve reached the top!'],
+  ['Geen klimmers gevonden','No climbers found'],['Geen posts','No posts'],['Geen projecten','No projects'],
+  ['Geen publieke sessies de laatste 90 dagen','No public sessions in the last 90 days'],
+  ['Geen resultaten','No results'],['Geen risicofactoren gevonden','No risk factors found'],
+  ['Geen sessies gevonden met de huidige filters.','No sessions found with the current filters.'],
+  ['Gem. per sessie','Avg. per session'],
+  ['Gem. sessiegevoel per routetype (0=😓 · 3=🔥)','Avg. session feel per route type (0=😓 · 3=🔥)'],
+  ['Gemiddeld sessiegevoel','Average session feel'],['Geregistreerd 🤘','Logged 🤘'],
+  ['gereset','reset'],['Gereset','Reset'],
+  ['Geslaagd','Sent'],['Gesponsorde kaart opgeslagen','Sponsored card saved'],['Gesponsorde kaart','Sponsored card'],['Gesponsord','Sponsored'],
+  ['Gevolgd!','Followed!'],['Gevolgde klimmers hebben nog niets gedeeld','Climbers you follow haven\'t shared anything yet'],
+  ['Gevonden','Found'],
+  ['Gewicht (kg extra)','Weight (extra kg)'],['Gisteren gereset','Reset yesterday'],
+  ['Goed','Good'],
+  ['Grade Normalisatie','Grade Normalization'],
+  ['Graden met ≥3 pogingen maar <50% slagingskans','Grades with ≥3 attempts but <50% success rate'],
+  ['Graad','Grade'],
+  ['Greeppatroon (setter)','Hold pattern (setter)'],['Greeppatroon opgeslagen!','Hold pattern saved!'],
+  ['Nog geen greeppatroon','No hold pattern yet'],
+  ['Grepen: ','Holds: '],['Grid: ','Grid: '],
+  ['✋ Greep','✋ Hold'],['🦶 Voet','🦶 Foot'],
+  ['Greep','Hold'],['Grip','Grip'],
+  ['Gym bestaat al','Gym already exists'],['Gym ingesteld — voeg routes toe!','Gym set — add routes!'],
+  ['Gym toegevoegd!','Gym added!'],['Gym toevoegen','Add gym'],['Gym verwijderen?','Delete gym?'],
+  ['Gym Resets','Gym resets'],['Gym: ','Gym: '],['Gyms & Hangboard','Gyms & Hangboard'],['Gyms','Gyms'],
+  ['HYPE SEND!','HYPE SEND!'],
+  ['Hangboard','Hangboard'],
+  ['Hangsessie opgeslagen! 💪','Hang session saved! 💪'],['Hangsessie opslaan','Save hang session'],
+  ['Hangsessie verwijderen?','Delete hang session?'],['Nog geen hangsessies','No hang sessions yet'],
+  ['Hangend...','Hanging...'],
+  ['Hangtijd ingevuld!','Hang time filled in!'],['Hangtijd progressie','Hang time progression'],['Hangtijd (sec)','Hang time (sec)'],
+  ['Hangtimer','Hang timer'],
+  ['Herhalingen','Reps'],['Herhaal sessie','Repeat session'],['Herhaal wachtwoord','Repeat password'],
+  ['Hersteld','Restored'],['Hervatten','Resume'],
+  ['Highpoint','Highpoint'],
+  ['Hoe voelde de sessie?','How did the session feel?'],
+  ['Hoek: ','Angle: '],['Hoek','Angle'],
+  ['Hoogste flash','Highest flash'],['Hoogste top','Highest top'],
+  ['Huidige data wordt overschreven.','Current data will be overwritten.'],
+  ['Huidige routes (blok) vs ideaal (stippel) · Meer ','Current routes (bar) vs ideal (dotted) · More '],
+  ['Ideaal = 2× meer routes per graad lager dan je PR','Ideal = 2× more routes per grade below your PR'],
+  ['Importeren','Import'],['Inloggen om te reageren','Log in to comment'],['Inloggen','Log in'],
+  ['Je bericht','Your message'],
+  ['Je klimt het beste op','You climb best on'],
+  ['dan vorige maand','than last month'],
+  ['Je klimt','You climb'],
+  ['Je slaagt het vaakst bij','You succeed most often at'],
+  ['Je topscore (','Your top grade ('],
+  ['Je had dit','You should have'],['al moeten sturen!','sent it by now!'],
+  ['🎯 Eerste','🎯 First'],['genoteerd','logged'],
+  ['Vul een bericht in','Enter a message'],['Bedankt voor je feedback!','Thanks for your feedback!'],
+  ['Vul een datum in','Enter a date'],['Vul een naam in','Enter a name'],
+  ['Doel toegevoegd!','Goal added!'],
+  ['Import mislukt — ongeldig JSON','Import failed — invalid JSON'],
+  ['Jouw bezoekpatroon','Your visit pattern'],['Jouw bouldering tracker','Your bouldering tracker'],
+  ['Jouw Klimkaart 🧗','Your Climb Card 🧗'],
+  ['Jouw naam','Your name'],
+  ['Jouw piramide is goed in balans — blijf zo doorgaan!','Your pyramid is well balanced — keep it up!'],
+  ['Jouw stats','Your stats'],
+  ['Kies een gym','Choose a gym'],['Kies een datum','Choose a date'],['Kies jouw profiel','Choose your profile'],
+  ['Kies rustduur en druk start','Choose rest duration and press start'],
+  ['KLAAR!','DONE!'],['Klaar','Done'],
+  ['Klim-playlist','Climbing playlist'],['Klimkaart gedownload!','Climb card downloaded!'],['Klimpiramide','Climbing pyramid'],
+  ['Kolommen','Columns'],['Korte bio','Short bio'],
+  ['Laden mislukt','Loading failed'],['Laden…','Loading…'],
+  ['Lichaamsdeel','Body part'],['Locatie (opt.)','Location (opt.)'],
+  ['Log in om sessies van vrienden te zien','Log in to see friends\' sessions'],
+  ['Log in om sessies te delen','Log in to share sessions'],
+  ['Log minimaal 6 sessies voor een bezoekpatroon','Log at least 6 sessions for a visit pattern'],
+  ['Log routes & sessies','Log routes & sessions'],['Loggen','Log'],
+  ['Max graad per sessie','Max grade per session'],['Max graad','Max grade'],['Max: ','Max: '],
+  ['Meer','More'],['Min. graad','Min. grade'],['Muziek','Music'],
+  ['Naam (optioneel)','Name (optional)'],['Naam sponsor','Sponsor name'],['Naam','Name'],
+  ['Niemand gevolgd','Not following anyone'],
+  ['Nieuwe gym toevoegen...','Add new gym...'],
+  ['Nieuwe hangsessie','New hang session'],['Nieuwe sessie gestart','New session started'],['Nieuwe sessie','New session'],
+  ['Nieuwe versie — tik om te herladen','New version — tap to reload'],
+  ['Nieuw project','New project'],['Nieuw profiel','New profile'],['Nieuw','New'],
+  ['Project toevoegen','Add project'],['Trainingsplan','Training plan'],['Competities','Competitions'],
+  ['Nog geen doelen','No goals yet'],['Nog geen feedback ontvangen.','No feedback received yet.'],
+  ['Nog geen geslaagde routes','No sent routes yet'],
+  ['Nog geen gyms — voeg er een toe hieronder.','No gyms yet — add one below.'],['Nog geen gyms','No gyms yet'],
+  ['Nog geen notities','No notes yet'],['Nog geen profielen','No profiles yet'],
+  ['Nog geen reacties','No comments yet'],['Nog geen sessies','No sessions yet'],['Nog geen sets gelogd','No sets logged yet'],
+  ['Nog niet genoeg progressie om te voorspellen.','Not enough progress yet to predict.'],
+  ['Nooit gelogd','Never logged'],
+  ['Notitie (optioneel)','Note (optional)'],
+  ['Of importeer een back-up','Or import a backup'],['Oké','Okay'],
+  ['Ongeldig back-upbestand','Invalid backup file'],['Ongeldig bestand','Invalid file'],
+  ['Ongeldige CTA URL','Invalid CTA URL'],['Ongeldige logo URL','Invalid logo URL'],
+  ['Ontvolgen mislukt','Unfollow failed'],
+  ['Op basis van jouw eigen sessies — jij klimt het minst op ','Based on your own sessions — you climb least on '],
+  ['Op deze dag vorig jaar','On this day last year'],
+  ['Openbaar profiel','Public profile'],['Opslaan mislukt: ','Save failed: '],['Opslaan mislukt','Save failed'],['Opslaan','Save'],
+  ['Per gym','Per gym'],
+  ['Piramide Audit ✓','Pyramid Audit ✓'],['Piramide Audit','Pyramid Audit'],
+  ['Poging','Attempt'],['Pogingen','Attempts'],
+  ['Profiel bijgewerkt!','Profile updated!'],['Profiel geïmporteerd!','Profile imported!'],
+  ['Profiel hernoemen','Rename profile'],['Profiel verwijderd','Profile deleted'],
+  ['Profiel verwijderen?','Delete profile?'],['Profiel verwijderen','Delete profile'],['Profielen','Profiles'],
+  ['Project (optioneel)','Project (optional)'],['Project bewerken','Edit project'],['Project verwijderd','Project deleted'],
+  ['Project verwijderen?','Delete project?'],['Projecten','Projects'],
+  ['Ranglijst (90 dagen)','Leaderboard (90 days)'],['Ranglijst','Leaderboard'],
+  ['Rust voorbij — pak je set!','Rest over — grab your set!'],
+  ['Reactie opslaan mislukt','Failed to save comment'],
+  ['Reacties','Comments'],['Recente hangsessies','Recent hang sessions'],['Recente sessies','Recent sessions'],
+  ['Registreren','Sign up'],
+  ['Reset gelogd! 🆕','Reset logged! 🆕'],['Reset loggen','Log reset'],
+  ['Resultaat','Result'],
+  ['Rivaal geïmporteerd','Rival imported'],['Rivaal gewist','Rival cleared'],['Rivaal modus','Rival mode'],
+  ['Rivaal importeren','Import rival'],['Exporteer','Export'],
+  ['Snel toppen ⚡','Quick top ⚡'],['Snel poging 📝','Quick attempt 📝'],
+  ['Snel toppen','Quick top'],['Snel poging','Quick attempt'],
+  ['Indrukwekkend klimbewijs.','Impressive climbing achievement.'],
+  ['geflasht!','flashed!'],['Direct gestuurd!','Sent it immediately!'],['Nieuw persoonlijk record!','New personal record!'],
+  ['routes geslaagd!','routes sent!'],['Goed bezig, blijf klimmen!','Good going, keep climbing!'],
+  ['Indrukwekkend aantal geslaagde routes!','Impressive number of sent routes!'],
+  ['Flash-reeks!','Flash streak!'],['in één sessie — ongelooflijk!','in one session — incredible!'],
+  ['Perfecte sessie!','Perfect session!'],['Alle routes van die dag gestuurd!','All routes that day sent!'],
+  ['5 weken actief!','5 weeks active!'],['Je klimt regelmatig — zo ga je echt vooruit!','You climb regularly — you\'re really making progress!'],
+  ['Eerste ','First '],
+  ['Welkom bij Coach!','Welcome to Coach!'],
+  ['Log je eerste sessies — na 3 sessies geeft de coach persoonlijk advies.','Log your first sessions — after 3 sessions the coach gives personal advice.'],
+  ['Jouw lijf vraagt rust','Your body needs rest'],
+  ['Een geplande hersteldag zorgt voor betere prestaties morgen.','A planned recovery day leads to better performance tomorrow.'],
+  ['Klaar voor de volgende stap','Ready for the next step'],
+  ['Je bent consistent — tijd om bewust harder te pushen.','You\'re consistent — time to deliberately push harder.'],
+  ['Versterk je fundament','Strengthen your foundation'],
+  ['Gerichte krachttraining versnelt jouw graadprogressie.','Targeted strength training speeds up your grade progression.'],
+  ['Training op schema','Training on track'],
+  ['Geen urgente aandachtspunten — blijf zo doorgaan!','No urgent concerns — keep it up!'],
+  ['Let Op','Note'],['Doorbraak','Breakthrough'],['Techniek','Technique'],['Kracht','Strength'],['Motivatie','Motivation'],['Variatie','Variety'],
+  ['Overtraining risico','Overtraining risk'],['Hoge belasting deze week','High load this week'],
+  ['3 sessies in 4 dagen','3 sessions in 4 days'],['Herstelsessie aanbevolen','Recovery session recommended'],
+  ['Flash-percentage daalt','Flash percentage dropping'],['Start met hangboard training','Start hangboard training'],
+  ['Bouw naar 10 seconden hangtijd','Build to 10 seconds hang time'],['Repeater protocol aanbevolen','Repeater protocol recommended'],
+  ['Max hangs met extra gewicht','Max hangs with extra weight'],['Andere gym proberen?','Try another gym?'],
+  ['Slagings%','Success %'],
+  ['Herstel','Recovery'],['Volume','Volume'],['Piek','Peak'],['Evaluatie','Evaluation'],
+  ['Lezen','Reading'],['Comfortzone','Comfort zone'],['Snelheid','Speed'],
+  ['Basis','Basics'],['Opbouw','Build-up'],['Test & Evalueer','Test & Evaluate'],['Intensiteit','Intensity'],
+  ['Graad Doorbraak','Grade Breakthrough'],['8 weken gericht jouw PR verbeteren','8 weeks focused on improving your PR'],
+  ['6 weken je flash-percentage verhogen','6 weeks improving your flash percentage'],
+  ['Fingerboard Kracht','Fingerboard Strength'],['6 weken vingersterkte opbouwen','6 weeks building finger strength'],
+  ['Graad-doel toevoegen','Add grade goal'],['Herhaling-doel toevoegen','Add repeat goal'],
+  ['Voeg je eerste project toe en houd bij hoe ver je komt op jouw droute.','Add your first project and track how far you get on your route.'],
+  ['Rijen','Rows'],
+  ['Route instellen','Set route'],['Route toegevoegd vanuit setter!','Route added from setter!'],['Route toevoegen →','Add route →'],
+  ['Routes per graad (geslaagd)','Routes per grade (sent)'],
+  ['Rust (sec)','Rest (sec)'],['Rusttimer','Rest timer'],
+  ['Schrijf een reactie…','Write a comment…'],
+  ['Sessie bewerken','Edit session'],['Sessie delen','Share session'],
+  ['Sessie info','Session info'],['Sessie loggen','Log session'],
+  ['Sessie opgeslagen — nieuwe sessie gestart!','Session saved — new session started!'],
+  ['Sessie opslaan','Save session'],['Sessie replay','Session replay'],
+  ['Sessie verlaten?','Leave session?'],['Sessie verwijderd','Session deleted'],['Sessie verwijderen?','Delete session?'],
+  ['Sessies','Sessions'],['Sessietijd','Session time'],['sessies','sessions'],['Sessie','Session'],
+  ['— geen —','— none —'],['— Kies een gym —','— Choose a gym —'],
+  ['slagingspercentage','success rate'],['Slagingspercentage','Success rate'],
+  ['Slimme inzichten','Smart insights'],['Sluiten','Close'],['Sociaal','Social'],
+  ['Sterkte:','Strength:'],
+  ['Stel doelen in','Set goals'],['Stoke Radar','Stoke Radar'],
+  ['Supabase niet geconfigureerd','Supabase not configured'],['Sync status','Sync status'],
+  ['Teruggetr.','Withdr.'],['Toepassen ✓','Apply ✓'],['Toevoegen','Add'],
+  ['Top!','Top!'],
+  ['Totaal routes','Total routes'],['Train vandaag?','Train today?'],['Trainingsbelasting','Training load'],
+  ['Trainingsplan gestart!','Training plan started!'],
+  ['Uitdagingen, tips voor jezelf, bijzonderheden...','Challenges, tips for yourself, details...'],
+  ['Uitgelogd','Logged out'],
+  ['Uitloggen / ander account','Log out / switch account'],['Uitloggen','Log out'],
+  ['URL (https://...)','URL (https://...)'],
+  ['Verbinding mislukt','Connection failed'],['Verbind je account','Connect your account'],
+  ['Verder zonder account','Continue without account'],
+  ['verwacht over','expected in'],
+  ['Verlaten','Leave'],['Verlopen','Expired'],
+  ['Verschijnt bij andere klimmers','Appears to other climbers'],
+  ['Versturen','Send'],
+  ['Verwijderd','Deleted'],['Verwijderen','Delete'],
+  ['Vinger Gezondheid','Finger Health'],
+  ['Voeg eerst een gym toe','Add a gym first'],['Voeg eerst een set toe','Add a set first'],
+  ['Voeg een route toe','Add a route'],['Voeg een set toe','Add a set'],
+  ['Voeg Flag-It toe','Add Flag-It'],
+  ['Voeg hieronder een graad- of herhaling-doel toe.','Add a grade or repeat goal below.'],
+  ['Voeg je Supabase-sleutels toe aan cloud.js','Add your Supabase keys to cloud.js'],
+  ['Voeg toe','Add'],
+  ['Volg je voortgang','Track your progress'],
+  ['Volgen mislukt','Follow failed'],['Volgen','Follow'],
+  ['Volgreep','Full crimp'],['Half-krim','Half crimp'],['Krim','Crimp'],['Sleuf','Sloper'],['Twee-vinger','Two-finger'],
+  ['Verticaal','Vertical'],
+  ['Voltooid','Completed'],
+  ['Voor alle gebruikers tegelijk','For all users at once'],
+  ['Vorige week','Last week'],['vorige maand','last month'],['deze maand','this month'],
+  ['Vandaag gereset','Reset today'],['Vandaag','Today'],['vandaag','today'],
+  ['vaker','more often'],['minder','less'],['geleden','ago'],['dagen','days'],['dag','day'],
+  ['Wachtwoord vergeten?','Forgot password?'],['Wachtwoord (min. 6 tekens)','Password (min. 6 characters)'],['Wachtwoord','Password'],
+  ['Weergavenaam','Display name'],['Wijzig','Change'],['Wijzigingen opslaan','Save changes'],
+  ['Wis rivaal','Clear rival'],['Wisselen','Switch'],['Wis','Clear'],
+  ['is je zwakste type — kies in je volgende sessie bewust','is your weakest type — deliberately choose'],
+  ['Zwakste route-types','Weakest route types'],
+  ['Zoek klimmers via het zoekicoon','Search climbers via the search icon'],
+  ['🔍 Zoek klimmer...','🔍 Search climber...'],
+  ['Zoeken','Search'],['Zwaar','Heavy'],
+  ['— type —','— type —'],
+  [') staat al',') has been stuck for'],
+  ['stil — tijd om te pushen!','— time to push!'],
+  ['weken','weeks'],
+  ['slaagt maar','only succeeds at'],
+  ['kies bewust','deliberately choose'],
+  ['routes op deze graad en analyseer de moves.','routes at this grade and analyze the moves.'],
+  ['Zwakste:','Weakest:'],
+  ['Gepauzeerd op','Paused at'],['Gepauzeerd','Paused'],
+  ['Aan het rusten...','Resting...'],['Pauzeren','Pause'],
+  ['Gebruik timer (','Use timer ('],
+  ['Gevolgd','Following'],['Volgen','Follow'],
+  ['gebruikersnaam','username'],['jij@voorbeeld.nl','you@example.com'],
+  ['bijv. jouw naam','e.g. your name'],['bijv. Amsterdam','e.g. Amsterdam'],
+  ['bijv. Monk, ClimbUp, Bjoeks...','e.g. Monk, ClimbUp, Bjoeks...'],
+  ['bijv. training na boulder, gevoel in koud weer...','e.g. training after bouldering, feel in cold weather...'],
+  ['bijv. De Spleet, Sector A links…','e.g. De Spleet, Sector A left…'],
+  ['bijv. De Spleet, Sector B links...','e.g. De Spleet, Sector B left...'],
+  ['bijv. Klimmuur Open, IFSC Kwalificatie...','e.g. Klimmuur Open, IFSC Qualifier...'],
+  ['Bijv. na bouldering, vermoeid, etc.','e.g. after bouldering, tired, etc.'],
+  ['Bug, idee, vraag...','Bug, idea, question...'],
+  ['CTA tekst (bijv. Bekijk de nieuwe Otaki →)','CTA text (e.g. Check out the new Otaki →)'],
+  ['Logo URL (https://...)','Logo URL (https://...)'],
+  ['Rusttimer','Rest timer'],
+  ['Afgelopen','Past'],
+  ['Hangboard','Hangboard'],
+];
+I18N_PHRASES.sort((a,b)=>b[0].length-a[0].length);
+function i18nTranslate(str){
+  if(currentLang!=='en'||typeof str!=='string'||!str)return str;
+  let out=str;
+  for(const[re,rep]of I18N_PATTERNS)out=out.replace(re,rep);
+  for(const[find,rep]of I18N_PHRASES)if(out.indexOf(find)!==-1)out=out.split(find).join(rep);
+  return out;
+}
+function _i18nSetIfChanged(str){const t=i18nTranslate(str);return t!==str?t:null}
+function translateSubtree(node){
+  if(!node)return;
+  if(node.nodeType===3){
+    const cur=node.textContent;
+    if(cur.trim()){const t=_i18nSetIfChanged(cur);if(t!==null)node.textContent=t}
+    return;
+  }
+  if(node.nodeType!==1)return;
+  const tag=node.tagName;
+  if(tag==='SCRIPT'||tag==='STYLE')return;
+  if(node.hasAttribute&&node.hasAttribute('placeholder')){const v=node.getAttribute('placeholder'),t=_i18nSetIfChanged(v);if(t!==null)node.setAttribute('placeholder',t)}
+  if(node.hasAttribute&&node.hasAttribute('title')){const v=node.getAttribute('title'),t=_i18nSetIfChanged(v);if(t!==null)node.setAttribute('title',t)}
+  if(node.hasAttribute&&node.hasAttribute('aria-label')){const v=node.getAttribute('aria-label'),t=_i18nSetIfChanged(v);if(t!==null)node.setAttribute('aria-label',t)}
+  for(const child of Array.from(node.childNodes))translateSubtree(child);
+}
+function updateLangButtons(){
+  const nl=document.getElementById('btn-lang-nl'),en=document.getElementById('btn-lang-en');
+  if(!nl||!en)return;
+  nl.classList.toggle('active',currentLang==='nl');
+  en.classList.toggle('active',currentLang==='en');
+}
+function initI18nObserver(){
+  if(currentLang==='en')translateSubtree(document.body);
+  updateLangButtons();
+  const observer=new MutationObserver(muts=>{
+    if(currentLang!=='en')return;
+    for(const m of muts){
+      m.addedNodes.forEach(n=>translateSubtree(n));
+      if(m.type==='characterData'&&m.target.parentNode)translateSubtree(m.target);
+    }
+  });
+  observer.observe(document.body,{childList:true,subtree:true,characterData:true});
+}
+initI18nObserver();
 
 /* ══════════════════════════════════════════
    STATE
@@ -1651,7 +1976,7 @@ async function renderFeedbackAdmin(){
   const rows=items.map(f=>`
     <div class="admin-row" style="flex-direction:column;align-items:flex-start;gap:4px">
       <div style="font-size:14px;white-space:pre-wrap">${esc(f.message)}</div>
-      <div class="admin-row-sub">${f.contact_email?esc(f.contact_email)+' · ':''}${new Date(f.created_at).toLocaleString('nl-NL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+      <div class="admin-row-sub">${f.contact_email?esc(f.contact_email)+' · ':''}${new Date(f.created_at).toLocaleString(LOCALE(),{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
     </div>`).join('');
   el.innerHTML=`<div class="admin-panel">
     <div class="admin-panel-title">Feedback (${items.length})</div>
@@ -1716,7 +2041,7 @@ function loadArr(k,fb){
    UTILS
 ══════════════════════════════════════════ */
 const gi=g=>GRADES.indexOf(g);
-function fmtDate(d){if(!d)return'';return new Date(d+'T00:00:00').toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'})}
+function fmtDate(d){if(!d)return'';return new Date(d+'T00:00:00').toLocaleDateString(LOCALE(),{weekday:'short',day:'numeric',month:'short'})}
 function fmtSecs(s){const m=Math.floor(s/60),sec=s%60;return`${m}:${String(sec).padStart(2,'0')}`}
 let _routesCache=null;
 const allRoutes=()=>{if(!_routesCache)_routesCache=sessions.flatMap(s=>s.routes.map(r=>({...r,date:s.date,sid:s.id})));return _routesCache};
@@ -1731,7 +2056,7 @@ function dateBucket(dateStr){
   if(diffDays===0)return'Vandaag';
   if(diffDays<=6)return'Deze week';
   if(diffDays<=13)return'Vorige week';
-  const d=new Date(dateStr+'T00:00:00'),lbl=d.toLocaleDateString('nl-NL',{month:'long',year:'numeric'});
+  const d=new Date(dateStr+'T00:00:00'),lbl=d.toLocaleDateString(LOCALE(),{month:'long',year:'numeric'});
   return lbl.charAt(0).toUpperCase()+lbl.slice(1);
 }
 
@@ -3070,7 +3395,7 @@ function renderHeatmap(){
     if(!first)return'';
     const dt=new Date(first.date+'T00:00:00');
     const m=dt.getMonth();
-    if(m!==lastMonth){lastMonth=m;return dt.toLocaleDateString('nl-NL',{month:'short'})}
+    if(m!==lastMonth){lastMonth=m;return dt.toLocaleDateString(LOCALE(),{month:'short'})}
     return'';
   });
   let mHtml='';
@@ -3140,7 +3465,7 @@ function computeInsights(){
   // Best day of week
   const dayS={},dayT={};
   sessions.forEach(s=>{
-    const dow=new Date(s.date+'T00:00:00').toLocaleDateString('nl-NL',{weekday:'long'});
+    const dow=new Date(s.date+'T00:00:00').toLocaleDateString(LOCALE(),{weekday:'long'});
     s.routes.forEach(r=>{dayT[dow]=(dayT[dow]||0)+1;if(r.result!=='poging')dayS[dow]=(dayS[dow]||0)+1});
   });
   const dayKeys=Object.keys(dayT).filter(d=>dayT[d]>=5);
@@ -4422,7 +4747,7 @@ function renderQuietTime(){
   const el=document.getElementById('quiet-time-section');
   if(!el)return;
   if(sessions.length<6){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:4px 0 12px">Log minimaal 6 sessies voor een bezoekpatroon</div>';return;}
-  const DAYS=['Zo','Ma','Di','Wo','Do','Vr','Za'];
+  const DAYS=currentLang==='en'?['Sun','Mon','Tue','Wed','Thu','Fri','Sat']:['Zo','Ma','Di','Wo','Do','Vr','Za'];
   const dayCounts=Array(7).fill(0);
   sessions.forEach(s=>{
     const dow=new Date(s.date+'T00:00:00').getDay();
@@ -4496,7 +4821,7 @@ function computeWeekPlan(){
   const recentCnt=sessions.filter(s=>Math.round((new Date(todayStr+'T00:00:00')-new Date(s.date+'T00:00:00'))/86400000)<28).length;
   const weeklyFreq=recentCnt/4;
   const hasHang=hangSessions.length>0;
-  const dayAbbr=['Zo','Ma','Di','Wo','Do','Vr','Za'];
+  const dayAbbr=currentLang==='en'?['Sun','Mon','Tue','Wed','Thu','Fri','Sat']:['Zo','Ma','Di','Wo','Do','Vr','Za'];
   let pattern;
   if(weeklyFreq>=3)pattern=['climb','hang','rest','climb','hang','rest','climb'];
   else if(weeklyFreq>=2)pattern=['climb','rest','hang','rest','climb','rest','rest'];
@@ -5694,7 +6019,7 @@ function renderGradeOracle(){
   const ssTot=data.reduce((a,p)=>a+(p.y-yMean)**2,0);
   const ssRes=data.reduce((a,p)=>a+(p.y-(m*p.x+b))**2,0);
   const conf=ssTot>0?Math.round(Math.max(0,Math.min(1,1-ssRes/ssTot))*100):0;
-  const dateStr=predDate.toLocaleDateString('nl-NL',{day:'numeric',month:'long',year:'numeric'});
+  const dateStr=predDate.toLocaleDateString(LOCALE(),{day:'numeric',month:'long',year:'numeric'});
 
   if(daysOut<0){
     el.innerHTML=`<div class="oracle-card">

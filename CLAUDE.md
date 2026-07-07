@@ -78,6 +78,7 @@ All state lives in global arrays, persisted to **localStorage** and optionally s
 | (cloud dirty) | `flagit_cloud_dirty_{profileId}` | Pending sync changes per table (cloud.js) |
 | (auth) | `flagit_auth` | Supabase auth session (cloud.js) |
 | (install prompt) | `flagit_install_dismissed_v1` | PWA install banner dismiss state |
+| (language) | `flagit_lang_v1` | UI language: `'nl'` (default) or `'en'` (global, no suffix) |
 
 **Mutation pattern:** Mutate the array directly → call the corresponding save function (`save()`, `saveGyms()`, `saveGoals()`, `saveHang()`, etc.). There is no reactive binding.
 
@@ -170,6 +171,17 @@ Five Chart.js instances — destroy with `.destroy()` before re-creating to prev
 
 Uses two globals: `editMode` (boolean) and `editSessionId` (string). The save form function checks these to decide whether to insert or update a record.
 
+### Internationalization (i18n)
+
+The app supports **Dutch (default) and English**, chosen via a toggle in Meer → Taal / Language. Rather than threading a `t('key')` call through every one of the ~200 `render*()` functions, translation happens as a **live DOM pass**, defined near the top of the `<script>` block in `index.html` (right after the `GRADES`/`TYPES`/`GRIPS` constants):
+
+- `currentLang` (`'nl'`|`'en'`) is read from `localStorage['flagit_lang_v1']` at load time. `setLang(lang)` persists the choice and calls `location.reload()` — a full reload is the simplest way to safely re-render everything in the new language.
+- `LOCALE()` returns `'en-US'`/`'nl-NL'` for use in `toLocaleDateString`/`toLocaleString` calls (`fmtDate`, `dateBucket`, etc.) so dates/weekdays/months localize correctly.
+- `I18N_PATTERNS` (regex → replacement) and `I18N_PHRASES` (plain NL substring → EN substring, sorted longest-first) together define the translation. `i18nTranslate(str)` applies patterns then phrases; it is a no-op when `currentLang !== 'en'`.
+- `translateSubtree(node)` walks text nodes plus `placeholder`/`title`/`aria-label` attributes, only writing back when the translated value actually differs (writing back an unchanged value would re-trigger the observer below and loop).
+- A single `MutationObserver` on `document.body` (installed once via `initI18nObserver()`) calls `translateSubtree` on every added/changed node when `currentLang === 'en'`. Because every `render*()` function already works by reassigning `innerHTML`, this one observer transparently covers all current and future dynamic content — no per-function changes needed.
+- Since NL is the untouched source language, adding a new Dutch string needs **no code change** for Dutch. To make it appear translated in English, add an `['Dutch phrase','English phrase']` entry to `I18N_PHRASES` (or a regex to `I18N_PATTERNS` if the string has interpolated values). Prefer the longest, most specific phrase that makes sense — the sort-by-length means longer entries are substituted before shorter/generic ones, avoiding accidental partial-word matches (e.g. `'Wisselen'` must have its own entry so the generic `'Wis'→'Clear'` rule doesn't mangle it into `'Clearselen'`).
+
 ### Finding functions
 
 With ~200 functions in a single file, use grep/search to locate them by name. Functions are grouped loosely by feature area in the script block:
@@ -180,7 +192,7 @@ profile management → data persistence → feed rendering → forms → charts 
 
 - **XSS protection:** User-supplied strings must be HTML-escaped before insertion into `innerHTML`. Use the existing `escHtml()` utility function for this.
 - **Mobile-first:** The layout targets max-width 430px. Use CSS `env(safe-area-inset-*)` for fixed bottom elements.
-- **Dutch UI:** All user-facing text is in Dutch. Keep new strings in Dutch.
+- **Dutch UI, EN/NL toggle:** All source strings (HTML markup + JS template literals) are written in Dutch — keep new strings in Dutch. English is a runtime translation layer on top (see [Internationalization (i18n)](#internationalization-i18n)); when adding new user-facing text, no code change is required for English support, but add an entry to the `I18N_PHRASES` dictionary in `index.html` if the string should be translatable.
 - **PWA offline:** All new static assets must be listed in the `sw.js` cache array and the cache version bumped.
 - **No build system** — keep logic self-contained; avoid introducing npm dependencies or build tools.
 - **Cloud-aware mutations:** If a data mutation should sync to Supabase, mark the relevant table dirty via the cloud.js dirty-tracking mechanism after saving to localStorage.
