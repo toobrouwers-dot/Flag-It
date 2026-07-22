@@ -438,7 +438,7 @@ async function doSignIn() {
   const pw    = document.getElementById('auth-pw')?.value;
   if (!email || !pw) { authShowMsg('Vul alle velden in', true); return; }
   const btn = document.querySelector('#auth-form-signin .auth-btn-primary');
-  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
+  if (btn) { btn.disabled = true; btn.classList.add('is-loading'); btn.textContent = 'Bezig…'; }
   authShowMsg('', false);
   try {
     await cloudSignIn(email, pw);
@@ -447,7 +447,7 @@ async function doSignIn() {
     if (typeof activeProfileId !== 'undefined' && activeProfileId) cloudMigrateLocal(activeProfileId).catch(() => {});
   } catch(e) {
     authShowMsg(_translateAuthError(e.message) || 'Inloggen mislukt', true);
-    if (btn) { btn.disabled = false; btn.textContent = 'Inloggen'; }
+    if (btn) { btn.disabled = false; btn.classList.remove('is-loading'); btn.textContent = 'Inloggen'; }
   }
 }
 
@@ -459,7 +459,7 @@ async function doSignUp() {
   if (pw !== pw2) { authShowMsg('Wachtwoorden komen niet overeen', true); return; }
   if (pw.length < 6) { authShowMsg('Wachtwoord moet minimaal 6 tekens zijn', true); return; }
   const btn = document.querySelector('#auth-form-signup .auth-btn-primary');
-  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
+  if (btn) { btn.disabled = true; btn.classList.add('is-loading'); btn.textContent = 'Bezig…'; }
   authShowMsg('', false);
   try {
     const user = await cloudSignUp(email, pw);
@@ -473,17 +473,17 @@ async function doSignUp() {
       // Email confirmation required — switch to sign-in with a hint
       authShowMsg('Account aangemaakt! Controleer je e-mail en log dan in.', false);
       setTimeout(() => authSwitchTab('signin'), 2000);
-      if (btn) { btn.disabled = false; btn.textContent = 'Account aanmaken'; }
+      if (btn) { btn.disabled = false; btn.classList.remove('is-loading'); btn.textContent = 'Account aanmaken'; }
     }
   } catch(e) {
     authShowMsg(_translateAuthError(e.message) || 'Registreren mislukt', true);
-    if (btn) { btn.disabled = false; btn.textContent = 'Account aanmaken'; }
+    if (btn) { btn.disabled = false; btn.classList.remove('is-loading'); btn.textContent = 'Account aanmaken'; }
   }
 }
 
 async function doSignInGoogle() {
   const btn = document.querySelector('.auth-btn-google');
-  if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; }
+  if (btn) { btn.disabled = true; btn.classList.add('is-loading'); }
   authShowMsg('Google-login starten…', false);
   try {
     sessionStorage.setItem('flagit_google_migrate', '1');
@@ -491,7 +491,7 @@ async function doSignInGoogle() {
   } catch(e) {
     sessionStorage.removeItem('flagit_google_migrate');
     authShowMsg(e.message || 'Google-login mislukt', true);
-    if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+    if (btn) { btn.disabled = false; btn.classList.remove('is-loading'); }
   }
 }
 
@@ -594,7 +594,7 @@ async function lfsDoSignIn() {
   const pw = document.getElementById('lfs-pw')?.value;
   if (!email || !pw) { lfsShowMsg('Vul alle velden in', true); return; }
   const btn = document.querySelector('#lfs-form-signin .auth-btn-primary');
-  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
+  if (btn) { btn.disabled = true; btn.classList.add('is-loading'); btn.textContent = 'Bezig…'; }
   lfsShowMsg('', false);
   try {
     await cloudSignIn(email, pw);
@@ -603,7 +603,7 @@ async function lfsDoSignIn() {
     setTimeout(() => window._lfsDone?.(), 400);
   } catch(e) {
     lfsShowMsg(_translateAuthError(e.message) || 'Inloggen mislukt', true);
-    if (btn) { btn.disabled = false; btn.textContent = 'Inloggen'; }
+    if (btn) { btn.disabled = false; btn.classList.remove('is-loading'); btn.textContent = 'Inloggen'; }
   }
 }
 
@@ -615,7 +615,7 @@ async function lfsDoSignUp() {
   if (pw !== pw2) { lfsShowMsg('Wachtwoorden komen niet overeen', true); return; }
   if (pw.length < 6) { lfsShowMsg('Wachtwoord moet minimaal 6 tekens zijn', true); return; }
   const btn = document.querySelector('#lfs-form-signup .auth-btn-primary');
-  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
+  if (btn) { btn.disabled = true; btn.classList.add('is-loading'); btn.textContent = 'Bezig…'; }
   lfsShowMsg('', false);
   try {
     await cloudSignUp(email, pw);
@@ -627,17 +627,17 @@ async function lfsDoSignUp() {
     } else {
       lfsShowMsg('Account aangemaakt! Controleer je e-mail en log dan in.', false);
       setTimeout(() => lfsAuthSwitchTab('signin'), 2000);
-      if (btn) { btn.disabled = false; btn.textContent = 'Account aanmaken'; }
+      if (btn) { btn.disabled = false; btn.classList.remove('is-loading'); btn.textContent = 'Account aanmaken'; }
     }
   } catch(e) {
     lfsShowMsg(_translateAuthError(e.message) || 'Registreren mislukt', true);
-    if (btn) { btn.disabled = false; btn.textContent = 'Account aanmaken'; }
+    if (btn) { btn.disabled = false; btn.classList.remove('is-loading'); btn.textContent = 'Account aanmaken'; }
   }
 }
 
 async function lfsDoSignInGoogle() {
   const btn = document.querySelector('#lfs-content .auth-btn-google');
-  if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; }
+  if (btn) { btn.disabled = true; btn.classList.add('is-loading'); }
   lfsShowMsg('Google-login starten…', false);
   try {
     sessionStorage.setItem('flagit_google_migrate', '1');
@@ -645,7 +645,7 @@ async function lfsDoSignInGoogle() {
   } catch(e) {
     sessionStorage.removeItem('flagit_google_migrate');
     lfsShowMsg(e.message || 'Google-login mislukt', true);
-    if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+    if (btn) { btn.disabled = false; btn.classList.remove('is-loading'); }
   }
 }
 

@@ -90,8 +90,8 @@ body.nav-transitioning{overflow:hidden}
 .route-chip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .chip-top .dot{background:var(--success)}.chip-flash .dot{background:var(--flash)}.chip-poging .dot{background:var(--attempt)}
 
-.btn-delete-session{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;margin-top:2px;min-width:44px;min-height:44px}
-.btn-delete-session:active{color:var(--danger);background:rgba(229,57,53,.12)}
+.btn-delete{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s,border-color .2s;min-width:44px;min-height:44px}
+.btn-delete:active{color:var(--danger);background:rgba(229,57,53,.12)}
 
 .empty-state{text-align:center;padding:48px 20px 40px;color:var(--muted)}
 .is-loading{opacity:.6;pointer-events:none}
@@ -269,7 +269,7 @@ select option{background:#1e1e1e}
 .goal-section-header:first-child{margin-top:0}
 .goal-section-divider{height:.5px;background:var(--border);margin-bottom:14px}
 
-.goal-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;animation:slideUp .25s ease both}
+.card-base{padding:16px;border-radius:14px;background:var(--surface);border:.5px solid var(--border);margin-bottom:12px;animation:slideUp .25s ease both}
 .goal-card.achieved{border-color:rgba(76,175,80,.4);background:rgba(76,175,80,.04)}
 .goal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
 .goal-grade{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--accent);line-height:1}
@@ -281,8 +281,6 @@ select option{background:#1e1e1e}
 .goal-card.achieved .goal-progress-fill{background:var(--success)}
 .goal-progress-label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
 .goal-progress-pct{color:var(--text);font-weight:600}
-.btn-delete-goal{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .2s;min-width:44px;min-height:44px}
-.btn-delete-goal:active{color:var(--danger)}
 
 /* add goal forms side by side in one card */
 .add-goal-form{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:24px}
@@ -302,7 +300,7 @@ select option{background:#1e1e1e}
 .hang-pr-val{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--hang);line-height:1}
 .hang-pr-sub{font-size:11px;color:var(--muted);margin-top:3px}
 
-.hang-card{margin-bottom:12px;background:var(--surface);border-radius:14px;border:.5px solid var(--border);overflow:hidden;animation:slideUp .3s ease both}
+.hang-card{padding:0;overflow:hidden;animation-duration:.3s}
 .hang-card-header{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 16px 12px}
 .hang-card-date{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase}
 .hang-card-sub{font-size:12px;color:var(--muted);margin-top:2px}
@@ -356,8 +354,6 @@ select option{background:#1e1e1e}
 .gym-actions{display:flex;align-items:center;gap:8px}
 .btn-fav{background:none;border:.5px solid var(--border);border-radius:8px;color:var(--muted);padding:6px 10px;font-size:11px;font-family:'Barlow',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:all .15s}
 .btn-fav.active{color:var(--accent);border-color:var(--accent);background:rgba(127,119,221,.1)}
-.btn-del-gym{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .2s;min-width:44px;min-height:44px}
-.btn-del-gym:active{color:var(--danger)}
 .add-gym-row{display:flex;gap:8px}
 .add-gym-row input{flex:1}
 .btn-add-gym{background:var(--accent);border:none;border-radius:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;padding:12px 18px;cursor:pointer;text-transform:uppercase;flex-shrink:0;transition:opacity .15s}
@@ -491,8 +487,7 @@ select option{background:#1e1e1e}
 .ps-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
 .ps-meta{font-size:11px;color:var(--muted);margin-top:2px}
 .ps-card-arrow{margin-left:auto;color:var(--muted);flex-shrink:0;pointer-events:none}
-.btn-ps-delete{background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:8px;margin-left:6px;flex-shrink:0;-webkit-tap-highlight-color:transparent;line-height:0}
-.btn-ps-delete:active{color:var(--danger);background:rgba(229,57,53,.12)}
+.btn-ps-delete{padding:6px;margin-left:6px;flex-shrink:0;min-width:0;min-height:0;-webkit-tap-highlight-color:transparent;line-height:0}
 .btn-new-profile{width:100%;max-width:360px;padding:16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:16px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:background .15s,border-color .15s;animation:ssUp .4s .25s ease both}
 .btn-new-profile:active{background:rgba(127,119,221,.1);border-color:var(--accent)}
 .btn-ps-import{width:100%;max-width:360px;padding:14px;background:none;border:.5px solid rgba(127,119,221,.3);border-radius:16px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;margin-top:8px;text-align:center;display:block}
@@ -508,7 +503,6 @@ select option{background:#1e1e1e}
 
 /* PROJECTS */
 .projects-content{padding:16px 20px}
-.project-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;animation:slideUp .25s ease both}
 .project-card.completed{border-color:rgba(76,175,80,.4);background:rgba(76,175,80,.04)}
 .project-card.retired{border-color:rgba(136,136,136,.25);opacity:.65}
 .project-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
@@ -530,8 +524,8 @@ select option{background:#1e1e1e}
 .project-card-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:.5px solid var(--border)}
 .btn-edit-project{flex:1;padding:9px;background:none;border:.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;cursor:pointer;transition:color .15s,border-color .15s}
 .btn-edit-project:active{color:var(--accent);border-color:var(--accent)}
-.btn-delete-project{padding:9px 12px;background:none;border:.5px solid var(--border);border-radius:10px;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .15s,border-color .15s;min-height:44px;min-width:44px}
-.btn-delete-project:active{color:var(--danger);border-color:var(--danger)}
+.btn-delete-project{padding:9px 12px;border:.5px solid var(--border);border-radius:10px}
+.btn-delete-project:active{background:none;border-color:var(--danger)}
 .btn-add-project{width:100%;padding:14px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:14px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:background .15s,border-color .15s;margin-top:4px}
 .btn-add-project:active{background:rgba(127,119,221,.08);border-color:var(--accent)}
 .status-toggle{display:flex;gap:6px;margin-top:4px}
@@ -543,7 +537,6 @@ select option{background:#1e1e1e}
 .project-section-label:first-child{margin-top:0}
 
 /* COMPETITIONS */
-.comp-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;animation:slideUp .25s ease both}
 .comp-card.comp-upcoming{border-color:rgba(127,119,221,.4)}
 .comp-card.comp-past{opacity:.6}
 .comp-countdown-widget{margin:0 16px 12px;background:linear-gradient(135deg,rgba(127,119,221,.18),rgba(127,119,221,.05));border:.5px solid rgba(127,119,221,.35);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;animation:slideUp .3s ease both}
@@ -962,9 +955,9 @@ select option{background:#1e1e1e}
   <div id="comp-countdown-area"></div>
   <div id="otd-section"></div>
   <div class="feed-toggle">
-    <button class="feed-toggle-btn active" id="tab-feed" onclick="switchFeedTab('feed')">Sessies</button>
-    <button class="feed-toggle-btn" id="tab-dagboek" onclick="switchFeedTab('dagboek')">Dagboek</button>
-    <button class="feed-toggle-btn" id="tab-home-sociaal" onclick="switchFeedTab('sociaal')">Sociaal</button>
+    <button class="feed-toggle-btn active" id="tab-feed-feed" onclick="switchFeedTab('feed')">Sessies</button>
+    <button class="feed-toggle-btn" id="tab-feed-dagboek" onclick="switchFeedTab('dagboek')">Dagboek</button>
+    <button class="feed-toggle-btn" id="tab-feed-sociaal" onclick="switchFeedTab('sociaal')">Sociaal</button>
   </div>
   <div id="feed-tab-feed">
     <div id="filter-bar" class="filter-bar">
@@ -1350,7 +1343,7 @@ const I18N_PHRASES=[
   ['Blijf zo doorgaan — je bent op de goede weg','Keep it up — you\'re on the right track'],
   ['Cloud niet geconfigureerd','Cloud not configured'],
   ['Competitie toegevoegd!','Competition added!'],['Competitie toevoegen','Add competition'],
-  ['Competitie verwijderen?','Delete competition?'],
+  ['Competitie verwijderen?','Delete competition?'],['Competitie verwijderd','Competition deleted'],
   ['Concept hersteld — nog niet opgeslagen','Draft restored — not saved yet'],['Concept hersteld','Draft restored'],
   ['Dagboek','Journal'],['Data geëxporteerd!','Data exported!'],['Data geïmporteerd!','Data imported!'],
   ['Data importeren?','Import data?'],
@@ -1389,7 +1382,7 @@ const I18N_PHRASES=[
   ['✋ Greep','✋ Hold'],['🦶 Voet','🦶 Foot'],
   ['Greep','Hold'],['Grip','Grip'],
   ['Gym bestaat al','Gym already exists'],['Gym ingesteld — voeg routes toe!','Gym set — add routes!'],
-  ['Gym toegevoegd!','Gym added!'],['Gym toevoegen','Add gym'],['Gym verwijderen?','Delete gym?'],
+  ['Gym toegevoegd!','Gym added!'],['Gym toevoegen','Add gym'],['Gym verwijderen?','Delete gym?'],['Gym verwijderd','Gym deleted'],
   ['Gym Resets','Gym resets'],['Gym: ','Gym: '],['Gyms & Hangboard','Gyms & Hangboard'],['Gyms','Gyms'],
   ['HYPE SEND!','HYPE SEND!'],
   ['Hangboard','Hangboard'],
@@ -1449,6 +1442,9 @@ const I18N_PHRASES=[
   ['Nog geen geslaagde routes','No sent routes yet'],
   ['Nog geen gyms — voeg er een toe hieronder.','No gyms yet — add one below.'],['Nog geen gyms','No gyms yet'],
   ['Nog geen notities','No notes yet'],['Nog geen profielen','No profiles yet'],
+  ['Nog geen competities — voeg er hierboven een toe voor een aftelling.','No competitions yet — add one above for a countdown.'],
+  ['Nog geen blessures gelogd — top, houden zo!','No injuries logged — great, keep it up!'],
+  ['Voeg eerst een gym toe — daarna kun je resets loggen.','Add a gym first — then you can log resets.'],
   ['Nog geen reacties','No comments yet'],['Nog geen sessies','No sessions yet'],['Nog geen sets gelogd','No sets logged yet'],
   ['Nog niet genoeg progressie om te voorspellen.','Not enough progress yet to predict.'],
   ['Nooit gelogd','Never logged'],
@@ -1532,7 +1528,7 @@ const I18N_PHRASES=[
   ['Teruggetr.','Withdr.'],['Toepassen ✓','Apply ✓'],['Toevoegen','Add'],
   ['Top!','Top!'],
   ['Totaal routes','Total routes'],['Train vandaag?','Train today?'],['Trainingsbelasting','Training load'],
-  ['Trainingsplan gestart!','Training plan started!'],
+  ['Trainingsplan gestart!','Training plan started!'],['Trainingsplan gestopt','Training plan stopped'],['Doel verwijderd','Goal deleted'],
   ['Uitdagingen, tips voor jezelf, bijzonderheden...','Challenges, tips for yourself, details...'],
   ['Uitgelogd','Logged out'],
   ['Uitloggen / ander account','Log out / switch account'],['Uitloggen','Log out'],
@@ -1711,7 +1707,7 @@ function renderProfileScreen(){
         <div class="ps-name">${esc(p.name)}</div>
         <div class="ps-meta">Aangemaakt ${esc(p.created||'')}</div>
       </div>
-      ${profiles.length>1?`<button class="btn-ps-delete" data-del-id="${p.id}" title="Profiel verwijderen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>`:''}
+      ${profiles.length>1?`<button class="btn-delete btn-ps-delete" data-del-id="${p.id}" title="Profiel verwijderen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>`:''}
       <svg class="ps-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
     </div>`).join('');
   list.onclick=function(e){
@@ -1997,11 +1993,11 @@ function save(){
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('sessions',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveGyms(){
-  try{localStorage.setItem(GYK,JSON.stringify(gyms))}catch(e){}
+  try{localStorage.setItem(GYK,JSON.stringify(gyms))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('gyms',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveGoals(){
-  try{localStorage.setItem(GOK,JSON.stringify(goals))}catch(e){}
+  try{localStorage.setItem(GOK,JSON.stringify(goals))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('goals',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveHang(){
@@ -2010,24 +2006,32 @@ function saveHang(){
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('hang_sessions',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveInjuries(){
-  try{localStorage.setItem(IJK,JSON.stringify(injuries))}catch(e){}
+  try{localStorage.setItem(IJK,JSON.stringify(injuries))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('injuries',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveActivePlan(){
-  try{localStorage.setItem(PLK,activePlan?JSON.stringify(activePlan):'null')}catch(e){}
+  try{localStorage.setItem(PLK,activePlan?JSON.stringify(activePlan):'null')}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('active_plans',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveCompetitions(){
-  try{localStorage.setItem(CMPK,JSON.stringify(competitions))}catch(e){}
+  try{localStorage.setItem(CMPK,JSON.stringify(competitions))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('competitions',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveResets(){
-  try{localStorage.setItem(RSTK,JSON.stringify(gymResets))}catch(e){}
+  try{localStorage.setItem(RSTK,JSON.stringify(gymResets))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('gym_resets',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveProjects(){
-  try{localStorage.setItem(PRK,JSON.stringify(projects))}catch(e){}
+  try{localStorage.setItem(PRK,JSON.stringify(projects))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('projects',activeProfileId);cloudScheduleSync(activeProfileId);}
+}
+// Generiek verwijder-patroon: muteer array in place, bewaar, her-render.
+function deleteItem(arr,id,saveFn,renderFn){
+  const idx=arr.findIndex(x=>x.id===id);
+  if(idx===-1)return;
+  arr.splice(idx,1);
+  saveFn();
+  renderFn();
 }
 function loadArr(k,fb){
   try{
@@ -2114,11 +2118,6 @@ function showPage(id,direction){
   }
   haptic();
   _animateNavBtn(id);
-  // Stop hang-page timers when navigating away (page-hang is now a shell; timer cleanup handled by switchMeerTab)
-  if(id!=='hang'&&document.querySelector('.page.active')?.id==='page-hang'){
-    if(timerRunning){clearInterval(timerInterval);timerInterval=null;timerRunning=false;const tb=document.getElementById('btn-timer');if(tb){tb.textContent='Hervatten';tb.className='btn-timer-start';}}
-    if(restTimerRunning){clearInterval(restTimerInterval);restTimerInterval=null;restTimerRunning=false;const rb=document.getElementById('btn-rest-timer');if(rb){rb.textContent='▶ Start rust';rb.className='btn-rest-start';}}
-  }
   if(id!=='log'&&editMode){
     _resetLogForm();
   }
@@ -2502,7 +2501,7 @@ function renderFeed(){
           <button class="btn-edit-session" onclick="editSession(${s.id})" aria-label="Sessie bewerken">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
-          <button class="btn-delete-session" onclick="deleteSession(${s.id})">
+          <button class="btn-delete" onclick="deleteSession(${s.id})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
         </div>
@@ -2565,13 +2564,19 @@ function repeatSession(id){
   toast('Gym ingesteld — voeg routes toe!');
 }
 
-function deleteSession(id){
-  const s=sessions.find(x=>x.id===id);if(!s)return;
-  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='conf-ov';
-  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Sessie verwijderen?</div><div class="confirm-sub">${esc(s.gym||'Gym')} — ${fmtDate(s.date)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('conf-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDelete(${id})">Verwijderen</button></div></div>`;
+// Generieke verwijder-bevestiging: modal met Annuleren/Verwijderen, sub-tekst moet al ge-escaped zijn.
+function showDeleteConfirm(title,sub,onConfirm){
+  const ov=document.createElement('div');ov.className='modal-overlay';
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">${title}</div><div class="confirm-sub">${sub}</div><div class="confirm-btns"><button class="confirm-cancel">Annuleren</button><button class="confirm-delete">Verwijderen</button></div></div>`;
+  ov.querySelector('.confirm-cancel').onclick=()=>ov.remove();
+  ov.querySelector('.confirm-delete').onclick=()=>{ov.remove();onConfirm();};
   document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
 }
-function confirmDelete(id){document.getElementById('conf-ov')?.remove();haptic(8);sessions=sessions.filter(s=>s.id!==id);save();toast('Sessie verwijderd','#e53935');renderFeed()}
+function deleteSession(id){
+  const s=sessions.find(x=>x.id===id);if(!s)return;
+  showDeleteConfirm('Sessie verwijderen?',`${esc(s.gym||'Gym')} — ${fmtDate(s.date)}`,()=>confirmDelete(id));
+}
+function confirmDelete(id){haptic(8);deleteItem(sessions,id,save,renderFeed);toast('Sessie verwijderd','#e53935')}
 
 function editSession(id){
   const s=sessions.find(x=>x.id===id);if(!s)return;
@@ -2619,18 +2624,16 @@ function addGym(){
 function setFav(id){gyms.forEach(g=>g.fav=(g.id===id));saveGyms();renderGymsPage();refreshGymSelect()}
 function deleteGym(id){
   const g=gyms.find(x=>x.id===id);if(!g)return;
-  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-gym-ov';
-  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Gym verwijderen?</div><div class="confirm-sub">${esc(g.name)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('del-gym-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDeleteGym(${id})">Verwijderen</button></div></div>`;
-  document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+  showDeleteConfirm('Gym verwijderen?',esc(g.name),()=>confirmDeleteGym(id));
 }
 function confirmDeleteGym(id){
-  document.getElementById('del-gym-ov')?.remove();
-  gyms=gyms.filter(g=>g.id!==id);if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms();renderGymsPage();refreshGymSelect();
+  deleteItem(gyms,id,()=>{if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms()},()=>{renderGymsPage();refreshGymSelect()});
+  toast('Gym verwijderd','#e53935');
 }
 function renderGymsPage(){
   const list=document.getElementById('gym-list');
   if(!gyms.length){list.innerHTML='<div class="empty-state" style="padding:30px 0"><div>Nog geen gyms — voeg er een toe hieronder.</div></div>';}
-  else{list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${esc(g.name)}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-fav ${g.fav?'active':''}" onclick="setFav(${g.id})">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-del-gym" onclick="deleteGym(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')}
+  else{list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${esc(g.name)}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-fav ${g.fav?'active':''}" onclick="setFav(${g.id})">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-delete" onclick="deleteGym(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')}
   renderResetSection();
   renderQuietTime();
 }
@@ -2657,7 +2660,7 @@ function addGymFromModal(){
   const inp=document.getElementById('modal-new-gym');if(!inp)return;
   const name=inp.value.trim();if(!name)return;
   if(gyms.find(g=>g.name.toLowerCase()===name.toLowerCase())){toast('Gym bestaat al','#e53935');return}
-  gyms.push({id:Date.now(),name,fav:gyms.length===0});saveGyms();inp.value='';
+  gyms.push({id:Date.now(),name,fav:gyms.length===0});saveGyms();inp.value='';toast('Gym toegevoegd!');
   const listEl=document.getElementById('gym-modal-list');
   if(listEl)listEl.innerHTML=gyms.map((g,i)=>`<div class="modal-gym-item" onclick="selectGymFromModal(${i})"><div class="modal-gym-name">${esc(g.name)}</div>${g.fav?'<span style="color:var(--accent)">★</span>':''}</div>`).join('');
   refreshGymSelect();
@@ -2982,7 +2985,7 @@ function addCountGoal(){
   goals.push({id:Date.now(),type:'count',grade,result,count,deadline,createdAt:new Date().toISOString().split('T')[0]});
   saveGoals();renderGoals();toast('Doel toegevoegd!');
 }
-function deleteGoal(id){goals=goals.filter(g=>g.id!==id);saveGoals();renderGoals()}
+function deleteGoal(id){deleteItem(goals,id,saveGoals,renderGoals);toast('Doel verwijderd','#e53935')}
 
 function renderGoals(){
   const trashSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>`;
@@ -2999,7 +3002,7 @@ function renderGoals(){
       const done=gradeGoalAchieved(g);
       const overdue=!done&&g.deadline&&g.deadline<today;
       const deadlineFmt=g.deadline?` · <span style="${overdue?'color:var(--danger)':''}">${fmtDate(g.deadline)}</span>`:'';
-      return`<div class="goal-card ${done?'achieved':overdue?'overdue':''}">
+      return`<div class="card-base goal-card ${done?'achieved':overdue?'overdue':''}">
         <div class="goal-header">
           <div>
             <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">🧗 Graad-doel</div>
@@ -3008,7 +3011,7 @@ function renderGoals(){
           </div>
           <div style="display:flex;align-items:center;gap:10px">
             ${done?'<div class="goal-achieved-badge">✓ Gehaald!</div>':overdue?'<div class="goal-overdue-badge">Verlopen</div>':'<div style="font-size:22px">⏳</div>'}
-            <button class="btn-delete-goal" onclick="deleteGoal(${g.id})">${trashSVG}</button>
+            <button class="btn-delete" onclick="deleteGoal(${g.id})">${trashSVG}</button>
           </div>
         </div>
         ${done?'<div class="goal-progress-bar"><div class="goal-progress-fill" style="width:100%"></div></div>':''}
@@ -3017,7 +3020,7 @@ function renderGoals(){
       const prog=countGoalProgress(g),pct=Math.min(100,Math.round((prog/g.count)*100)),done=prog>=g.count;
       const overdue=!done&&g.deadline&&g.deadline<today;
       const deadlineFmt=g.deadline?` · <span style="${overdue?'color:var(--danger)':''}">${fmtDate(g.deadline)}</span>`:'';
-      return`<div class="goal-card ${done?'achieved':overdue?'overdue':''}">
+      return`<div class="card-base goal-card ${done?'achieved':overdue?'overdue':''}">
         <div class="goal-header">
           <div>
             <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">📊 Herhaling-doel</div>
@@ -3026,7 +3029,7 @@ function renderGoals(){
           </div>
           <div style="display:flex;align-items:center;gap:10px">
             ${done?'<div class="goal-achieved-badge">✓ Gehaald!</div>':overdue?'<div class="goal-overdue-badge">Verlopen</div>':''}
-            <button class="btn-delete-goal" onclick="deleteGoal(${g.id})">${trashSVG}</button>
+            <button class="btn-delete" onclick="deleteGoal(${g.id})">${trashSVG}</button>
           </div>
         </div>
         <div class="goal-progress-bar"><div class="goal-progress-fill" style="width:${pct}%"></div></div>
@@ -3285,14 +3288,11 @@ function saveHangSession(){
 
 function deleteHangSession(id){
   const s=hangSessions.find(x=>x.id===id);if(!s)return;
-  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-hang-ov';
-  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Hangsessie verwijderen?</div><div class="confirm-sub">${esc(fmtDate(s.date))} · ${s.sets.length} set${s.sets.length!==1?'s':''}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('del-hang-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDeleteHangSession(${id})">Verwijderen</button></div></div>`;
-  document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+  showDeleteConfirm('Hangsessie verwijderen?',`${esc(fmtDate(s.date))} · ${s.sets.length} set${s.sets.length!==1?'s':''}`,()=>confirmDeleteHangSession(id));
 }
 function confirmDeleteHangSession(id){
-  document.getElementById('del-hang-ov')?.remove();
-  hangSessions=hangSessions.filter(s=>s.id!==id);
-  saveHang();renderHangPage();toast('Verwijderd','#e53935');
+  deleteItem(hangSessions,id,saveHang,renderHangPage);
+  toast('Verwijderd','#e53935');
 }
 
 function renderHangPage(){
@@ -3312,14 +3312,14 @@ function renderHangPage(){
   const feed=document.getElementById('hang-feed');
   if(!hangSessions.length){feed.innerHTML='<div class="empty-state"><div class="big">Nog geen hangsessies</div></div>';return}
   renderHangChart();
-  feed.innerHTML=[...hangSessions].reverse().map((s,i)=>`<div class="hang-card" style="animation-delay:${i*STAGGER_DELAY_S}s">
+  feed.innerHTML=[...hangSessions].reverse().map((s,i)=>`<div class="card-base hang-card" style="animation-delay:${i*STAGGER_DELAY_S}s">
     <div class="hang-card-header">
       <div>
         <div class="hang-card-date">${fmtDate(s.date)}</div>
         <div class="hang-card-sub">${s.sets.length} set${s.sets.length!==1?'s':''} · ${s.sets.reduce((a,b)=>a+(b.time*b.reps),0)}s totaal</div>
         ${s.note?`<div class="hang-card-note">"${esc(s.note)}"</div>`:''}
       </div>
-      <button class="btn-delete-session" onclick="deleteHangSession(${s.id})">
+      <button class="btn-delete" onclick="deleteHangSession(${s.id})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
       </button>
     </div>
@@ -3758,7 +3758,7 @@ function renderProjects(){
       const badgeClass='s-'+sec.key;
       const badgeLabel=sec.key==='project'?'Project':sec.key==='completed'?'Voltooid':'Teruggetrokken';
       const gradeColor=GRADE_COLORS[GRADES.indexOf(p.grade)]||'var(--accent)';
-      html+=`<div class="project-card ${statusClass}" style="animation-delay:${i*STAGGER_DELAY_S}s">
+      html+=`<div class="card-base project-card ${statusClass}" style="animation-delay:${i*STAGGER_DELAY_S}s">
         <div class="project-card-header">
           <div>
             <div class="project-grade" style="${statusClass==='project'?'color:'+gradeColor:''}">${esc(p.grade)}</div>
@@ -3781,7 +3781,7 @@ function renderProjects(){
         <div class="project-card-actions">
           <button class="btn-edit-project" onclick="openProjectModal(${p.id})">Bewerken</button>
           ${p.setterData&&p.setterData.holds&&p.setterData.holds.some(Boolean)?`<button class="btn-edit-project" style="background:rgba(127,119,221,.12);border-color:rgba(127,119,221,.3);color:var(--accent)" onclick="viewProjectSetter(${p.id})">🗺️ Kaart</button>`:''}
-          <button class="btn-delete-project" onclick="deleteProject(${p.id})" title="Verwijderen">${trashSVG}</button>
+          <button class="btn-delete btn-delete-project" onclick="deleteProject(${p.id})" title="Verwijderen">${trashSVG}</button>
         </div>
       </div>`;
     });
@@ -3805,22 +3805,11 @@ function logAttempt(id){
 
 function deleteProject(id){
   const p=projects.find(x=>x.id===id);if(!p)return;
-  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-proj-ov';
-  ov.innerHTML=`<div class="confirm-box">
-    <div class="confirm-title">Project verwijderen?</div>
-    <div class="confirm-sub">${esc(p.grade+(p.name?' · '+p.name:'')+(p.gym?' @ '+p.gym:''))}</div>
-    <div class="confirm-btns">
-      <button class="confirm-cancel" onclick="document.getElementById('del-proj-ov').remove()">Annuleren</button>
-      <button class="confirm-delete" onclick="confirmDeleteProject(${id})">Verwijderen</button>
-    </div>
-  </div>`;
-  document.body.appendChild(ov);
-  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+  showDeleteConfirm('Project verwijderen?',esc(p.grade+(p.name?' · '+p.name:'')+(p.gym?' @ '+p.gym:'')),()=>confirmDeleteProject(id));
 }
 function confirmDeleteProject(id){
-  document.getElementById('del-proj-ov')?.remove();
-  projects=projects.filter(p=>p.id!==id);
-  saveProjects();renderProjects();toast('Project verwijderd','#e53935');
+  deleteItem(projects,id,saveProjects,renderProjects);
+  toast('Project verwijderd','#e53935');
 }
 
 function openProjectModal(id){
@@ -3987,7 +3976,7 @@ function renderCompSection(){
     const up=days>=0;
     const dLbl=days===0?'Vandaag!':days>0?`Over ${days} dag${days!==1?'en':''}`:`${Math.abs(days)} dag${Math.abs(days)!==1?'en':''} geleden`;
     const taper=up&&days<=14&&days>0;
-    return`<div class="comp-card ${up?'comp-upcoming':'comp-past'}">
+    return`<div class="card-base comp-card ${up?'comp-upcoming':'comp-past'}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
         <div>
           <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">🏆 Competitie</div>
@@ -3996,7 +3985,7 @@ function renderCompSection(){
           <div style="font-size:13px;color:${up?'var(--accent)':'var(--muted)'};margin-top:5px;font-weight:600">${dLbl}</div>
           ${taper?`<div style="font-size:12px;color:var(--flash);margin-top:3px">⚡ Taper: volume −30%, intensiteit behouden</div>`:''}
         </div>
-        <button class="btn-delete-goal" onclick="deleteComp(${c.id})" style="flex-shrink:0;margin-top:2px">${trashSVG}</button>
+        <button class="btn-delete" onclick="deleteComp(${c.id})" style="flex-shrink:0;margin-top:2px">${trashSVG}</button>
       </div>
     </div>`;
   };
@@ -4008,6 +3997,7 @@ function renderCompSection(){
     </div>
     <button class="btn-add-comp" onclick="addComp()">Competitie toevoegen</button>
   </div>
+  ${!competitions.length?`<div class="empty-state" style="padding:24px 20px"><div class="empty-icon" style="font-size:36px;margin-bottom:10px">🏆</div><div class="empty-sub" style="margin-bottom:0">Nog geen competities — voeg er hierboven een toe voor een aftelling.</div></div>`:''}
   ${upcoming.map(compCard).join('')}
   ${past.length?`<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:4px 0 8px">Afgelopen</div>${past.slice(0,3).map(compCard).join('')}`:''}`;
 }
@@ -4027,14 +4017,11 @@ function addComp(){
 
 function deleteComp(id){
   const c=competitions.find(x=>x.id===id);if(!c)return;
-  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-comp-ov';
-  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Competitie verwijderen?</div><div class="confirm-sub">${esc(c.name)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('del-comp-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDeleteComp(${id})">Verwijderen</button></div></div>`;
-  document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+  showDeleteConfirm('Competitie verwijderen?',esc(c.name),()=>confirmDeleteComp(id));
 }
 function confirmDeleteComp(id){
-  document.getElementById('del-comp-ov')?.remove();
-  competitions=competitions.filter(c=>c.id!==id);
-  saveCompetitions();renderCompSection();renderCompCountdown();
+  deleteItem(competitions,id,saveCompetitions,()=>{renderCompSection();renderCompCountdown()});
+  toast('Competitie verwijderd','#e53935');
 }
 
 /* ══════════════════════════════════════════
@@ -4043,7 +4030,7 @@ function confirmDeleteComp(id){
 function renderResetSection(){
   const el=document.getElementById('reset-section');
   if(!el)return;
-  if(!gyms.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:4px 0 12px">Voeg eerst een gym toe</div>';return;}
+  if(!gyms.length){el.innerHTML='<div class="empty-state" style="padding:16px 20px 20px"><div class="empty-sub" style="margin-bottom:0">Voeg eerst een gym toe — daarna kun je resets loggen.</div></div>';return;}
   const today=new Date().toISOString().split('T')[0];
   el.innerHTML=gyms.map(g=>{
     const gResets=gymResets.filter(r=>r.gymId===g.id).sort((a,b)=>b.date.localeCompare(a.date));
@@ -4184,6 +4171,7 @@ function startPlan(planId){
 
 function stopPlan(){
   activePlan=null;saveActivePlan();renderPlanSection();
+  toast('Trainingsplan gestopt');
 }
 
 /* ══════════════════════════════════════════
@@ -4212,36 +4200,32 @@ function renderOnThisDay(){
   </div>`;
 }
 
+// Generiek subtab-mechanisme: knoppen heten tab-{prefix}-{naam}, panelen {prefix}-tab-{naam}.
+function switchTab(prefix,tabs,active){
+  tabs.forEach(t=>{
+    document.getElementById(`tab-${prefix}-${t}`)?.classList.toggle('active',t===active);
+    const p=document.getElementById(`${prefix}-tab-${t}`);
+    if(p)p.style.display=t===active?'':'none';
+  });
+}
+
 function switchFeedTab(tab){
   feedTab=tab;
-  document.getElementById('tab-feed').className='feed-toggle-btn'+(tab==='feed'?' active':'');
-  document.getElementById('tab-dagboek').className='feed-toggle-btn'+(tab==='dagboek'?' active':'');
-  document.getElementById('tab-home-sociaal').className='feed-toggle-btn'+(tab==='sociaal'?' active':'');
-  document.getElementById('feed-tab-feed').style.display=tab==='feed'?'':'none';
-  document.getElementById('feed-tab-dagboek').style.display=tab==='dagboek'?'':'none';
-  document.getElementById('feed-tab-sociaal').style.display=tab==='sociaal'?'':'none';
+  switchTab('feed',['feed','dagboek','sociaal'],tab);
   if(tab==='dagboek')renderDagboek();
   if(tab==='sociaal')renderSociaalPage();
 }
 
 function switchDoelenTab(tab){
   doelenTab=tab;
-  document.getElementById('tab-doelen-goals').className='feed-toggle-btn'+(tab==='goals'?' active':'');
-  document.getElementById('tab-doelen-projects').className='feed-toggle-btn'+(tab==='projects'?' active':'');
-  document.getElementById('doelen-tab-goals').style.display=tab==='goals'?'':'none';
-  document.getElementById('doelen-tab-projects').style.display=tab==='projects'?'':'none';
+  switchTab('doelen',['goals','projects'],tab);
   if(tab==='goals')renderGoals();
   if(tab==='projects')renderProjects();
 }
 
 function switchSociaalTab(tab){
   sociaalTab=tab;
-  document.getElementById('tab-sociaal-feed').className='feed-toggle-btn'+(tab==='feed'?' active':'');
-  document.getElementById('tab-sociaal-search').className='feed-toggle-btn'+(tab==='search'?' active':'');
-  document.getElementById('tab-sociaal-lb').className='feed-toggle-btn'+(tab==='lb'?' active':'');
-  document.getElementById('sociaal-tab-feed').style.display=tab==='feed'?'':'none';
-  document.getElementById('sociaal-tab-search').style.display=tab==='search'?'':'none';
-  document.getElementById('sociaal-tab-lb').style.display=tab==='lb'?'':'none';
+  switchTab('sociaal',['feed','search','lb'],tab);
   if(tab==='feed'&&typeof renderSocialFeed==='function')renderSocialFeed();
   if(tab==='lb'&&typeof renderLeaderboard==='function')renderLeaderboard();
   if(tab==='search'){const inp=document.getElementById('user-search-input');if(inp)setTimeout(()=>inp.focus(),100);}
@@ -4254,10 +4238,7 @@ function renderSociaalPage(){
 
 function switchAnalyseTab(tab){
   analyseTab=tab;
-  document.getElementById('tab-analyse-stats').className='feed-toggle-btn'+(tab==='stats'?' active':'');
-  document.getElementById('tab-analyse-coach').className='feed-toggle-btn'+(tab==='coach'?' active':'');
-  document.getElementById('analyse-tab-stats').style.display=tab==='stats'?'':'none';
-  document.getElementById('analyse-tab-coach').style.display=tab==='coach'?'':'none';
+  switchTab('analyse',['stats','coach'],tab);
   if(tab==='stats')renderStats();
   if(tab==='coach')renderCoach();
 }
@@ -4268,10 +4249,7 @@ function switchMeerTab(tab){
     if(restTimerRunning){clearInterval(restTimerInterval);restTimerInterval=null;restTimerRunning=false;const rb=document.getElementById('btn-rest-timer');if(rb){rb.textContent='▶ Start rust';rb.className='btn-rest-start';}}
   }
   meerTab=tab;
-  document.getElementById('tab-meer-gyms').className='feed-toggle-btn'+(tab==='gyms'?' active':'');
-  document.getElementById('tab-meer-hang').className='feed-toggle-btn'+(tab==='hang'?' active':'');
-  document.getElementById('meer-tab-gyms').style.display=tab==='gyms'?'':'none';
-  document.getElementById('meer-tab-hang').style.display=tab==='hang'?'':'none';
+  switchTab('meer',['gyms','hang'],tab);
   if(tab==='gyms'){renderGymsPage();renderProfileMgmt();renderOwnerControls();renderFeedbackAdmin();}
   if(tab==='hang')renderHangPage();
 }
@@ -4389,7 +4367,7 @@ function renderFingerHealth(){
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
             ${inj.status==='active'?`<button onclick="toggleInjuryStatus(${inj.id})" style="background:rgba(76,175,80,.12);border:.5px solid rgba(76,175,80,.4);border-radius:8px;color:var(--success);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;padding:5px 10px;cursor:pointer;text-transform:uppercase">Hersteld</button>`:''}
-            <button onclick="deleteInjury(${inj.id})" class="btn-delete-session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+            <button onclick="deleteInjury(${inj.id})" class="btn-delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
           </div>
         </div>`;
       }).join('')
@@ -4408,7 +4386,8 @@ function renderFingerHealth(){
       <div class="fh-risk-bar-wrap"><div class="fh-risk-bar" style="width:${score}%;background:${color}"></div></div>
       <div class="fh-factors" style="margin-top:12px">${factorsHtml}</div>
     </div>
-    ${injHtml?`<div class="form-section-title" style="padding:12px 0 8px">Blessurelog</div>${injHtml}`:''}
+    <div class="form-section-title" style="padding:12px 0 8px">Blessurelog</div>
+    ${injHtml||`<div class="empty-state" style="padding:16px 20px 20px"><div class="empty-sub" style="margin-bottom:0">Nog geen blessures gelogd — top, houden zo! 💪</div></div>`}
     <button class="btn-add-injury" onclick="openInjuryModal()">+ Blessure toevoegen</button>`;
 }
 
@@ -4458,10 +4437,7 @@ function toggleInjuryStatus(id){
   if(inj){inj.status=inj.status==='active'?'recovered':'active';saveInjuries();renderFingerHealth();}
 }
 
-function deleteInjury(id){
-  injuries=injuries.filter(i=>i.id!==id);
-  saveInjuries();renderFingerHealth();
-}
+function deleteInjury(id){deleteItem(injuries,id,saveInjuries,renderFingerHealth);toast('Verwijderd','#e53935')}
 
 /* ══════════════════════════════════════════
    GRADE PYRAMID AUDITOR
@@ -5888,9 +5864,6 @@ function viewProjectSetter(id){
       if(onLog&&hasRoutes)fireShakedown();
     }
   },{passive:true});
-
-  // Also expose a manual trigger for testing on desktop
-  window.triggerShakedown=fireShakedown;
 })();
 
 /* ══════════════════════════════════════════
