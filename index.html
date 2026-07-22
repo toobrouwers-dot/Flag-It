@@ -2114,11 +2114,6 @@ function showPage(id,direction){
   }
   haptic();
   _animateNavBtn(id);
-  // Stop hang-page timers when navigating away (page-hang is now a shell; timer cleanup handled by switchMeerTab)
-  if(id!=='hang'&&document.querySelector('.page.active')?.id==='page-hang'){
-    if(timerRunning){clearInterval(timerInterval);timerInterval=null;timerRunning=false;const tb=document.getElementById('btn-timer');if(tb){tb.textContent='Hervatten';tb.className='btn-timer-start';}}
-    if(restTimerRunning){clearInterval(restTimerInterval);restTimerInterval=null;restTimerRunning=false;const rb=document.getElementById('btn-rest-timer');if(rb){rb.textContent='▶ Start rust';rb.className='btn-rest-start';}}
-  }
   if(id!=='log'&&editMode){
     _resetLogForm();
   }
@@ -5888,9 +5883,6 @@ function viewProjectSetter(id){
       if(onLog&&hasRoutes)fireShakedown();
     }
   },{passive:true});
-
-  // Also expose a manual trigger for testing on desktop
-  window.triggerShakedown=fireShakedown;
 })();
 
 /* ══════════════════════════════════════════
