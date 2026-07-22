@@ -1343,7 +1343,7 @@ const I18N_PHRASES=[
   ['Blijf zo doorgaan — je bent op de goede weg','Keep it up — you\'re on the right track'],
   ['Cloud niet geconfigureerd','Cloud not configured'],
   ['Competitie toegevoegd!','Competition added!'],['Competitie toevoegen','Add competition'],
-  ['Competitie verwijderen?','Delete competition?'],
+  ['Competitie verwijderen?','Delete competition?'],['Competitie verwijderd','Competition deleted'],
   ['Concept hersteld — nog niet opgeslagen','Draft restored — not saved yet'],['Concept hersteld','Draft restored'],
   ['Dagboek','Journal'],['Data geëxporteerd!','Data exported!'],['Data geïmporteerd!','Data imported!'],
   ['Data importeren?','Import data?'],
@@ -1382,7 +1382,7 @@ const I18N_PHRASES=[
   ['✋ Greep','✋ Hold'],['🦶 Voet','🦶 Foot'],
   ['Greep','Hold'],['Grip','Grip'],
   ['Gym bestaat al','Gym already exists'],['Gym ingesteld — voeg routes toe!','Gym set — add routes!'],
-  ['Gym toegevoegd!','Gym added!'],['Gym toevoegen','Add gym'],['Gym verwijderen?','Delete gym?'],
+  ['Gym toegevoegd!','Gym added!'],['Gym toevoegen','Add gym'],['Gym verwijderen?','Delete gym?'],['Gym verwijderd','Gym deleted'],
   ['Gym Resets','Gym resets'],['Gym: ','Gym: '],['Gyms & Hangboard','Gyms & Hangboard'],['Gyms','Gyms'],
   ['HYPE SEND!','HYPE SEND!'],
   ['Hangboard','Hangboard'],
@@ -1525,7 +1525,7 @@ const I18N_PHRASES=[
   ['Teruggetr.','Withdr.'],['Toepassen ✓','Apply ✓'],['Toevoegen','Add'],
   ['Top!','Top!'],
   ['Totaal routes','Total routes'],['Train vandaag?','Train today?'],['Trainingsbelasting','Training load'],
-  ['Trainingsplan gestart!','Training plan started!'],
+  ['Trainingsplan gestart!','Training plan started!'],['Trainingsplan gestopt','Training plan stopped'],['Doel verwijderd','Goal deleted'],
   ['Uitdagingen, tips voor jezelf, bijzonderheden...','Challenges, tips for yourself, details...'],
   ['Uitgelogd','Logged out'],
   ['Uitloggen / ander account','Log out / switch account'],['Uitloggen','Log out'],
@@ -1990,11 +1990,11 @@ function save(){
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('sessions',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveGyms(){
-  try{localStorage.setItem(GYK,JSON.stringify(gyms))}catch(e){}
+  try{localStorage.setItem(GYK,JSON.stringify(gyms))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('gyms',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveGoals(){
-  try{localStorage.setItem(GOK,JSON.stringify(goals))}catch(e){}
+  try{localStorage.setItem(GOK,JSON.stringify(goals))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('goals',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveHang(){
@@ -2003,23 +2003,23 @@ function saveHang(){
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('hang_sessions',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveInjuries(){
-  try{localStorage.setItem(IJK,JSON.stringify(injuries))}catch(e){}
+  try{localStorage.setItem(IJK,JSON.stringify(injuries))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('injuries',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveActivePlan(){
-  try{localStorage.setItem(PLK,activePlan?JSON.stringify(activePlan):'null')}catch(e){}
+  try{localStorage.setItem(PLK,activePlan?JSON.stringify(activePlan):'null')}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('active_plans',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveCompetitions(){
-  try{localStorage.setItem(CMPK,JSON.stringify(competitions))}catch(e){}
+  try{localStorage.setItem(CMPK,JSON.stringify(competitions))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('competitions',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveResets(){
-  try{localStorage.setItem(RSTK,JSON.stringify(gymResets))}catch(e){}
+  try{localStorage.setItem(RSTK,JSON.stringify(gymResets))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('gym_resets',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 function saveProjects(){
-  try{localStorage.setItem(PRK,JSON.stringify(projects))}catch(e){}
+  try{localStorage.setItem(PRK,JSON.stringify(projects))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('projects',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
 // Generiek verwijder-patroon: muteer array in place, bewaar, her-render.
@@ -2622,6 +2622,7 @@ function deleteGym(id){
 function confirmDeleteGym(id){
   document.getElementById('del-gym-ov')?.remove();
   deleteItem(gyms,id,()=>{if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms()},()=>{renderGymsPage();refreshGymSelect()});
+  toast('Gym verwijderd','#e53935');
 }
 function renderGymsPage(){
   const list=document.getElementById('gym-list');
@@ -2653,7 +2654,7 @@ function addGymFromModal(){
   const inp=document.getElementById('modal-new-gym');if(!inp)return;
   const name=inp.value.trim();if(!name)return;
   if(gyms.find(g=>g.name.toLowerCase()===name.toLowerCase())){toast('Gym bestaat al','#e53935');return}
-  gyms.push({id:Date.now(),name,fav:gyms.length===0});saveGyms();inp.value='';
+  gyms.push({id:Date.now(),name,fav:gyms.length===0});saveGyms();inp.value='';toast('Gym toegevoegd!');
   const listEl=document.getElementById('gym-modal-list');
   if(listEl)listEl.innerHTML=gyms.map((g,i)=>`<div class="modal-gym-item" onclick="selectGymFromModal(${i})"><div class="modal-gym-name">${esc(g.name)}</div>${g.fav?'<span style="color:var(--accent)">★</span>':''}</div>`).join('');
   refreshGymSelect();
@@ -2978,7 +2979,7 @@ function addCountGoal(){
   goals.push({id:Date.now(),type:'count',grade,result,count,deadline,createdAt:new Date().toISOString().split('T')[0]});
   saveGoals();renderGoals();toast('Doel toegevoegd!');
 }
-function deleteGoal(id){deleteItem(goals,id,saveGoals,renderGoals)}
+function deleteGoal(id){deleteItem(goals,id,saveGoals,renderGoals);toast('Doel verwijderd','#e53935')}
 
 function renderGoals(){
   const trashSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>`;
@@ -4030,6 +4031,7 @@ function deleteComp(id){
 function confirmDeleteComp(id){
   document.getElementById('del-comp-ov')?.remove();
   deleteItem(competitions,id,saveCompetitions,()=>{renderCompSection();renderCompCountdown()});
+  toast('Competitie verwijderd','#e53935');
 }
 
 /* ══════════════════════════════════════════
@@ -4179,6 +4181,7 @@ function startPlan(planId){
 
 function stopPlan(){
   activePlan=null;saveActivePlan();renderPlanSection();
+  toast('Trainingsplan gestopt');
 }
 
 /* ══════════════════════════════════════════
@@ -4443,7 +4446,7 @@ function toggleInjuryStatus(id){
   if(inj){inj.status=inj.status==='active'?'recovered':'active';saveInjuries();renderFingerHealth();}
 }
 
-function deleteInjury(id){deleteItem(injuries,id,saveInjuries,renderFingerHealth)}
+function deleteInjury(id){deleteItem(injuries,id,saveInjuries,renderFingerHealth);toast('Verwijderd','#e53935')}
 
 /* ══════════════════════════════════════════
    GRADE PYRAMID AUDITOR

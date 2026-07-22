@@ -40,7 +40,7 @@ async function toggleKudos(sessionCid, btn) {
   if (btn?.dataset.loading) return;
   const user = await cloudCurrentUser();
   if (!user) { showAuthScreen(); return; }
-  if (btn) btn.dataset.loading = '1';
+  if (btn) { btn.dataset.loading = '1'; btn.classList.add('is-loading'); }
   try {
     if (btn?.classList.contains('kudos-active')) {
       await removeKudos(sessionCid, btn);
@@ -48,7 +48,7 @@ async function toggleKudos(sessionCid, btn) {
       await giveKudos(sessionCid, btn);
     }
   } finally {
-    if (btn) delete btn.dataset.loading;
+    if (btn) { delete btn.dataset.loading; btn.classList.remove('is-loading'); }
   }
 }
 
@@ -67,10 +67,12 @@ async function socialFollow(targetId, btn) {
   const user = await cloudCurrentUser();
   if (!user) { showAuthScreen(); return; }
   if (user.id === targetId) return;
+  if (btn) btn.classList.add('is-loading');
   const { error } = await db().from('follows').upsert(
     { follower_id: user.id, following_id: targetId },
     { onConflict: 'follower_id,following_id', ignoreDuplicates: true }
   );
+  if (btn) btn.classList.remove('is-loading');
   if (error) { if (typeof toast === 'function') toast('Volgen mislukt', 'var(--danger)'); return; }
   if (btn) { btn.textContent = 'Gevolgd'; btn.classList.add('btn-following'); btn.onclick = () => socialUnfollow(targetId, btn); }
   if (typeof toast === 'function') toast('Gevolgd!', 'var(--success)');
@@ -81,7 +83,9 @@ async function socialUnfollow(targetId, btn) {
   if (!cloudReady()) return;
   const user = await cloudCurrentUser();
   if (!user) return;
+  if (btn) btn.classList.add('is-loading');
   const { error } = await db().from('follows').delete().eq('follower_id', user.id).eq('following_id', targetId);
+  if (btn) btn.classList.remove('is-loading');
   if (error) { if (typeof toast === 'function') toast('Ontvolgen mislukt', 'var(--danger)'); return; }
   if (btn) { btn.textContent = 'Volgen'; btn.classList.remove('btn-following'); btn.onclick = () => socialFollow(targetId, btn); }
 }
@@ -254,20 +258,22 @@ async function showComments(sessionId) {
     <div style="max-height:280px;overflow-y:auto;padding:0 4px 8px">${list}</div>
     ${user ? `<div class="comment-input-row">
       <input id="comment-input" class="form-input" placeholder="Schrijf een reactie…" style="flex:1;font-size:14px">
-      <button onclick="postComment('${sessionId}')" style="background:var(--accent);border:none;border-radius:10px;color:#fff;padding:0 14px;font-size:13px;font-weight:700;cursor:pointer;min-height:44px">Post</button>
+      <button onclick="postComment('${sessionId}', this)" style="background:var(--accent);border:none;border-radius:10px;color:#fff;padding:0 14px;font-size:13px;font-weight:700;cursor:pointer;min-height:44px">Post</button>
     </div>` : `<div style="text-align:center;padding:8px"><button onclick="showAuthScreen()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px">Inloggen om te reageren</button></div>`}
   </div>`;
   document.body.appendChild(ov);
   ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
 }
 
-async function postComment(sessionId) {
+async function postComment(sessionId, btn) {
   const input = document.getElementById('comment-input');
   const content = input?.value?.trim();
   if (!content) return;
   const user = await cloudCurrentUser();
   if (!user) return;
+  if (btn) { btn.disabled = true; btn.classList.add('is-loading'); }
   const { error } = await db().from('comments').insert({ user_id: user.id, session_id: sessionId, content });
+  if (btn) { btn.disabled = false; btn.classList.remove('is-loading'); }
   if (error) {
     if (typeof toast === 'function') toast('Reactie opslaan mislukt', 'var(--danger)');
     return;
