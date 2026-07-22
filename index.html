@@ -90,8 +90,8 @@ body.nav-transitioning{overflow:hidden}
 .route-chip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .chip-top .dot{background:var(--success)}.chip-flash .dot{background:var(--flash)}.chip-poging .dot{background:var(--attempt)}
 
-.btn-delete-session{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;margin-top:2px;min-width:44px;min-height:44px}
-.btn-delete-session:active{color:var(--danger);background:rgba(229,57,53,.12)}
+.btn-delete{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s,border-color .2s;min-width:44px;min-height:44px}
+.btn-delete:active{color:var(--danger);background:rgba(229,57,53,.12)}
 
 .empty-state{text-align:center;padding:48px 20px 40px;color:var(--muted)}
 .is-loading{opacity:.6;pointer-events:none}
@@ -281,8 +281,6 @@ select option{background:#1e1e1e}
 .goal-card.achieved .goal-progress-fill{background:var(--success)}
 .goal-progress-label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
 .goal-progress-pct{color:var(--text);font-weight:600}
-.btn-delete-goal{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .2s;min-width:44px;min-height:44px}
-.btn-delete-goal:active{color:var(--danger)}
 
 /* add goal forms side by side in one card */
 .add-goal-form{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:24px}
@@ -356,8 +354,6 @@ select option{background:#1e1e1e}
 .gym-actions{display:flex;align-items:center;gap:8px}
 .btn-fav{background:none;border:.5px solid var(--border);border-radius:8px;color:var(--muted);padding:6px 10px;font-size:11px;font-family:'Barlow',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:all .15s}
 .btn-fav.active{color:var(--accent);border-color:var(--accent);background:rgba(127,119,221,.1)}
-.btn-del-gym{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .2s;min-width:44px;min-height:44px}
-.btn-del-gym:active{color:var(--danger)}
 .add-gym-row{display:flex;gap:8px}
 .add-gym-row input{flex:1}
 .btn-add-gym{background:var(--accent);border:none;border-radius:10px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;padding:12px 18px;cursor:pointer;text-transform:uppercase;flex-shrink:0;transition:opacity .15s}
@@ -491,8 +487,7 @@ select option{background:#1e1e1e}
 .ps-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
 .ps-meta{font-size:11px;color:var(--muted);margin-top:2px}
 .ps-card-arrow{margin-left:auto;color:var(--muted);flex-shrink:0;pointer-events:none}
-.btn-ps-delete{background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:8px;margin-left:6px;flex-shrink:0;-webkit-tap-highlight-color:transparent;line-height:0}
-.btn-ps-delete:active{color:var(--danger);background:rgba(229,57,53,.12)}
+.btn-ps-delete{padding:6px;margin-left:6px;flex-shrink:0;min-width:0;min-height:0;-webkit-tap-highlight-color:transparent;line-height:0}
 .btn-new-profile{width:100%;max-width:360px;padding:16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:16px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:background .15s,border-color .15s;animation:ssUp .4s .25s ease both}
 .btn-new-profile:active{background:rgba(127,119,221,.1);border-color:var(--accent)}
 .btn-ps-import{width:100%;max-width:360px;padding:14px;background:none;border:.5px solid rgba(127,119,221,.3);border-radius:16px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;margin-top:8px;text-align:center;display:block}
@@ -529,8 +524,8 @@ select option{background:#1e1e1e}
 .project-card-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:.5px solid var(--border)}
 .btn-edit-project{flex:1;padding:9px;background:none;border:.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;cursor:pointer;transition:color .15s,border-color .15s}
 .btn-edit-project:active{color:var(--accent);border-color:var(--accent)}
-.btn-delete-project{padding:9px 12px;background:none;border:.5px solid var(--border);border-radius:10px;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .15s,border-color .15s;min-height:44px;min-width:44px}
-.btn-delete-project:active{color:var(--danger);border-color:var(--danger)}
+.btn-delete-project{padding:9px 12px;border:.5px solid var(--border);border-radius:10px}
+.btn-delete-project:active{background:none;border-color:var(--danger)}
 .btn-add-project{width:100%;padding:14px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:14px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;transition:background .15s,border-color .15s;margin-top:4px}
 .btn-add-project:active{background:rgba(127,119,221,.08);border-color:var(--accent)}
 .status-toggle{display:flex;gap:6px;margin-top:4px}
@@ -1709,7 +1704,7 @@ function renderProfileScreen(){
         <div class="ps-name">${esc(p.name)}</div>
         <div class="ps-meta">Aangemaakt ${esc(p.created||'')}</div>
       </div>
-      ${profiles.length>1?`<button class="btn-ps-delete" data-del-id="${p.id}" title="Profiel verwijderen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>`:''}
+      ${profiles.length>1?`<button class="btn-delete btn-ps-delete" data-del-id="${p.id}" title="Profiel verwijderen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>`:''}
       <svg class="ps-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
     </div>`).join('');
   list.onclick=function(e){
@@ -2495,7 +2490,7 @@ function renderFeed(){
           <button class="btn-edit-session" onclick="editSession(${s.id})" aria-label="Sessie bewerken">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
-          <button class="btn-delete-session" onclick="deleteSession(${s.id})">
+          <button class="btn-delete" onclick="deleteSession(${s.id})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
         </div>
@@ -2623,7 +2618,7 @@ function confirmDeleteGym(id){
 function renderGymsPage(){
   const list=document.getElementById('gym-list');
   if(!gyms.length){list.innerHTML='<div class="empty-state" style="padding:30px 0"><div>Nog geen gyms — voeg er een toe hieronder.</div></div>';}
-  else{list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${esc(g.name)}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-fav ${g.fav?'active':''}" onclick="setFav(${g.id})">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-del-gym" onclick="deleteGym(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')}
+  else{list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${esc(g.name)}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-fav ${g.fav?'active':''}" onclick="setFav(${g.id})">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-delete" onclick="deleteGym(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')}
   renderResetSection();
   renderQuietTime();
 }
@@ -3001,7 +2996,7 @@ function renderGoals(){
           </div>
           <div style="display:flex;align-items:center;gap:10px">
             ${done?'<div class="goal-achieved-badge">✓ Gehaald!</div>':overdue?'<div class="goal-overdue-badge">Verlopen</div>':'<div style="font-size:22px">⏳</div>'}
-            <button class="btn-delete-goal" onclick="deleteGoal(${g.id})">${trashSVG}</button>
+            <button class="btn-delete" onclick="deleteGoal(${g.id})">${trashSVG}</button>
           </div>
         </div>
         ${done?'<div class="goal-progress-bar"><div class="goal-progress-fill" style="width:100%"></div></div>':''}
@@ -3019,7 +3014,7 @@ function renderGoals(){
           </div>
           <div style="display:flex;align-items:center;gap:10px">
             ${done?'<div class="goal-achieved-badge">✓ Gehaald!</div>':overdue?'<div class="goal-overdue-badge">Verlopen</div>':''}
-            <button class="btn-delete-goal" onclick="deleteGoal(${g.id})">${trashSVG}</button>
+            <button class="btn-delete" onclick="deleteGoal(${g.id})">${trashSVG}</button>
           </div>
         </div>
         <div class="goal-progress-bar"><div class="goal-progress-fill" style="width:${pct}%"></div></div>
@@ -3312,7 +3307,7 @@ function renderHangPage(){
         <div class="hang-card-sub">${s.sets.length} set${s.sets.length!==1?'s':''} · ${s.sets.reduce((a,b)=>a+(b.time*b.reps),0)}s totaal</div>
         ${s.note?`<div class="hang-card-note">"${esc(s.note)}"</div>`:''}
       </div>
-      <button class="btn-delete-session" onclick="deleteHangSession(${s.id})">
+      <button class="btn-delete" onclick="deleteHangSession(${s.id})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
       </button>
     </div>
@@ -3774,7 +3769,7 @@ function renderProjects(){
         <div class="project-card-actions">
           <button class="btn-edit-project" onclick="openProjectModal(${p.id})">Bewerken</button>
           ${p.setterData&&p.setterData.holds&&p.setterData.holds.some(Boolean)?`<button class="btn-edit-project" style="background:rgba(127,119,221,.12);border-color:rgba(127,119,221,.3);color:var(--accent)" onclick="viewProjectSetter(${p.id})">🗺️ Kaart</button>`:''}
-          <button class="btn-delete-project" onclick="deleteProject(${p.id})" title="Verwijderen">${trashSVG}</button>
+          <button class="btn-delete btn-delete-project" onclick="deleteProject(${p.id})" title="Verwijderen">${trashSVG}</button>
         </div>
       </div>`;
     });
@@ -3989,7 +3984,7 @@ function renderCompSection(){
           <div style="font-size:13px;color:${up?'var(--accent)':'var(--muted)'};margin-top:5px;font-weight:600">${dLbl}</div>
           ${taper?`<div style="font-size:12px;color:var(--flash);margin-top:3px">⚡ Taper: volume −30%, intensiteit behouden</div>`:''}
         </div>
-        <button class="btn-delete-goal" onclick="deleteComp(${c.id})" style="flex-shrink:0;margin-top:2px">${trashSVG}</button>
+        <button class="btn-delete" onclick="deleteComp(${c.id})" style="flex-shrink:0;margin-top:2px">${trashSVG}</button>
       </div>
     </div>`;
   };
@@ -4382,7 +4377,7 @@ function renderFingerHealth(){
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
             ${inj.status==='active'?`<button onclick="toggleInjuryStatus(${inj.id})" style="background:rgba(76,175,80,.12);border:.5px solid rgba(76,175,80,.4);border-radius:8px;color:var(--success);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;padding:5px 10px;cursor:pointer;text-transform:uppercase">Hersteld</button>`:''}
-            <button onclick="deleteInjury(${inj.id})" class="btn-delete-session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+            <button onclick="deleteInjury(${inj.id})" class="btn-delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
           </div>
         </div>`;
       }).join('')
