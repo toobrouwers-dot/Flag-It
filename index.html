@@ -955,9 +955,9 @@ select option{background:#1e1e1e}
   <div id="comp-countdown-area"></div>
   <div id="otd-section"></div>
   <div class="feed-toggle">
-    <button class="feed-toggle-btn active" id="tab-feed" onclick="switchFeedTab('feed')">Sessies</button>
-    <button class="feed-toggle-btn" id="tab-dagboek" onclick="switchFeedTab('dagboek')">Dagboek</button>
-    <button class="feed-toggle-btn" id="tab-home-sociaal" onclick="switchFeedTab('sociaal')">Sociaal</button>
+    <button class="feed-toggle-btn active" id="tab-feed-feed" onclick="switchFeedTab('feed')">Sessies</button>
+    <button class="feed-toggle-btn" id="tab-feed-dagboek" onclick="switchFeedTab('dagboek')">Dagboek</button>
+    <button class="feed-toggle-btn" id="tab-feed-sociaal" onclick="switchFeedTab('sociaal')">Sociaal</button>
   </div>
   <div id="feed-tab-feed">
     <div id="filter-bar" class="filter-bar">
@@ -4200,36 +4200,32 @@ function renderOnThisDay(){
   </div>`;
 }
 
+// Generiek subtab-mechanisme: knoppen heten tab-{prefix}-{naam}, panelen {prefix}-tab-{naam}.
+function switchTab(prefix,tabs,active){
+  tabs.forEach(t=>{
+    document.getElementById(`tab-${prefix}-${t}`)?.classList.toggle('active',t===active);
+    const p=document.getElementById(`${prefix}-tab-${t}`);
+    if(p)p.style.display=t===active?'':'none';
+  });
+}
+
 function switchFeedTab(tab){
   feedTab=tab;
-  document.getElementById('tab-feed').className='feed-toggle-btn'+(tab==='feed'?' active':'');
-  document.getElementById('tab-dagboek').className='feed-toggle-btn'+(tab==='dagboek'?' active':'');
-  document.getElementById('tab-home-sociaal').className='feed-toggle-btn'+(tab==='sociaal'?' active':'');
-  document.getElementById('feed-tab-feed').style.display=tab==='feed'?'':'none';
-  document.getElementById('feed-tab-dagboek').style.display=tab==='dagboek'?'':'none';
-  document.getElementById('feed-tab-sociaal').style.display=tab==='sociaal'?'':'none';
+  switchTab('feed',['feed','dagboek','sociaal'],tab);
   if(tab==='dagboek')renderDagboek();
   if(tab==='sociaal')renderSociaalPage();
 }
 
 function switchDoelenTab(tab){
   doelenTab=tab;
-  document.getElementById('tab-doelen-goals').className='feed-toggle-btn'+(tab==='goals'?' active':'');
-  document.getElementById('tab-doelen-projects').className='feed-toggle-btn'+(tab==='projects'?' active':'');
-  document.getElementById('doelen-tab-goals').style.display=tab==='goals'?'':'none';
-  document.getElementById('doelen-tab-projects').style.display=tab==='projects'?'':'none';
+  switchTab('doelen',['goals','projects'],tab);
   if(tab==='goals')renderGoals();
   if(tab==='projects')renderProjects();
 }
 
 function switchSociaalTab(tab){
   sociaalTab=tab;
-  document.getElementById('tab-sociaal-feed').className='feed-toggle-btn'+(tab==='feed'?' active':'');
-  document.getElementById('tab-sociaal-search').className='feed-toggle-btn'+(tab==='search'?' active':'');
-  document.getElementById('tab-sociaal-lb').className='feed-toggle-btn'+(tab==='lb'?' active':'');
-  document.getElementById('sociaal-tab-feed').style.display=tab==='feed'?'':'none';
-  document.getElementById('sociaal-tab-search').style.display=tab==='search'?'':'none';
-  document.getElementById('sociaal-tab-lb').style.display=tab==='lb'?'':'none';
+  switchTab('sociaal',['feed','search','lb'],tab);
   if(tab==='feed'&&typeof renderSocialFeed==='function')renderSocialFeed();
   if(tab==='lb'&&typeof renderLeaderboard==='function')renderLeaderboard();
   if(tab==='search'){const inp=document.getElementById('user-search-input');if(inp)setTimeout(()=>inp.focus(),100);}
@@ -4242,10 +4238,7 @@ function renderSociaalPage(){
 
 function switchAnalyseTab(tab){
   analyseTab=tab;
-  document.getElementById('tab-analyse-stats').className='feed-toggle-btn'+(tab==='stats'?' active':'');
-  document.getElementById('tab-analyse-coach').className='feed-toggle-btn'+(tab==='coach'?' active':'');
-  document.getElementById('analyse-tab-stats').style.display=tab==='stats'?'':'none';
-  document.getElementById('analyse-tab-coach').style.display=tab==='coach'?'':'none';
+  switchTab('analyse',['stats','coach'],tab);
   if(tab==='stats')renderStats();
   if(tab==='coach')renderCoach();
 }
@@ -4256,10 +4249,7 @@ function switchMeerTab(tab){
     if(restTimerRunning){clearInterval(restTimerInterval);restTimerInterval=null;restTimerRunning=false;const rb=document.getElementById('btn-rest-timer');if(rb){rb.textContent='▶ Start rust';rb.className='btn-rest-start';}}
   }
   meerTab=tab;
-  document.getElementById('tab-meer-gyms').className='feed-toggle-btn'+(tab==='gyms'?' active':'');
-  document.getElementById('tab-meer-hang').className='feed-toggle-btn'+(tab==='hang'?' active':'');
-  document.getElementById('meer-tab-gyms').style.display=tab==='gyms'?'':'none';
-  document.getElementById('meer-tab-hang').style.display=tab==='hang'?'':'none';
+  switchTab('meer',['gyms','hang'],tab);
   if(tab==='gyms'){renderGymsPage();renderProfileMgmt();renderOwnerControls();renderFeedbackAdmin();}
   if(tab==='hang')renderHangPage();
 }
