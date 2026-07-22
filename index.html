@@ -2564,13 +2564,19 @@ function repeatSession(id){
   toast('Gym ingesteld — voeg routes toe!');
 }
 
-function deleteSession(id){
-  const s=sessions.find(x=>x.id===id);if(!s)return;
-  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='conf-ov';
-  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Sessie verwijderen?</div><div class="confirm-sub">${esc(s.gym||'Gym')} — ${fmtDate(s.date)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('conf-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDelete(${id})">Verwijderen</button></div></div>`;
+// Generieke verwijder-bevestiging: modal met Annuleren/Verwijderen, sub-tekst moet al ge-escaped zijn.
+function showDeleteConfirm(title,sub,onConfirm){
+  const ov=document.createElement('div');ov.className='modal-overlay';
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">${title}</div><div class="confirm-sub">${sub}</div><div class="confirm-btns"><button class="confirm-cancel">Annuleren</button><button class="confirm-delete">Verwijderen</button></div></div>`;
+  ov.querySelector('.confirm-cancel').onclick=()=>ov.remove();
+  ov.querySelector('.confirm-delete').onclick=()=>{ov.remove();onConfirm();};
   document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
 }
-function confirmDelete(id){document.getElementById('conf-ov')?.remove();haptic(8);deleteItem(sessions,id,save,renderFeed);toast('Sessie verwijderd','#e53935')}
+function deleteSession(id){
+  const s=sessions.find(x=>x.id===id);if(!s)return;
+  showDeleteConfirm('Sessie verwijderen?',`${esc(s.gym||'Gym')} — ${fmtDate(s.date)}`,()=>confirmDelete(id));
+}
+function confirmDelete(id){haptic(8);deleteItem(sessions,id,save,renderFeed);toast('Sessie verwijderd','#e53935')}
 
 function editSession(id){
   const s=sessions.find(x=>x.id===id);if(!s)return;
@@ -2618,12 +2624,9 @@ function addGym(){
 function setFav(id){gyms.forEach(g=>g.fav=(g.id===id));saveGyms();renderGymsPage();refreshGymSelect()}
 function deleteGym(id){
   const g=gyms.find(x=>x.id===id);if(!g)return;
-  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-gym-ov';
-  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Gym verwijderen?</div><div class="confirm-sub">${esc(g.name)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('del-gym-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDeleteGym(${id})">Verwijderen</button></div></div>`;
-  document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+  showDeleteConfirm('Gym verwijderen?',esc(g.name),()=>confirmDeleteGym(id));
 }
 function confirmDeleteGym(id){
-  document.getElementById('del-gym-ov')?.remove();
   deleteItem(gyms,id,()=>{if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms()},()=>{renderGymsPage();refreshGymSelect()});
   toast('Gym verwijderd','#e53935');
 }
@@ -3285,12 +3288,9 @@ function saveHangSession(){
 
 function deleteHangSession(id){
   const s=hangSessions.find(x=>x.id===id);if(!s)return;
-  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-hang-ov';
-  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Hangsessie verwijderen?</div><div class="confirm-sub">${esc(fmtDate(s.date))} · ${s.sets.length} set${s.sets.length!==1?'s':''}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('del-hang-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDeleteHangSession(${id})">Verwijderen</button></div></div>`;
-  document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+  showDeleteConfirm('Hangsessie verwijderen?',`${esc(fmtDate(s.date))} · ${s.sets.length} set${s.sets.length!==1?'s':''}`,()=>confirmDeleteHangSession(id));
 }
 function confirmDeleteHangSession(id){
-  document.getElementById('del-hang-ov')?.remove();
   deleteItem(hangSessions,id,saveHang,renderHangPage);
   toast('Verwijderd','#e53935');
 }
@@ -3805,20 +3805,9 @@ function logAttempt(id){
 
 function deleteProject(id){
   const p=projects.find(x=>x.id===id);if(!p)return;
-  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-proj-ov';
-  ov.innerHTML=`<div class="confirm-box">
-    <div class="confirm-title">Project verwijderen?</div>
-    <div class="confirm-sub">${esc(p.grade+(p.name?' · '+p.name:'')+(p.gym?' @ '+p.gym:''))}</div>
-    <div class="confirm-btns">
-      <button class="confirm-cancel" onclick="document.getElementById('del-proj-ov').remove()">Annuleren</button>
-      <button class="confirm-delete" onclick="confirmDeleteProject(${id})">Verwijderen</button>
-    </div>
-  </div>`;
-  document.body.appendChild(ov);
-  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+  showDeleteConfirm('Project verwijderen?',esc(p.grade+(p.name?' · '+p.name:'')+(p.gym?' @ '+p.gym:'')),()=>confirmDeleteProject(id));
 }
 function confirmDeleteProject(id){
-  document.getElementById('del-proj-ov')?.remove();
   deleteItem(projects,id,saveProjects,renderProjects);
   toast('Project verwijderd','#e53935');
 }
@@ -4028,12 +4017,9 @@ function addComp(){
 
 function deleteComp(id){
   const c=competitions.find(x=>x.id===id);if(!c)return;
-  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='del-comp-ov';
-  ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Competitie verwijderen?</div><div class="confirm-sub">${esc(c.name)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('del-comp-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDeleteComp(${id})">Verwijderen</button></div></div>`;
-  document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+  showDeleteConfirm('Competitie verwijderen?',esc(c.name),()=>confirmDeleteComp(id));
 }
 function confirmDeleteComp(id){
-  document.getElementById('del-comp-ov')?.remove();
   deleteItem(competitions,id,saveCompetitions,()=>{renderCompSection();renderCompCountdown()});
   toast('Competitie verwijderd','#e53935');
 }
