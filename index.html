@@ -269,7 +269,7 @@ select option{background:#1e1e1e}
 .goal-section-header:first-child{margin-top:0}
 .goal-section-divider{height:.5px;background:var(--border);margin-bottom:14px}
 
-.goal-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;animation:slideUp .25s ease both}
+.card-base{padding:16px;border-radius:14px;background:var(--surface);border:.5px solid var(--border);margin-bottom:12px;animation:slideUp .25s ease both}
 .goal-card.achieved{border-color:rgba(76,175,80,.4);background:rgba(76,175,80,.04)}
 .goal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
 .goal-grade{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--accent);line-height:1}
@@ -302,7 +302,7 @@ select option{background:#1e1e1e}
 .hang-pr-val{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:var(--hang);line-height:1}
 .hang-pr-sub{font-size:11px;color:var(--muted);margin-top:3px}
 
-.hang-card{margin-bottom:12px;background:var(--surface);border-radius:14px;border:.5px solid var(--border);overflow:hidden;animation:slideUp .3s ease both}
+.hang-card{padding:0;overflow:hidden;animation-duration:.3s}
 .hang-card-header{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 16px 12px}
 .hang-card-date{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase}
 .hang-card-sub{font-size:12px;color:var(--muted);margin-top:2px}
@@ -508,7 +508,6 @@ select option{background:#1e1e1e}
 
 /* PROJECTS */
 .projects-content{padding:16px 20px}
-.project-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;animation:slideUp .25s ease both}
 .project-card.completed{border-color:rgba(76,175,80,.4);background:rgba(76,175,80,.04)}
 .project-card.retired{border-color:rgba(136,136,136,.25);opacity:.65}
 .project-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
@@ -543,7 +542,6 @@ select option{background:#1e1e1e}
 .project-section-label:first-child{margin-top:0}
 
 /* COMPETITIONS */
-.comp-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;animation:slideUp .25s ease both}
 .comp-card.comp-upcoming{border-color:rgba(127,119,221,.4)}
 .comp-card.comp-past{opacity:.6}
 .comp-countdown-widget{margin:0 16px 12px;background:linear-gradient(135deg,rgba(127,119,221,.18),rgba(127,119,221,.05));border:.5px solid rgba(127,119,221,.35);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;animation:slideUp .3s ease both}
@@ -2994,7 +2992,7 @@ function renderGoals(){
       const done=gradeGoalAchieved(g);
       const overdue=!done&&g.deadline&&g.deadline<today;
       const deadlineFmt=g.deadline?` · <span style="${overdue?'color:var(--danger)':''}">${fmtDate(g.deadline)}</span>`:'';
-      return`<div class="goal-card ${done?'achieved':overdue?'overdue':''}">
+      return`<div class="card-base goal-card ${done?'achieved':overdue?'overdue':''}">
         <div class="goal-header">
           <div>
             <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">🧗 Graad-doel</div>
@@ -3012,7 +3010,7 @@ function renderGoals(){
       const prog=countGoalProgress(g),pct=Math.min(100,Math.round((prog/g.count)*100)),done=prog>=g.count;
       const overdue=!done&&g.deadline&&g.deadline<today;
       const deadlineFmt=g.deadline?` · <span style="${overdue?'color:var(--danger)':''}">${fmtDate(g.deadline)}</span>`:'';
-      return`<div class="goal-card ${done?'achieved':overdue?'overdue':''}">
+      return`<div class="card-base goal-card ${done?'achieved':overdue?'overdue':''}">
         <div class="goal-header">
           <div>
             <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">📊 Herhaling-doel</div>
@@ -3307,7 +3305,7 @@ function renderHangPage(){
   const feed=document.getElementById('hang-feed');
   if(!hangSessions.length){feed.innerHTML='<div class="empty-state"><div class="big">Nog geen hangsessies</div></div>';return}
   renderHangChart();
-  feed.innerHTML=[...hangSessions].reverse().map((s,i)=>`<div class="hang-card" style="animation-delay:${i*STAGGER_DELAY_S}s">
+  feed.innerHTML=[...hangSessions].reverse().map((s,i)=>`<div class="card-base hang-card" style="animation-delay:${i*STAGGER_DELAY_S}s">
     <div class="hang-card-header">
       <div>
         <div class="hang-card-date">${fmtDate(s.date)}</div>
@@ -3753,7 +3751,7 @@ function renderProjects(){
       const badgeClass='s-'+sec.key;
       const badgeLabel=sec.key==='project'?'Project':sec.key==='completed'?'Voltooid':'Teruggetrokken';
       const gradeColor=GRADE_COLORS[GRADES.indexOf(p.grade)]||'var(--accent)';
-      html+=`<div class="project-card ${statusClass}" style="animation-delay:${i*STAGGER_DELAY_S}s">
+      html+=`<div class="card-base project-card ${statusClass}" style="animation-delay:${i*STAGGER_DELAY_S}s">
         <div class="project-card-header">
           <div>
             <div class="project-grade" style="${statusClass==='project'?'color:'+gradeColor:''}">${esc(p.grade)}</div>
@@ -3982,7 +3980,7 @@ function renderCompSection(){
     const up=days>=0;
     const dLbl=days===0?'Vandaag!':days>0?`Over ${days} dag${days!==1?'en':''}`:`${Math.abs(days)} dag${Math.abs(days)!==1?'en':''} geleden`;
     const taper=up&&days<=14&&days>0;
-    return`<div class="comp-card ${up?'comp-upcoming':'comp-past'}">
+    return`<div class="card-base comp-card ${up?'comp-upcoming':'comp-past'}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
         <div>
           <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">🏆 Competitie</div>
