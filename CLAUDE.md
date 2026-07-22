@@ -15,7 +15,7 @@ The app has a **Supabase backend** for cloud sync and social features. Core appl
 | `index.html` | Entire app — CSS, HTML, main JS (~5,600 lines) |
 | `cloud.js` | Supabase auth + multi-device sync (~785 lines) |
 | `social.js` | Kudos, follows, public profiles, feed, leaderboard, comments (~545 lines) |
-| `sw.js` | Service worker — offline caching (cache: `flagit-v18`) |
+| `sw.js` | Service worker — offline caching (cache: `flagit-v22`) |
 | `manifest.json` | PWA manifest |
 | `supabase_schema.sql` | Postgres schema + RLS policies for the Supabase backend |
 | `icons/` | PWA icons (192px, 512px) |
@@ -26,7 +26,9 @@ The app has a **Supabase backend** for cloud sync and social features. Core appl
 
 **To deploy:** Push to `main` — GitHub Actions (`.github/workflows/deploy.yml`) automatically deploys to GitHub Pages.
 
-**Service worker cache:** Bump the cache name in `sw.js` (`flagit-v18` → `flagit-v19`, etc.) whenever making changes that need to invalidate cached assets for existing users. Also add any new static files to the cache array.
+**Service worker cache:** Bump the cache name in `sw.js` (`flagit-v22` → `flagit-v23`, etc.) whenever making changes that need to invalidate cached assets for existing users. Also add any new static files to the cache array.
+
+**Open beslissing (offline CDN):** de service worker cachet alleen first-party bestanden; Chart.js, Supabase JS en Google Fonts komen van CDN's zonder offline fallback. Een volledig offline cold load mist dus grafieken en cloud-features (de rest werkt). Bewuste trade-off tot de product-eigenaar beslist of de drie CDN-URL's een runtime cache-first strategie in `sw.js` krijgen.
 
 ## Architecture
 
@@ -257,53 +259,28 @@ Gebruik uitsluitend deze waarden — geen uitzonderingen bij nieuwe of gewijzigd
 - `14px` — secundaire/utility-knoppen
 - `17px` — primaire actieknoppen (`.btn-save`, `.btn-add-*`)
 
-**CSS-consolidatie (pas toe bij aanraken van betreffende regels):**
+**CSS-consolidatie — voltooid:**
 
-1. Extraheer één `.card-base` rule en laat alle kaartklassen die overnemen:
-   ```css
-   .card-base {
-     padding: 16px;
-     border-radius: 14px;
-     background: var(--surface);
-     border: 0.5px solid var(--border);
-     margin-bottom: 12px;
-   }
-   ```
-   Voeg `card-base` toe als extra klasse aan `.goal-card`, `.project-card`, `.comp-card`, `.hang-card` in plaats van dubbele declaraties.
+1. ✅ `.card-base` bestaat en draagt de gedeelde kaartdeclaraties; `.goal-card`, `.project-card`, `.comp-card` en `.hang-card` worden gerenderd als `class="card-base <type>-card"` en houden alleen hun echte verschillen (`.hang-card`: geen padding, `overflow:hidden`, tragere animatie).
+2. ✅ Eén `.btn-delete` klasse vervangt de vijf oude delete-knop-rules; `.btn-ps-delete` en `.btn-delete-project` bestaan nog als dunne modifiers bovenop `.btn-delete`.
+3. ✅ `margin-bottom` van alle kaarten is `12px` (via `.card-base`).
 
-2. Consolideer de 7 vrijwel identieke `.btn-delete-*` rules tot één `.btn-delete` klasse.
-
-3. Zet `margin-bottom` van alle kaarten op `12px` (`.comp-card` gebruikt nu afwijkend `10px`).
+De bredere spacing/radius/font-normalisatie (alle waarden buiten de kaarten en delete-knoppen) is bewust **niet** in één keer gedaan — pas de schaal hierboven toe bij het aanraken van betreffende regels.
 
 ### UX-verbeteringen
 
-**Tab-switching patroon:**
+**Tab-switching patroon — voltooid:**
 
-De functies `switchFeedTab()`, `switchDoelenTab()`, `switchSociaalTab()`, `switchAnalyseTab()` en `switchMeerTab()` zijn structureel identiek (vijf stuks inmiddels, nog steeds niet geconsolideerd). Vervang bij aanpassing door één generieke functie:
+Eén generieke `switchTab(prefix, tabs, active)` doet het knop/paneel-werk via de id-conventie `tab-{prefix}-{naam}` (knop) / `{prefix}-tab-{naam}` (paneel). De vijf `switch*Tab()`-functies bestaan nog als dunne wrappers die de state-variabele zetten en per-tab render-side-effects aanroepen. Nieuwe subtabs: volg de id-conventie en roep `switchTab` aan vanuit een wrapper.
 
-```js
-function switchTab(containerId, tabName) {
-  document.querySelectorAll(`#${containerId} .tab-btn`).forEach(b =>
-    b.classList.toggle('active', b.dataset.tab === tabName));
-  document.querySelectorAll(`#${containerId} .tab-section`).forEach(s =>
-    s.style.display = s.dataset.tab === tabName ? '' : 'none');
-}
-```
+**Feedbackstaten — voltooid:**
 
-**Feedbackstaten (voeg toe aan CSS, gebruik consequent):**
+- `.is-loading` (in CSS) wordt toegepast op elke knop die een netwerk-round-trip start: auth-flows (beide schermen), kudos, volgen/ontvolgen, reactie posten, feedback versturen. Nieuwe async knoppen volgen hetzelfde patroon.
+- Toast-audit: alle `save*()`-functies toasten `'Opslaan mislukt'` bij een localStorage-fout, en elke gebruikersactie geeft feedback (toast of zichtbare navigatie/re-render). Bewuste keuze: **geen** succes-toast ín de low-level save-functies zelf — backup-restore en delete-flows roepen meerdere saves na elkaar aan en tonen al hun eigen feedback; een toast per save zou spammen. `saveDraft()` blijft een stille autosave.
 
-```css
-.is-loading { opacity: 0.6; pointer-events: none; }
-.field-error input, .field-error select { border-color: var(--danger); }
-.field-error-msg { font-size: 12px; color: var(--danger); margin-top: 4px; }
-```
+**Lege staten — voltooid:**
 
-- Elke knop die een async actie start krijgt `.is-loading` tijdens de operatie.
-- Elke `save*()`-functie moet na afloop `toast('...')` aanroepen. Audit bestaande save-functies en voeg ontbrekende toast-calls toe.
-
-**Lege staten:**
-
-De klasse `.empty-state` bestaat maar wordt inconsistent gebruikt. Elke `render*()`-functie die een lijst toont **moet** een `.empty-state`-blok renderen als de array leeg is:
+Elke `render*()`-functie die een lijst toont rendert een `.empty-state`-blok bij een lege array (feed, gyms, doelen, hangboard, projecten, dagboek, competities, blessurelog, reset-sectie). Houd dit aan voor nieuwe lijsten:
 
 ```js
 if (!items.length) {
@@ -320,17 +297,7 @@ De quick-actionrow op Home (`.home-qa-btn` — "+ Sessie loggen" / "⚡ Snel top
 
 Pas deze patronen toe bij aanraking van bestaande code — geen grootschalige refactor in één keer.
 
-**Delete-functies:** 7 vrijwel identieke `deleteX(id)`-functies bestaan. Gebruik bij aanpassing het patroon:
-
-```js
-function deleteItem(arr, id, saveFn, renderFn) {
-  const idx = arr.findIndex(x => x.id === id);
-  if (idx === -1) return;
-  arr.splice(idx, 1);
-  saveFn();
-  renderFn();
-}
-```
+**Delete-functies — voltooid:** alle delete-flows gebruiken `deleteItem(arr, id, saveFn, renderFn)` (splice in place → save → render) en de gedeelde bevestigingsmodal `showDeleteConfirm(title, sub, onConfirm)`. Gebruik beide voor nieuwe delete-flows. Bekende uitzondering: `deleteGoal` verwijdert zonder bevestiging — bewust zo gelaten tot de product-eigenaar beslist of doelen ook een confirm verdienen.
 
 **Kaartrendering:** elke `render*()`-functie bouwt HTML via template literals. De buitenste wrapper gebruikt altijd de basisklasse + typemodifier (bijv. `class="card-base goal-card"`), niet afzonderlijke conflicterende stijlen.
 
