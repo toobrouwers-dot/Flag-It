@@ -2022,6 +2022,14 @@ function saveProjects(){
   try{localStorage.setItem(PRK,JSON.stringify(projects))}catch(e){}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('projects',activeProfileId);cloudScheduleSync(activeProfileId);}
 }
+// Generiek verwijder-patroon: muteer array in place, bewaar, her-render.
+function deleteItem(arr,id,saveFn,renderFn){
+  const idx=arr.findIndex(x=>x.id===id);
+  if(idx===-1)return;
+  arr.splice(idx,1);
+  saveFn();
+  renderFn();
+}
 function loadArr(k,fb){
   try{
     const r=localStorage.getItem(k)||(fb?localStorage.getItem(fb):null);
@@ -2559,7 +2567,7 @@ function deleteSession(id){
   ov.innerHTML=`<div class="confirm-box"><div class="confirm-title">Sessie verwijderen?</div><div class="confirm-sub">${esc(s.gym||'Gym')} — ${fmtDate(s.date)}</div><div class="confirm-btns"><button class="confirm-cancel" onclick="document.getElementById('conf-ov').remove()">Annuleren</button><button class="confirm-delete" onclick="confirmDelete(${id})">Verwijderen</button></div></div>`;
   document.body.appendChild(ov);ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
 }
-function confirmDelete(id){document.getElementById('conf-ov')?.remove();haptic(8);sessions=sessions.filter(s=>s.id!==id);save();toast('Sessie verwijderd','#e53935');renderFeed()}
+function confirmDelete(id){document.getElementById('conf-ov')?.remove();haptic(8);deleteItem(sessions,id,save,renderFeed);toast('Sessie verwijderd','#e53935')}
 
 function editSession(id){
   const s=sessions.find(x=>x.id===id);if(!s)return;
@@ -2613,7 +2621,7 @@ function deleteGym(id){
 }
 function confirmDeleteGym(id){
   document.getElementById('del-gym-ov')?.remove();
-  gyms=gyms.filter(g=>g.id!==id);if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms();renderGymsPage();refreshGymSelect();
+  deleteItem(gyms,id,()=>{if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms()},()=>{renderGymsPage();refreshGymSelect()});
 }
 function renderGymsPage(){
   const list=document.getElementById('gym-list');
@@ -2970,7 +2978,7 @@ function addCountGoal(){
   goals.push({id:Date.now(),type:'count',grade,result,count,deadline,createdAt:new Date().toISOString().split('T')[0]});
   saveGoals();renderGoals();toast('Doel toegevoegd!');
 }
-function deleteGoal(id){goals=goals.filter(g=>g.id!==id);saveGoals();renderGoals()}
+function deleteGoal(id){deleteItem(goals,id,saveGoals,renderGoals)}
 
 function renderGoals(){
   const trashSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>`;
@@ -3279,8 +3287,8 @@ function deleteHangSession(id){
 }
 function confirmDeleteHangSession(id){
   document.getElementById('del-hang-ov')?.remove();
-  hangSessions=hangSessions.filter(s=>s.id!==id);
-  saveHang();renderHangPage();toast('Verwijderd','#e53935');
+  deleteItem(hangSessions,id,saveHang,renderHangPage);
+  toast('Verwijderd','#e53935');
 }
 
 function renderHangPage(){
@@ -3807,8 +3815,8 @@ function deleteProject(id){
 }
 function confirmDeleteProject(id){
   document.getElementById('del-proj-ov')?.remove();
-  projects=projects.filter(p=>p.id!==id);
-  saveProjects();renderProjects();toast('Project verwijderd','#e53935');
+  deleteItem(projects,id,saveProjects,renderProjects);
+  toast('Project verwijderd','#e53935');
 }
 
 function openProjectModal(id){
@@ -4021,8 +4029,7 @@ function deleteComp(id){
 }
 function confirmDeleteComp(id){
   document.getElementById('del-comp-ov')?.remove();
-  competitions=competitions.filter(c=>c.id!==id);
-  saveCompetitions();renderCompSection();renderCompCountdown();
+  deleteItem(competitions,id,saveCompetitions,()=>{renderCompSection();renderCompCountdown()});
 }
 
 /* ══════════════════════════════════════════
@@ -4436,10 +4443,7 @@ function toggleInjuryStatus(id){
   if(inj){inj.status=inj.status==='active'?'recovered':'active';saveInjuries();renderFingerHealth();}
 }
 
-function deleteInjury(id){
-  injuries=injuries.filter(i=>i.id!==id);
-  saveInjuries();renderFingerHealth();
-}
+function deleteInjury(id){deleteItem(injuries,id,saveInjuries,renderFingerHealth)}
 
 /* ══════════════════════════════════════════
    GRADE PYRAMID AUDITOR
