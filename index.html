@@ -1442,6 +1442,9 @@ const I18N_PHRASES=[
   ['Nog geen geslaagde routes','No sent routes yet'],
   ['Nog geen gyms — voeg er een toe hieronder.','No gyms yet — add one below.'],['Nog geen gyms','No gyms yet'],
   ['Nog geen notities','No notes yet'],['Nog geen profielen','No profiles yet'],
+  ['Nog geen competities — voeg er hierboven een toe voor een aftelling.','No competitions yet — add one above for a countdown.'],
+  ['Nog geen blessures gelogd — top, houden zo!','No injuries logged — great, keep it up!'],
+  ['Voeg eerst een gym toe — daarna kun je resets loggen.','Add a gym first — then you can log resets.'],
   ['Nog geen reacties','No comments yet'],['Nog geen sessies','No sessions yet'],['Nog geen sets gelogd','No sets logged yet'],
   ['Nog niet genoeg progressie om te voorspellen.','Not enough progress yet to predict.'],
   ['Nooit gelogd','Never logged'],
@@ -4005,6 +4008,7 @@ function renderCompSection(){
     </div>
     <button class="btn-add-comp" onclick="addComp()">Competitie toevoegen</button>
   </div>
+  ${!competitions.length?`<div class="empty-state" style="padding:24px 20px"><div class="empty-icon" style="font-size:36px;margin-bottom:10px">🏆</div><div class="empty-sub" style="margin-bottom:0">Nog geen competities — voeg er hierboven een toe voor een aftelling.</div></div>`:''}
   ${upcoming.map(compCard).join('')}
   ${past.length?`<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:4px 0 8px">Afgelopen</div>${past.slice(0,3).map(compCard).join('')}`:''}`;
 }
@@ -4040,7 +4044,7 @@ function confirmDeleteComp(id){
 function renderResetSection(){
   const el=document.getElementById('reset-section');
   if(!el)return;
-  if(!gyms.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:4px 0 12px">Voeg eerst een gym toe</div>';return;}
+  if(!gyms.length){el.innerHTML='<div class="empty-state" style="padding:16px 20px 20px"><div class="empty-sub" style="margin-bottom:0">Voeg eerst een gym toe — daarna kun je resets loggen.</div></div>';return;}
   const today=new Date().toISOString().split('T')[0];
   el.innerHTML=gyms.map(g=>{
     const gResets=gymResets.filter(r=>r.gymId===g.id).sort((a,b)=>b.date.localeCompare(a.date));
@@ -4396,7 +4400,8 @@ function renderFingerHealth(){
       <div class="fh-risk-bar-wrap"><div class="fh-risk-bar" style="width:${score}%;background:${color}"></div></div>
       <div class="fh-factors" style="margin-top:12px">${factorsHtml}</div>
     </div>
-    ${injHtml?`<div class="form-section-title" style="padding:12px 0 8px">Blessurelog</div>${injHtml}`:''}
+    <div class="form-section-title" style="padding:12px 0 8px">Blessurelog</div>
+    ${injHtml||`<div class="empty-state" style="padding:16px 20px 20px"><div class="empty-sub" style="margin-bottom:0">Nog geen blessures gelogd — top, houden zo! 💪</div></div>`}
     <button class="btn-add-injury" onclick="openInjuryModal()">+ Blessure toevoegen</button>`;
 }
 
