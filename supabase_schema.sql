@@ -318,20 +318,35 @@ alter table public.accounts
   add column if not exists is_admin boolean default false;
 
 -- SECURITY FIX: "accounts_own_write" (regel ~199) staat toe dat een
--- gebruiker elke kolom van zijn eigen accounts-rij update, dus zonder
--- onderstaande REVOKE kan iedereen via de API zelf is_admin=true zetten.
--- De SQL Editor draait als superuser (postgres) en omzeilt kolom-grants,
--- dus "eigenaar zet dit handmatig via dashboard" blijft gewoon werken.
-revoke update (is_admin) on public.accounts from authenticated;
-revoke update (is_admin) on public.accounts from anon;
+-- gebruiker elke kolom van zijn eigen accounts-rij update/insert, en
+-- "accounts_public_read" (regel ~198) filtert alleen op rijen, niet op
+-- kolommen. Zonder onderstaande grants kan iedereen via de API zelf
+-- is_admin=true zetten of uitlezen wie admin is.
+--
+-- LET OP: "revoke select/update (is_admin) ... from anon" (een eerdere
+-- versie van deze fix) werkt NIET — Postgres kent geen "deny"-concept,
+-- alleen grants. Zolang anon/authenticated een blanket tabelbrede
+-- GRANT SELECT/UPDATE hebben (Supabase-default), doet een kolom-
+-- specifieke REVOKE niets: de tabelbrede grant blijft alle kolommen
+-- dekken. De enige werkende aanpak is het tabelbrede recht helemaal
+-- intrekken en dan alleen de veilige kolommen teruggeven.
+--
+-- De SQL Editor draait als superuser (postgres) en omzeilt grants,
+-- dus "eigenaar zet is_admin handmatig via dashboard" blijft werken.
+revoke select on public.accounts from authenticated, anon;
+grant select (id, username, display_name, emoji, bio, is_public, local_profiles, created_at)
+  on public.accounts to authenticated, anon;
 
--- SECURITY FIX: "accounts_public_read" (regel ~198) filtert alleen op
--- rijen, niet op kolommen — zonder onderstaande REVOKE kan iedereen
--- zonder in te loggen "select is_admin from accounts" uitvoeren en zo
--- precies zien welke accounts adminrechten hebben. check_is_admin()
--- blijft werken (security definer functies omzeilen kolom-grants).
-revoke select (is_admin) on public.accounts from authenticated;
-revoke select (is_admin) on public.accounts from anon;
+revoke update on public.accounts from authenticated, anon;
+grant update (username, display_name, bio, is_public)
+  on public.accounts to authenticated, anon;
+
+-- De app doet nooit een directe insert in accounts (alleen de
+-- handle_new_user()-trigger hieronder, die als security definer draait
+-- en grants omzeilt) — zonder deze revoke zou iemand anders hun eigen
+-- accounts-rij kunnen verwijderen (toegestaan door accounts_own_write)
+-- en een nieuwe kunnen inserten met is_admin=true.
+revoke insert on public.accounts from authenticated, anon;
 
 -- Globale app-instellingen (key/value)
 create table if not exists public.app_settings (
