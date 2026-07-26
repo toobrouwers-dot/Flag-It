@@ -5277,10 +5277,10 @@ async function renderOwnerControls(){
     </div>
     <div class="admin-row" style="flex-direction:column;align-items:flex-start;gap:10px">
       <div class="admin-row-label">Gesponsorde kaart</div>
-      <input id="sp-title" class="form-input" placeholder="Naam sponsor" value="${escHtml(sponsor?.title||'')}" style="font-size:14px;width:100%;box-sizing:border-box">
-      <input id="sp-cta" class="form-input" placeholder="CTA tekst (bijv. Bekijk de nieuwe Otaki →)" value="${escHtml(sponsor?.cta_text||'')}" style="font-size:14px;width:100%;box-sizing:border-box">
-      <input id="sp-url" class="form-input" placeholder="URL (https://...)" value="${escHtml(sponsor?.cta_url||'')}" style="font-size:14px;width:100%;box-sizing:border-box">
-      <input id="sp-logo" class="form-input" placeholder="Logo URL (https://...)" value="${escHtml(sponsor?.logo_url||'')}" style="font-size:14px;width:100%;box-sizing:border-box">
+      <input id="sp-title" class="form-input" placeholder="Naam sponsor" value="${esc(sponsor?.title||'')}" style="font-size:14px;width:100%;box-sizing:border-box">
+      <input id="sp-cta" class="form-input" placeholder="CTA tekst (bijv. Bekijk de nieuwe Otaki →)" value="${esc(sponsor?.cta_text||'')}" style="font-size:14px;width:100%;box-sizing:border-box">
+      <input id="sp-url" class="form-input" placeholder="URL (https://...)" value="${esc(sponsor?.cta_url||'')}" style="font-size:14px;width:100%;box-sizing:border-box">
+      <input id="sp-logo" class="form-input" placeholder="Logo URL (https://...)" value="${esc(sponsor?.logo_url||'')}" style="font-size:14px;width:100%;box-sizing:border-box">
       <label style="display:flex;align-items:center;gap:10px;font-size:14px">
         <input type="checkbox" id="sp-active" ${sponsor?.active?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)">
         Actief tonen in feed
