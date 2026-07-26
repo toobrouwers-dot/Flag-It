@@ -317,6 +317,14 @@ create index on public.follows(following_id);
 alter table public.accounts
   add column if not exists is_admin boolean default false;
 
+-- SECURITY FIX: "accounts_own_write" (regel ~199) staat toe dat een
+-- gebruiker elke kolom van zijn eigen accounts-rij update, dus zonder
+-- onderstaande REVOKE kan iedereen via de API zelf is_admin=true zetten.
+-- De SQL Editor draait als superuser (postgres) en omzeilt kolom-grants,
+-- dus "eigenaar zet dit handmatig via dashboard" blijft gewoon werken.
+revoke update (is_admin) on public.accounts from authenticated;
+revoke update (is_admin) on public.accounts from anon;
+
 -- Globale app-instellingen (key/value)
 create table if not exists public.app_settings (
   key        text primary key,

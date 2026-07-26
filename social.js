@@ -187,10 +187,15 @@ async function renderSocialFeed() {
             🤜 <span class="kudos-n">…</span>
           </button>
           <button class="social-comment-btn" onclick="showComments('${s.id}')">💬</button>
-          ${acc?.id ? `<button class="social-profile-btn" onclick="showPublicProfile('${_s(acc.id)}','${_s(acc.username||'')}')">👤 ${_s(acc.username || '')}</button>` : ''}
+          ${acc?.id ? `<button class="social-profile-btn" data-profile-id="${_s(acc.id)}" data-profile-username="${_s(acc.username||'')}">👤 ${_s(acc.username || '')}</button>` : ''}
         </div>
       </div>`;
     }).join('');
+
+    el.onclick = function(e){
+      const profileBtn = e.target.closest('[data-profile-id]');
+      if (profileBtn) showPublicProfile(profileBtn.dataset.profileId, profileBtn.dataset.profileUsername);
+    };
 
     // Batch-load all kudos in one query
     const currentUser = await cloudCurrentUser();
@@ -388,7 +393,7 @@ async function renderLeaderboard() {
 
     el.innerHTML = top25.map((u, i) => {
       const gc = GRADE_COLORS[GRADES.indexOf(u.grade)] || 'var(--accent)';
-      return `<div class="lb-row" onclick="showPublicProfile('${_s(u.id)}','${_s(u.username)}')">
+      return `<div class="lb-row" data-profile-id="${_s(u.id)}" data-profile-username="${_s(u.username)}">
         <div class="lb-rank">${medals[i] || (i + 1)}</div>
         <div class="lb-avatar">${_s(u.emoji)}</div>
         <div class="lb-info">
@@ -399,6 +404,11 @@ async function renderLeaderboard() {
         <div class="lb-grade" style="color:${gc}">${_s(u.grade)}</div>
       </div>${i === 4 ? adBannerHtml : ''}`;
     }).join('');
+
+    el.onclick = function(e){
+      const row = e.target.closest('[data-profile-id]');
+      if (row) showPublicProfile(row.dataset.profileId, row.dataset.profileUsername);
+    };
 
     // Batch-load kudos for the best sessions
     const currentUser = await cloudCurrentUser();
@@ -548,4 +558,4 @@ async function loadFeedKudos() {
 
 // ── HELPERS ──────────────────────────────────────────────
 
-function _s(v) { return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function _s(v) { return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
