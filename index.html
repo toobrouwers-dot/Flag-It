@@ -533,6 +533,9 @@ select option{background:#1e1e1e}
 .status-btn.sel-project{background:rgba(127,119,221,.2);border-color:var(--accent);color:var(--accent)}
 .status-btn.sel-completed{background:rgba(76,175,80,.2);border-color:var(--success);color:var(--success)}
 .status-btn.sel-retired{background:rgba(136,136,136,.2);border-color:#888;color:#ccc}
+.status-btn.sel-tone{background:rgba(127,119,221,.2);border-color:var(--accent);color:var(--accent)}
+.narrative-text{font-size:15px;line-height:1.6;margin:12px 0 16px;color:var(--text)}
+.narrative-caption{font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:14px}
 .project-section-label{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
 .project-section-label:first-child{margin-top:0}
 
@@ -1590,6 +1593,9 @@ const I18N_PHRASES=[
   ['Rusttimer','Rest timer'],
   ['Afgelopen','Past'],
   ['Hangboard','Hangboard'],
+  ['Verhalen zijn alleen in het Nederlands beschikbaar','Stories are only available in Dutch'],
+  ['Klimverhaal','Climbing story'],['Nieuw verhaal','New story'],['Herschud','Reshuffle'],
+  ['Poëtisch','Poetic'],['Episch','Epic'],['Droog','Dry'],['Delen','Share'],
 ];
 I18N_PHRASES.sort((a,b)=>b[0].length-a[0].length);
 function i18nTranslate(str){
@@ -1610,6 +1616,7 @@ function translateSubtree(node){
   if(node.nodeType!==1)return;
   const tag=node.tagName;
   if(tag==='SCRIPT'||tag==='STYLE')return;
+  if(node.hasAttribute&&node.hasAttribute('data-no-i18n'))return;
   if(node.hasAttribute&&node.hasAttribute('placeholder')){const v=node.getAttribute('placeholder'),t=_i18nSetIfChanged(v);if(t!==null)node.setAttribute('placeholder',t)}
   if(node.hasAttribute&&node.hasAttribute('title')){const v=node.getAttribute('title'),t=_i18nSetIfChanged(v);if(t!==null)node.setAttribute('title',t)}
   if(node.hasAttribute&&node.hasAttribute('aria-label')){const v=node.getAttribute('aria-label'),t=_i18nSetIfChanged(v);if(t!==null)node.setAttribute('aria-label',t)}
@@ -1638,7 +1645,7 @@ initI18nObserver();
 /* ══════════════════════════════════════════
    STATE
 ══════════════════════════════════════════ */
-let sessions=[],gyms=[],goals=[],hangSessions=[],projects=[],injuries=[],competitions=[],gymResets=[];
+let sessions=[],gyms=[],goals=[],hangSessions=[],projects=[],injuries=[],competitions=[],gymResets=[],projectLoreCache={};
 let rivalData=null,rivalName='Rivaal';
 let restPresetSecs=90,restTimerSecs=90,restTimerInterval=null,restTimerRunning=false;
 let setterHolds=[],setterActiveHoldType='hand',setterAngle='Verticaal',setterCols=5,setterRows=8;
@@ -1674,7 +1681,7 @@ function saveProfiles(profiles){
   try{localStorage.setItem(PFK,JSON.stringify(profiles))}catch(e){}
 }
 function profileStorageKeys(id){
-  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id,prk:'flagit_projects_v1_'+id,ijk:'flagit_injuries_v1_'+id,plk:'flagit_plan_v1_'+id,cmpk:'flagit_comp_v1_'+id,rstk:'flagit_resets_v1_'+id,ldk:'flagit_log_draft_v1_'+id};
+  return{sk:'flagit_sessions_v2_'+id,gyk:'flagit_gyms_v1_'+id,gok:'flagit_goals_v2_'+id,hsk:'flagit_hang_v1_'+id,prk:'flagit_projects_v1_'+id,ijk:'flagit_injuries_v1_'+id,plk:'flagit_plan_v1_'+id,cmpk:'flagit_comp_v1_'+id,rstk:'flagit_resets_v1_'+id,ldk:'flagit_log_draft_v1_'+id,plrk:'flagit_project_lore_v1_'+id};
 }
 function maybeRunMigration(){
   const profiles=loadProfiles();
@@ -1984,7 +1991,7 @@ async function renderFeedbackAdmin(){
    STORAGE
    — sessies en hangsessies worden elk apart opgeslagen
 ══════════════════════════════════════════ */
-let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1',PRK='flagit_projects_v1',IJK='flagit_injuries_v1',PLK='flagit_plan_v1',CMPK='flagit_comp_v1',RSTK='flagit_resets_v1',LDK='flagit_log_draft_v1';
+let SK='flagit_sessions_v2',GYK='flagit_gyms_v1',GOK='flagit_goals_v2',HSK='flagit_hang_v1',PRK='flagit_projects_v1',IJK='flagit_injuries_v1',PLK='flagit_plan_v1',CMPK='flagit_comp_v1',RSTK='flagit_resets_v1',LDK='flagit_log_draft_v1',PLRK='flagit_project_lore_v1';
 
 function save(){
   _routesCache=null;
@@ -2024,6 +2031,15 @@ function saveResets(){
 function saveProjects(){
   try{localStorage.setItem(PRK,JSON.stringify(projects))}catch(e){toast('Opslaan mislukt','#e53935')}
   if(typeof cloudMarkDirty==='function'){cloudMarkDirty('projects',activeProfileId);cloudScheduleSync(activeProfileId);}
+}
+// Lokaal-only cache voor gegenereerde quest-lore (project-titel + blurb) — bewust NIET gesynct naar Supabase,
+// want cloud.js's _toRow() spreadt het volledige projectobject; een ad-hoc veld zou de upsert breken zonder schema-migratie.
+function loadProjectLore(){
+  try{const r=localStorage.getItem(PLRK);if(r){const p=JSON.parse(r);if(p&&typeof p==='object')return p}}catch(e){}
+  return{};
+}
+function saveProjectLore(){
+  try{localStorage.setItem(PLRK,JSON.stringify(projectLoreCache))}catch(e){toast('Opslaan mislukt','#e53935')}
 }
 // Generiek verwijder-patroon: muteer array in place, bewaar, her-render.
 function deleteItem(arr,id,saveFn,renderFn){
@@ -2192,6 +2208,31 @@ function toast(msg,color){
   t.style.pointerEvents='none';t.style.cursor='';t.onclick=null;
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)
 }
+
+/* ══════════════════════════════════════════
+   NARRATIEF-ENGINE — seeded template generator
+   Puur client-side, deterministisch: zelfde seed geeft altijd
+   dezelfde uitkomst. Gebruikt door Klimverhaal en Quest Lore.
+══════════════════════════════════════════ */
+function _seededRand(seedStr){
+  let h=2166136261;
+  const s=String(seedStr);
+  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}
+  let a=h>>>0;
+  return function(){
+    a|=0;a=a+0x6D2B79F5|0;
+    let t=Math.imul(a^a>>>15,1|a);
+    t=t+Math.imul(t^t>>>7,61|t)^t;
+    return((t^t>>>14)>>>0)/4294967296;
+  };
+}
+function _pick(arr,rand){return arr[Math.floor(rand()*arr.length)]}
+function _shuffle(arr,rand){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function _seedFor(id,tone,nonce){return`${id}|${tone}|${nonce||0}`}
 
 /* ══════════════════════════════════════════
    SWIPE NAVIGATION
@@ -2497,6 +2538,9 @@ function renderFeed(){
           </button>
           <button class="btn-edit-session" onclick="shareSession(${s.id})" title="Delen" aria-label="Sessie delen">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+          <button class="btn-edit-session" onclick="showStoryModal(${s.id})" title="Klimverhaal" aria-label="Klimverhaal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
           </button>
           <button class="btn-edit-session" onclick="editSession(${s.id})" aria-label="Sessie bewerken">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -3664,7 +3708,10 @@ function showSessionDetailModal(s){
     ${mg?`<div style="font-size:13px;color:var(--muted);margin-bottom:10px">Max: <span style="color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px">${esc(mg.grade)}</span></div>`:''}
     ${s.note?`<div style="font-size:13px;color:var(--muted);font-style:italic;margin-bottom:10px">"${esc(s.note)}"</div>`:''}
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">${chips}</div>
-    <button class="modal-close" onclick="document.getElementById('sess-detail-ov').remove()">Sluiten</button>
+    <div style="display:flex;gap:8px">
+      <button class="modal-close" style="flex:1" onclick="document.getElementById('sess-detail-ov').remove()">Sluiten</button>
+      <button class="btn-save" style="flex:1;padding:14px;font-size:17px" onclick="showStoryModal(${s.id})">📖 Klimverhaal</button>
+    </div>
   </div>`;
   document.body.appendChild(ov);
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
@@ -3732,6 +3779,318 @@ function shareSession(id){
 }
 
 /* ══════════════════════════════════════════
+   KLIMVERHAAL — sessieverhaal generator
+   Puur lokaal: geen netwerk, geen opslag. Elk verhaal wordt
+   on-the-fly opnieuw opgebouwd uit sessiedata + gekozen toon.
+══════════════════════════════════════════ */
+const STORY_TONES=['episch','droog','poetisch'];
+const STORY_TONE_LABELS={episch:'Episch',droog:'Droog',poetisch:'Poëtisch'};
+const STORY_BANK={
+  episch:{
+    opening:[
+      "In {gym} daalde de stilte neer voor de strijd begon.",
+      "De muren van {gym} wachtten, koud en onverbiddelijk, op een nieuwe uitdager.",
+      "Vandaag trok de klimmer ten strijde tegen de rots van {gym}.",
+      "Geen aankondiging, geen fanfare — alleen krijt, huid en de wil om te winnen in {gym}.",
+      "De legende begint zoals alle legendes beginnen: met een greep en een besluit, in {gym}.",
+      "{gym} zag vandaag een gevecht dat de kronieken waard is.",
+      "Terwijl anderen twijfelden, trok een klimmer vastberaden de krijtzak open in {gym}.",
+      "De arena heette vandaag {gym}, en de vijand was, zoals altijd, de zwaartekracht."
+    ],
+    body_hardestGrade:[
+      "Op de rots van graad {grade} boog de berg uiteindelijk het hoofd.",
+      "{grade} probeerde te weerstaan, maar viel voor vastberadenheid.",
+      "De kroon van de dag droeg graad {grade}, veroverd na een meedogenloos gevecht.",
+      "Waar {grade} anderen had teruggedrongen, week het vandaag opzij.",
+      "Een route van graad {grade} werd tot bondgenoot gemaakt, niet tot vijand.",
+      "Op de top van {grade} stond, heel even, een overwinnaar."
+    ],
+    body_flash:[
+      "Eén poging was genoeg — de flash sloeg in als een bliksemschicht.",
+      "Zonder aarzeling, zonder vallen: de flash schreef zichzelf in de annalen.",
+      "De rots werd in één ademtocht overmeesterd, geen seconde te veel.",
+      "Er was geen tweede kans nodig — de eerste was al genoeg.",
+      "Zo'n overwinning in één poging wordt niet vergeten, alleen bezongen.",
+      "De greep werd genomen alsof hij al honderd keer geoefend was — flash, meteen raak."
+    ],
+    body_manyFalls:[
+      "De rots vocht terug, keer op keer, en elke val was een nieuwe les.",
+      "Wat niet lukte in de eerste poging, werd niet opgegeven maar herhaald, koppig en onwrikbaar.",
+      "Vallen hoorde bij het gevecht — opstaan hoorde er ook bij.",
+      "De route eiste zijn tol in mislukte pogingen, maar de klimmer bleef terugkeren.",
+      "Zoveel pogingen, zoveel keer opnieuw beginnen — dat is geen falen, dat is volharding.",
+      "De muur won vandaag meerdere rondes, maar niet de oorlog."
+    ],
+    body_lowFeel:[
+      "De krachten waren niet op hun best, maar de wil hield stand.",
+      "Het lichaam was moe, de geest bleef strijdvaardig.",
+      "Geen glorieuze dag qua kracht, maar wel een dag van doorzetten.",
+      "Zelfs met lood in de armen bleef de klimmer de rots trotseren.",
+      "Vandaag was zwaar — en toch werd er niet opgegeven."
+    ],
+    body_highFeel:[
+      "De kracht stroomde door elke greep, alsof de rots geen tegenstand bood.",
+      "Dit was een dag waarop alles lukte, een dag om te onthouden.",
+      "Sterk, scherp, onverzettelijk — zo betrad de klimmer vandaag de muur.",
+      "Elke beweging voelde moeiteloos, alsof de zwaartekracht even rust nam.",
+      "Op zijn best gaf de klimmer de muur het nakijken."
+    ],
+    body_volume:[
+      "Route na route werd bedwongen, een lange mars over de rots.",
+      "Het was geen enkel gevecht, maar een hele veldslag van grepen en bewegingen.",
+      "De hoeveelheid routes vandaag getuigt van een leger aan doorzettingsvermogen.",
+      "Van de eerste tot de laatste route hield de vastberadenheid stand.",
+      "Een dag vol beklimmingen, elk een klein hoofdstuk in een groter verhaal."
+    ],
+    body_generic:[
+      "Ook een korte veldslag is een veldslag.",
+      "Niet elke dag hoeft een epos te zijn om het onthouden waard te zijn.",
+      "De rots werd bezocht, en dat alleen al is een daad van moed.",
+      "Klein of groot, elke sessie voegt een regel toe aan het verhaal.",
+      "De strijd was kort vandaag, maar de vastberadenheid was groot."
+    ],
+    closing:[
+      "En zo eindigt weer een dag in de kronieken van {gym}.",
+      "De muur wacht al op de terugkeer — de strijd is nooit echt voorbij.",
+      "Met krijt op de handen en een verhaal in het hart verliet de klimmer {gym}.",
+      "Het gevecht is gestreden, de overwinning genoteerd, de legende groeit.",
+      "Tot de volgende keer, {gym} — de rots vergeet niet, en de klimmer ook niet.",
+      "Zo eindigt dit hoofdstuk, maar het boek is nog lang niet uit.",
+      "De zon zakte, de krijtstof daalde neer, en het verhaal van vandaag was geschreven.",
+      "In {gym} is vandaag geschiedenis geschreven, al is het maar een kleine regel."
+    ]
+  },
+  droog:{
+    opening:[
+      "Weer naar {gym} gegaan, met de gebruikelijke mix van ambitie en zelfoverschatting.",
+      "In {gym} werd vandaag serieus geprobeerd indruk te maken op de zwaartekracht.",
+      "De dag begon zoals altijd: optimistisch, en dat hield ongeveer tien minuten stand in {gym}.",
+      "Weer eens naar {gym}, ditmaal met een plan. Het plan overleefde de eerste route niet.",
+      "In {gym} werd besloten dat vandaag Dé Dag zou worden. Statistisch gezien klopte dat deels.",
+      "{gym} stond klaar, de klimmer ook — al was dat laatste maar de vraag.",
+      "Vandaag naar {gym}, met frisse energie en een hardnekkige overtuiging dat dit zou lukken.",
+      "In {gym} begon het zoals het altijd begint: met te veel zelfvertrouwen bij de eerste greep."
+    ],
+    body_hardestGrade:[
+      "Uiteindelijk lukte {grade} — na een gesprek met de route dat niet helemaal wederzijds was.",
+      "{grade} ging eraan, al kostte het meer overtuigingskracht dan sportiviteit.",
+      "Er werd {grade} gehaald, wat volgens goede bronnen (de klimmer zelf) vrij indrukwekkend was.",
+      "Na wat onderhandelen met de fysica werd {grade} alsnog binnengehaald.",
+      "{grade}: gedaan. Verder nog vragen?",
+      "Het hoogtepunt was {grade}, wat de rest van de dag meteen relativeerde."
+    ],
+    body_flash:[
+      "Eén keer geprobeerd, meteen gelukt — de rest van de dag kon dus eigenlijk niks meer stuk.",
+      "De flash kwam zomaar aanwaaien, tot eigen verbazing vooral.",
+      "Zelden zo makkelijk gegaan — verdacht makkelijk zelfs.",
+      "Eerste poging, meteen raak. Het geluk was duidelijk even mee.",
+      "Geen worsteling, geen strijd — gewoon foutloos naar boven, wat bijna saai voelde.",
+      "In één keer boven, wat de rest van de sessie een beetje overbodig maakte."
+    ],
+    body_manyFalls:[
+      "Er werd meer gevallen dan geklommen, wat statistisch ook een prestatie is.",
+      "De route en ik hadden een lang gesprek, vooral bestaand uit 'nee'.",
+      "Zoveel pogingen dat de route inmiddels wel weet hoe ik heet.",
+      "Vallen werd bijna een specialiteit vandaag.",
+      "Na de zoveelste val begon het bijna een gewoonte te worden.",
+      "De zwaartekracht won duidelijk op punten vandaag."
+    ],
+    body_lowFeel:[
+      "De energie was er niet echt, maar de koppigheid des te meer.",
+      "Het lichaam stemde tegen, de agenda stemde voor — dus toch maar gegaan.",
+      "Vandaag voelde alles zwaarder dan het eigenlijk was, inclusief de lucht.",
+      "Niet de sterkste dag, maar wel eentje die geteld heeft.",
+      "Moe begonnen, moe gebleven, en toch iets gedaan — dat telt ook."
+    ],
+    body_highFeel:[
+      "Zelden zo lekker gegaan — bijna verdacht goed, eigenlijk.",
+      "Alles lukte vandaag, wat statistisch gezien niet normaal is.",
+      "Kracht en vorm zaten precies goed, voor de verandering.",
+      "Een dag waarop zelfs de moeilijke routes een beetje meewerkten.",
+      "Alles voelde licht, wat op zich al verdacht was."
+    ],
+    body_volume:[
+      "Er werd flink wat routes gedaan — de armen zullen morgen ongetwijfeld protesteren.",
+      "Een hele stapel routes verwerkt, alsof het een to-dolijst was.",
+      "Het aantal routes vandaag rechtvaardigt zeker de extra koffie erna.",
+      "Productieve sessie, in klimtermen: veel geklommen, weinig geklaagd.",
+      "Een flinke hoeveelheid routes, en de handen weten het inmiddels ook."
+    ],
+    body_generic:[
+      "Kort maar krachtig, of in ieder geval kort.",
+      "Niet de meest legendarische sessie, maar wel eentje die geteld heeft.",
+      "Gewoon geklommen, zoals dat gaat — niks bijzonders, en dat is ook prima.",
+      "Er is geklommen. Dat is het verslag, in het kort.",
+      "Klein sessietje, groot enthousiasme — of in ieder geval het idee daarvan."
+    ],
+    closing:[
+      "Zo eindigde de sessie in {gym}, met meer krijt op de kleren dan grip in de handen.",
+      "En daarmee zit de sessie in {gym} erop — de bank wacht, terecht.",
+      "Weer een dag in {gym} overleefd. De volgende komt vanzelf, met dezelfde ambities.",
+      "Kortom: gegaan, geklommen, en met een goed gevoel weer weg uit {gym}.",
+      "Tot de volgende keer in {gym} — de armen hebben nu even rust verdiend.",
+      "Zo, dat was het weer voor vandaag. {gym} wint sowieso de volgende ronde ook wel weer een beetje.",
+      "Klaar voor vandaag. {gym} blijft gewoon staan, ongeïnteresseerd als altijd.",
+      "En zo sluit deze sessie af — niet perfect, maar prima genoeg."
+    ]
+  },
+  poetisch:{
+    opening:[
+      "In {gym} hing de stilte als krijtstof in het licht, wachtend op beweging.",
+      "De rots van {gym} ademde koud en geduldig, terwijl vingers zich naar grip tastten.",
+      "Tussen muur en huid ontstond vandaag in {gym} een stil gesprek.",
+      "Het licht viel schuin over de grepen van {gym}, en de dag begon zonder woorden.",
+      "In {gym} werd de zwaartekracht even een danspartner, geen vijand.",
+      "De handen vonden hun ritme tegen de koele rots van {gym}.",
+      "Zoals elke dag begon ook deze in {gym} met adem, krijt en verwachting.",
+      "De muur van {gym} wachtte roerloos, terwijl de klimmer zich naar boven verlangde."
+    ],
+    body_hardestGrade:[
+      "Op {grade} vond het lichaam even zijn zwaartepunt in de lucht.",
+      "{grade} voelde als een gedicht dat pas bij de laatste regel zijn betekenis prijsgaf.",
+      "Op de rand van {grade} lag een moment van volledige stilte, en toen: beweging.",
+      "{grade} liet zich lezen als een verhaal met een moeilijke, maar mooie zin.",
+      "Bij {grade} smolt twijfel samen met vertrouwen, en de top kwam vanzelf dichterbij.",
+      "In de lijnen van {grade} school een belofte, ingelost met de laatste greep."
+    ],
+    body_flash:[
+      "Eén poging, en de beweging vond zichzelf al vloeiend een weg naar boven.",
+      "Zonder aarzeling streek de klim zich uit als een enkele, zuivere lijn.",
+      "De eerste keer was meteen de juiste — een zeldzaam soort helderheid.",
+      "Het lichaam wist de weg al voordat het hoofd het kon bedenken.",
+      "In één adem naar boven, alsof de route allang op deze dag had gewacht.",
+      "Geen omweg, geen aarzeling — enkel een rechte lijn naar de top."
+    ],
+    body_manyFalls:[
+      "De val kwam vaker dan de top, en toch bleef elke poging een eigen klein gedicht.",
+      "Wat niet lukte, werd niet vergeten — het werd een volgende poging, zachter geschreven.",
+      "Elke val voegde een regel toe aan een verhaal dat nog niet af was.",
+      "De rots gaf niet meteen toe, en dat leerde geduld dat woorden niet konden geven.",
+      "Vallen werd, langzaam, een eigen soort ritme — niet mislukking, maar herhaling.",
+      "Tussen elke val en elke nieuwe poging lag een stilte vol vastberadenheid."
+    ],
+    body_lowFeel:[
+      "Het lichaam was zwaar vandaag, als regen die niet wilde vallen.",
+      "De kracht was ver weg, maar de wil bleef dichtbij.",
+      "Vandaag voelde de rots kouder aan dan anders, en de grip moeizamer.",
+      "Moeheid hing als een sluier over elke beweging, en toch werd er bewogen.",
+      "Niet elke dag hoeft licht te voelen om waardevol te zijn."
+    ],
+    body_highFeel:[
+      "Het lichaam voelde licht, bijna gewichtloos tegen de rots.",
+      "Kracht en rust vonden elkaar in iedere greep.",
+      "Vandaag bewoog alles moeiteloos, als water dat zijn weg vindt.",
+      "De muur voelde zachter aan dan anders, gastvrijer bijna.",
+      "Een dag waarop lichaam en rots hetzelfde ritme leken te delen."
+    ],
+    body_volume:[
+      "Route na route reeg zich aaneen als kralen aan een lange dag.",
+      "De grepen stapelden zich op tot een klein landschap van vandaag.",
+      "Zoveel routes, zoveel korte verhalen naast elkaar.",
+      "De dag vulde zich langzaam met beweging, laag over laag.",
+      "Elke beklommen route voegde een nieuwe kleur toe aan de dag."
+    ],
+    body_generic:[
+      "Ook een korte sessie laat sporen na, al zijn ze klein.",
+      "Niet elk bezoek aan de rots hoeft een verhaal op zich te zijn.",
+      "Soms is aanwezigheid genoeg, zonder grote woorden.",
+      "Een korte adempauze tussen twee stukken rots — ook dat telt.",
+      "Klein was de sessie, maar niet betekenisloos."
+    ],
+    closing:[
+      "En toen was het stil weer in {gym}, alsof er niets was gebeurd — behalve alles.",
+      "De krijtstof daalde neer in {gym}, en met haar de laatste spanning van de dag.",
+      "Buiten {gym} wachtte de wereld, een beetje trager dan daarbinnen.",
+      "Zo sloot de dag zich, zacht, om het verhaal van vandaag in {gym}.",
+      "De handen waren moe, het hoofd stil, en {gym} bleef achter in het licht.",
+      "Tot een volgende dag, {gym} — de rots vergeet niets, en onthoudt alles.",
+      "Het verhaal van vandaag eindigt hier, in {gym}, zacht en onaf.",
+      "En met de laatste adem sloot de sessie zich, ergens tussen rots en lucht."
+    ]
+  }
+};
+function computeStorySignals(session){
+  const routes=session.routes||[];
+  const total=routes.length;
+  const flashCount=routes.filter(r=>r.result==='flash').length;
+  const pogingCount=routes.filter(r=>r.result==='poging').length;
+  const mg=maxGrade(routes);
+  return{
+    gym:session.gym||'de zaal',
+    total,flashCount,pogingCount,
+    pogingRatio:total?pogingCount/total:0,
+    feel:session.feel,
+    grade:mg?mg.grade:null
+  };
+}
+function generateSessionStory(session,tone,nonce){
+  const sig=computeStorySignals(session);
+  const rand=_seededRand(_seedFor(session.id,tone,nonce));
+  const bank=STORY_BANK[tone]||STORY_BANK.episch;
+  const fill=str=>str.replace(/\{gym\}/g,sig.gym).replace(/\{grade\}/g,sig.grade||'');
+  const bodyPool=[];
+  if(sig.grade)bodyPool.push('body_hardestGrade');
+  if(sig.flashCount>0)bodyPool.push('body_flash');
+  if(sig.total>=3&&sig.pogingRatio>0.5)bodyPool.push('body_manyFalls');
+  if(sig.feel!=null&&sig.feel<=1)bodyPool.push('body_lowFeel');
+  if(sig.feel!=null&&sig.feel>=2)bodyPool.push('body_highFeel');
+  if(sig.total>=6)bodyPool.push('body_volume');
+  if(!bodyPool.length)bodyPool.push('body_generic');
+  const parts=[fill(_pick(bank.opening,rand))];
+  _shuffle(bodyPool,rand).slice(0,3).forEach(cat=>parts.push(fill(_pick(bank[cat],rand))));
+  parts.push(fill(_pick(bank.closing,rand)));
+  return parts.join(' ');
+}
+let _storyState={sessionId:null,tone:'episch',nonce:0};
+function showStoryModal(sessionId){
+  document.getElementById('story-modal-ov')?.remove();
+  const s=sessions.find(x=>x.id===sessionId);if(!s)return;
+  _storyState={sessionId,tone:'episch',nonce:0};
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='story-modal-ov';
+  ov.innerHTML=`<div class="modal-box">
+    <div class="modal-title">📖 Klimverhaal</div>
+    <div id="story-modal-body">${_renderStoryModalBody(s,_storyState.tone,_storyState.nonce)}</div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="confirm-cancel" onclick="_shareStory(${sessionId})">Delen</button>
+      <button class="btn-save" style="flex:1;padding:14px;font-size:17px" onclick="_shuffleStory(${sessionId})">🔀 Herschud</button>
+    </div>
+    <button class="modal-close" style="margin-top:8px" onclick="document.getElementById('story-modal-ov').remove()">Sluiten</button>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+function _renderStoryModalBody(session,tone,nonce){
+  const story=generateSessionStory(session,tone,nonce);
+  const tabs=STORY_TONES.map(t=>`<button class="status-btn ${t===tone?'sel-tone':''}" onclick="_setStoryTone(${session.id},'${t}')">${STORY_TONE_LABELS[t]}</button>`).join('');
+  return`<div class="status-toggle">${tabs}</div>
+    <div class="narrative-text" data-no-i18n>${esc(story)}</div>
+    <div class="narrative-caption">Verhalen zijn alleen in het Nederlands beschikbaar</div>`;
+}
+function _setStoryTone(sessionId,tone){
+  _storyState.tone=tone;_storyState.nonce=0;
+  const s=sessions.find(x=>x.id===sessionId);
+  const el=document.getElementById('story-modal-body');
+  if(el&&s)el.innerHTML=_renderStoryModalBody(s,tone,0);
+}
+function _shuffleStory(sessionId){
+  _storyState.nonce=(_storyState.nonce||0)+1;
+  const s=sessions.find(x=>x.id===sessionId);
+  const el=document.getElementById('story-modal-body');
+  if(el&&s)el.innerHTML=_renderStoryModalBody(s,_storyState.tone,_storyState.nonce);
+  haptic(8);
+}
+function _shareStory(sessionId){
+  const s=sessions.find(x=>x.id===sessionId);if(!s)return;
+  const story=generateSessionStory(s,_storyState.tone,_storyState.nonce);
+  const text=`📖 ${story}\n\n— gelogd met Flag-It 🏔️`;
+  if(navigator.share){
+    navigator.share({title:'Mijn klimverhaal',text}).catch(()=>{});
+  }else if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(()=>toast('Gekopieerd naar klembord')).catch(()=>{});
+  }
+}
+
+/* ══════════════════════════════════════════
    PROJECTS
 ══════════════════════════════════════════ */
 function renderProjects(){
@@ -3780,6 +4139,7 @@ function renderProjects(){
         ${p.betaNotes?`<div class="project-beta-preview">📝 ${esc(p.betaNotes)}</div>`:''}
         <div class="project-card-actions">
           <button class="btn-edit-project" onclick="openProjectModal(${p.id})">Bewerken</button>
+          <button class="btn-edit-project" onclick="showProjectLoreModal(${p.id})">📜 Lore</button>
           ${p.setterData&&p.setterData.holds&&p.setterData.holds.some(Boolean)?`<button class="btn-edit-project" style="background:rgba(127,119,221,.12);border-color:rgba(127,119,221,.3);color:var(--accent)" onclick="viewProjectSetter(${p.id})">🗺️ Kaart</button>`:''}
           <button class="btn-delete btn-delete-project" onclick="deleteProject(${p.id})" title="Verwijderen">${trashSVG}</button>
         </div>
@@ -3809,6 +4169,7 @@ function deleteProject(id){
 }
 function confirmDeleteProject(id){
   deleteItem(projects,id,saveProjects,renderProjects);
+  if(projectLoreCache[id]){delete projectLoreCache[id];saveProjectLore();}
   toast('Project verwijderd','#e53935');
 }
 
@@ -3885,6 +4246,188 @@ function saveProjectFromModal(id){
   saveProjects();renderProjects();
   haptic(15);
   toast(id?'Project bijgewerkt!':'Project toegevoegd!');
+}
+
+/* ══════════════════════════════════════════
+   PROJECT QUEST LORE — fantasy quest generator
+   Titel + blurb worden één keer gegenereerd en lokaal gecachet
+   (projectLoreCache) — regenereren kan altijd via de knop in de modal.
+══════════════════════════════════════════ */
+const LORE_TITLE_PARTS={
+  prefixes:['De Beproeving van','Het Raadsel van','De Poort naar','De Belofte van','Het Pad naar','De Fluistering van','De Wacht bij','Het Litteken van','De Sleutel tot','De Schaduw over','Het Gefluister van','De Drempel van','Het Gezicht van','De Stilte van','Het Hart van'],
+  nouns:{
+    laag:['de Eerste Stap','het Ochtendlicht','de Groene Wand','het Beginnersgeluk','de Zachte Helling','het Lentepad','de Open Deur','het Speelse Randje','de Wakkere Wand','het Nieuwe Begin','de Lichte Muur','het Vriendelijke Gezicht','de Korte Weg','het Warme Welkom','de Eerste Poort'],
+    midden:['de Grijze Rots','het Kruispunt','de Stille Wand','het Verborgen Pad','de Lange Adem','het Wankele Punt','de Halve Waarheid','het Onzekere Randje','de Diepe Zucht','het Volgehouden Gevecht','de Twijfelzone','het Verre Uitzicht','de Koude Schaduw','het Zware Woord','de Onvoltooide Zin'],
+    hoog:['de Onmogelijke Wand','het Laatste Bastion','de Ondergang','het Duister','de Verboden Lijn','het Eeuwige Nee','de IJzeren Muur','het Zwarte Randje','de Vergeten Vloek','het Onverbiddelijke Pad','de Doodlopende Weg','het Grimmige Randje','de Steile Waarheid','het Onneembare Bastion','de Laatste Adem']
+  }
+};
+const LORE_BLURB={
+  project:{
+    opening:[
+      "Dit is geen gewone route — dit is een queeste.",
+      "Ergens in de rots ligt een geheim verborgen, en de zoektocht is nog niet voorbij.",
+      "Niet elke wand laat zich zomaar lezen; deze vraagt om geduld.",
+      "De muur bewaart haar geheimen goed, maar niet voor altijd.",
+      "Elke poging is een nieuwe bladzijde in een verhaal dat nog geschreven wordt.",
+      "Deze route heeft een naam verdiend, en een verhaal dat nog niet af is.",
+      "Sommige wanden moet je overtuigen, niet overwinnen.",
+      "Dit is het soort project waar legendes van gemaakt worden — ooit.",
+      "De rots stelt een vraag; het antwoord laat nog op zich wachten.",
+      "Niet alle queestes worden in één dag voltooid, en dat is precies het punt."
+    ],
+    middle:{
+      eerste:[
+        "De eerste verkenning is gedaan — de wand is gezien, nog niet doorgrond.",
+        "Nog maar net begonnen aan deze queeste, en de wand houdt haar geheimen nog vast.",
+        "Eén poging is achter de rug; de rest van het verhaal moet nog komen.",
+        "De eerste stap op dit pad is gezet — voorzichtig, verkennend.",
+        "Een enkele poging, en toch voelt de wand al bekend en onbekend tegelijk."
+      ],
+      weinig:[
+        "Een handvol pogingen verder, en de contouren van de weg worden zichtbaarder.",
+        "Stap voor stap wordt het pad duidelijker, al is het einde nog ver.",
+        "De queeste is begonnen, en elke poging brengt nieuwe kennis van de rots.",
+        "Nog geen doorbraak, maar wel voortgang — de wand begint te wijken.",
+        "De eerste puzzelstukjes van deze wand beginnen op hun plek te vallen."
+      ],
+      veel:[
+        "Talloze pogingen zijn al ondernomen, en de vastberadenheid groeit met elke val.",
+        "De wand heeft haar sporen achtergelaten, maar zo heeft de klimmer die ook op haar.",
+        "Dit is geen kortstondige ontmoeting meer — dit is een langdurige queeste geworden.",
+        "Veel pogingen, veel lessen — de wand geeft langzaam prijs wat ze verbergt.",
+        "De strijd sleept voort, maar opgeven staat niet in dit verhaal geschreven."
+      ],
+      talloos:[
+        "Zoveel pogingen dat de wand en de klimmer inmiddels oude bekenden zijn.",
+        "Dit is een queeste die grenst aan obsessie — en dat is precies wat legendes maakt.",
+        "De rots heeft geteld, de klimmer ook — en beide tellingen lopen hoog op.",
+        "Wat begon als een project is een levenswerk geworden, of voelt in ieder geval zo.",
+        "Talloze pogingen, talloze verhalen — allemaal onderdeel van dezelfde queeste."
+      ]
+    },
+    closing:[
+      "Het einde van dit verhaal is nog niet geschreven.",
+      "De queeste gaat door — de volgende poging wacht al.",
+      "Nog niet voltooid, maar zeker niet vergeten.",
+      "De wand blijft staan, en de klimmer blijft komen.",
+      "Dit hoofdstuk is nog niet af — wordt vervolgd.",
+      "Ooit valt deze wand. Vandaag nog niet, maar ooit.",
+      "De queeste sluimert tot de volgende sessie — dan gaat het verhaal verder.",
+      "Zo blijft het project staan: onvoltooid, onverslagen, wachtend."
+    ]
+  },
+  completed:{
+    opening:[
+      "Deze queeste is volbracht.",
+      "Wat ooit een raadsel was, is nu een herinnering aan een overwinning.",
+      "De wand die zoveel vroeg, heeft uiteindelijk toegegeven.",
+      "Dit verhaal heeft een einde gekregen — en het is een goed einde.",
+      "Een lange weg is afgelegd, en de top is bereikt.",
+      "Waar eerst twijfel was, staat nu een overwinning geschreven.",
+      "De laatste greep is genomen, de queeste is voltooid.",
+      "Dit hoofdstuk sluit af zoals het hoort: met een top."
+    ],
+    middle:[
+      "Wat eerst onmogelijk leek, werd stap voor stap overwonnen.",
+      "Elke eerdere val was, achteraf gezien, een noodzakelijke les.",
+      "De doorbraak kwam niet toevallig — die werd verdiend.",
+      "Het verhaal van deze wand eindigt met een overwinning, geschreven in doorzettingsvermogen.",
+      "De queeste vroeg om geduld, en het geduld werd beloond.",
+      "Wat lang een vraag was, kreeg eindelijk een antwoord.",
+      "De wand hield lang stand, maar niet voor altijd.",
+      "Uiteindelijk boog de rots, en de klimmer stond boven."
+    ],
+    closing:[
+      "Deze queeste is afgesloten — met eer.",
+      "Het verhaal is compleet, en het staat in de kronieken geschreven.",
+      "Een voltooide legende, klaar om herinnerd te worden.",
+      "Dit hoofdstuk is dicht — tijd voor de volgende wand.",
+      "De top is bereikt, en dat wordt niet meer afgenomen.",
+      "Zo eindigt een queeste zoals elke queeste zou moeten eindigen: met succes.",
+      "Deze wand behoort nu tot het verleden — overwonnen, niet vergeten.",
+      "Een afgesloten hoofdstuk, een open toekomst voor de volgende beklimming."
+    ]
+  },
+  retired:{
+    opening:[
+      "Deze queeste is neergelegd, niet voltooid, maar ook niet vergeten.",
+      "Sommige wanden win je niet — je laat ze gewoon los.",
+      "Dit verhaal eindigt zonder overwinning, en dat is ook een einde.",
+      "De queeste is gestaakt; de wand houdt haar geheim voorlopig.",
+      "Niet elke wand hoeft bedwongen te worden om het proberen waard te zijn geweest.",
+      "Deze rots blijft onbedwongen — voor nu, of voor altijd.",
+      "Het pad is verlaten, maar de voetstappen blijven zichtbaar.",
+      "Sommige verhalen eindigen zonder climax, en dat is oké."
+    ],
+    middle:[
+      "De pogingen leverden geen top op, maar wel lessen die blijven hangen.",
+      "Wat niet lukte, was geen falen — het was gewoon een ander soort einde.",
+      "De wand bleek een gesloten deur, en die deur is dichtgelaten.",
+      "Er waren pogingen genoeg; de wand koos er gewoon voor niet toe te geven.",
+      "Soms is het sterkste wat je kunt doen, stoppen.",
+      "De queeste ligt stil, maar het verhaal ervan blijft bestaan.",
+      "Niet elke wand wordt bedwongen — sommige worden gewoon onthouden.",
+      "De rots wint deze ronde, en dat is ook een uitkomst."
+    ],
+    closing:[
+      "Deze queeste is neergelegd — misschien voorgoed, misschien voor even.",
+      "Het boek sluit hier, zonder spijt.",
+      "Zo blijft deze wand: onbedwongen, en dat is prima.",
+      "Een gestaakte queeste is nog altijd een verhaal dat verteld mag worden.",
+      "Wie weet keert de klimmer terug — wie weet ook niet.",
+      "Deze legende eindigt onvoltooid, en dat is ook een soort vrede.",
+      "Het pad wordt hier verlaten; de rots blijft wachten, onaangeraakt.",
+      "Zo sluit dit hoofdstuk, stil en zonder fanfare."
+    ]
+  }
+};
+function computeLoreSignals(project){
+  const gIdx=gi(project.grade);
+  const tier=gIdx<8?'laag':gIdx<16?'midden':'hoog';
+  const attempts=project.attempts||0;
+  const attemptsBucket=attempts<=1?'eerste':attempts<=5?'weinig':attempts<=15?'veel':'talloos';
+  return{tier,attemptsBucket,status:LORE_BLURB[project.status]?project.status:'project'};
+}
+function generateProjectLore(project,nonce){
+  const sig=computeLoreSignals(project);
+  const rand=_seededRand(_seedFor(project.id,'lore',nonce));
+  const title=`${_pick(LORE_TITLE_PARTS.prefixes,rand)} ${_pick(LORE_TITLE_PARTS.nouns[sig.tier],rand)}`;
+  const bank=LORE_BLURB[sig.status];
+  const middlePool=Array.isArray(bank.middle)?bank.middle:bank.middle[sig.attemptsBucket];
+  const blurb=[_pick(bank.opening,rand),_pick(middlePool,rand),_pick(bank.closing,rand)].join(' ');
+  return{title,blurb};
+}
+function showProjectLoreModal(projectId){
+  document.getElementById('lore-modal-ov')?.remove();
+  const p=projects.find(x=>x.id===projectId);if(!p)return;
+  let entry=projectLoreCache[projectId];
+  if(!entry){entry=generateProjectLore(p,0);entry.nonce=0;projectLoreCache[projectId]=entry;saveProjectLore();}
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='lore-modal-ov';
+  ov.innerHTML=`<div class="modal-box">
+    <div id="lore-modal-body">${_renderLoreModalBody(entry)}</div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="confirm-cancel" onclick="document.getElementById('lore-modal-ov').remove()">Sluiten</button>
+      <button class="btn-save" style="flex:1;padding:14px;font-size:17px" onclick="regenerateProjectLore(${projectId})">🔀 Nieuw verhaal</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+function _renderLoreModalBody(entry){
+  return`<div class="modal-title" data-no-i18n>📜 ${esc(entry.title)}</div>
+    <div class="narrative-text" data-no-i18n>${esc(entry.blurb)}</div>
+    <div class="narrative-caption">Verhalen zijn alleen in het Nederlands beschikbaar</div>`;
+}
+function regenerateProjectLore(projectId){
+  const p=projects.find(x=>x.id===projectId);if(!p)return;
+  const prevNonce=(projectLoreCache[projectId]&&projectLoreCache[projectId].nonce)||0;
+  const entry=generateProjectLore(p,prevNonce+1);
+  entry.nonce=prevNonce+1;
+  projectLoreCache[projectId]=entry;
+  saveProjectLore();
+  const el=document.getElementById('lore-modal-body');
+  if(el)el.innerHTML=_renderLoreModalBody(entry);
+  haptic(8);
 }
 
 /* ══════════════════════════════════════════
@@ -5339,7 +5882,7 @@ function initApp(profileId){
 
   // Point storage keys at this profile's namespace
   const keys=profileStorageKeys(profileId);
-  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;PRK=keys.prk;IJK=keys.ijk;PLK=keys.plk;CMPK=keys.cmpk;RSTK=keys.rstk;LDK=keys.ldk;
+  SK=keys.sk;GYK=keys.gyk;GOK=keys.gok;HSK=keys.hsk;PRK=keys.prk;IJK=keys.ijk;PLK=keys.plk;CMPK=keys.cmpk;RSTK=keys.rstk;LDK=keys.ldk;PLRK=keys.plrk;
 
   // Load data
   sessions=loadArr(SK,'bsessions');
@@ -5347,6 +5890,7 @@ function initApp(profileId){
   goals=loadArr(GOK);
   hangSessions=loadArr(HSK);
   projects=loadArr(PRK);
+  projectLoreCache=loadProjectLore();
   injuries=loadArr(IJK);
   competitions=loadArr(CMPK);
   gymResets=loadArr(RSTK);
