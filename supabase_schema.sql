@@ -325,6 +325,14 @@ alter table public.accounts
 revoke update (is_admin) on public.accounts from authenticated;
 revoke update (is_admin) on public.accounts from anon;
 
+-- SECURITY FIX: "accounts_public_read" (regel ~198) filtert alleen op
+-- rijen, niet op kolommen — zonder onderstaande REVOKE kan iedereen
+-- zonder in te loggen "select is_admin from accounts" uitvoeren en zo
+-- precies zien welke accounts adminrechten hebben. check_is_admin()
+-- blijft werken (security definer functies omzeilen kolom-grants).
+revoke select (is_admin) on public.accounts from authenticated;
+revoke select (is_admin) on public.accounts from anon;
+
 -- Globale app-instellingen (key/value)
 create table if not exists public.app_settings (
   key        text primary key,

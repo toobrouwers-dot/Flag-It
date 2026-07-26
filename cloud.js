@@ -264,7 +264,7 @@ async function cloudGetAccount() {
   if (!cloudReady()) return null;
   const user = await cloudCurrentUser();
   if (!user) return null;
-  const { data } = await db().from('accounts').select('*').eq('id', user.id).maybeSingle();
+  const { data } = await db().from('accounts').select('id,username,display_name,emoji,bio,is_public,local_profiles,created_at').eq('id', user.id).maybeSingle();
   return data;
 }
 

@@ -296,7 +296,7 @@ async function showPublicProfile(userId, username) {
   const me = await cloudCurrentUser();
 
   const [acctRes, sessRes] = await Promise.all([
-    db().from('accounts').select('*').eq('id', userId).maybeSingle(),
+    db().from('accounts').select('id,username,display_name,emoji,bio,is_public,created_at').eq('id', userId).maybeSingle(),
     db().from('sessions').select('date,routes,gym').eq('user_id', userId).eq('is_public', true)
       .order('date', { ascending: false }).limit(20)
   ]);
