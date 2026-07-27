@@ -1012,7 +1012,7 @@ select option{background:#1e1e1e}
           </div>
         </div>
       </div>
-      <div class="input-row"><div class="field"><label>Notitie (optioneel)</label><textarea id="inp-note" placeholder="Uitdagingen, tips voor jezelf, bijzonderheden..." oninput="_saveDraftDebounced()"></textarea></div></div>
+      <div class="input-row"><div class="field"><label>Notitie (optioneel)</label><textarea id="inp-note" data-no-i18n placeholder="Uitdagingen, tips voor jezelf, bijzonderheden..." oninput="_saveDraftDebounced()"></textarea></div></div>
       <div class="feel-section">
         <div class="feel-label">Hoe voelde de sessie?</div>
         <div class="feel-row">
@@ -1331,9 +1331,14 @@ const I18N_PATTERNS=[
   [/Over (\d+) dag(en)?/g,(m,n,en)=>`In ${n} day${en?'s':''}`],
   [/(\d+) dagen geleden gereset/g,(m,n)=>`Reset ${n} days ago`],
   [/^Rivaal geïmporteerd: (.+)!$/,'Rival imported: $1!'],
+  [/^Je trainingsbelasting deze week \((\d+)\) is (-?\d+)% hoger dan je 4-weeksgemiddelde \((\d+)\)\. Plan een rustdag of lichte sessie\.$/,
+    'Your training load this week ($1) is $2% higher than your 4-week average ($3). Plan a rest day or a light session.'],
+  [/^of$/,'or'],
 ];
 const I18N_PHRASES=[
   ['Aanmaken','Create'],['Aanpakken →','Tackle it →'],['Aantal keer','Number of times'],
+  ['project mist jou','project misses you'],['projecten missen jou','projects miss you'],
+  [' dagen geen pogingen',' days no attempts'],
   ['Account aanmaken','Create account'],['Account verbinden','Connect account'],['Account bijgewerkt','Account updated'],
   ['Actief profiel','Active profile'],['Activiteitskalender','Activity calendar'],
   ['Advertenties','Ads'],['Advertentie','Ad'],['Advies voor jou','Advice for you'],
@@ -1375,6 +1380,8 @@ const I18N_PHRASES=[
   ['Gevolgd!','Followed!'],['Gevolgde klimmers hebben nog niets gedeeld','Climbers you follow haven\'t shared anything yet'],
   ['Gevonden','Found'],
   ['Gewicht (kg extra)','Weight (extra kg)'],['Gisteren gereset','Reset yesterday'],
+  ['Lekker bezig! 💪','Nice work! 💪'],['Goed geklommen! 🧗','Well climbed! 🧗'],
+  ['Mooie sessie! 🏔️','Great session! 🏔️'],['Blijf zo doorgaan! 📈','Keep it up! 📈'],
   ['Goed','Good'],
   ['Grade Normalisatie','Grade Normalization'],
   ['Graden met ≥3 pogingen maar <50% slagingskans','Grades with ≥3 attempts but <50% success rate'],
@@ -1459,11 +1466,19 @@ const I18N_PHRASES=[
   ['Op basis van jouw eigen sessies — jij klimt het minst op ','Based on your own sessions — you climb least on '],
   ['Op deze dag vorig jaar','On this day last year'],
   ['Openbaar profiel','Public profile'],['Opslaan mislukt: ','Save failed: '],['Opslaan mislukt','Save failed'],['Opslaan','Save'],
+  ['Openbaar — tik om privé te maken','Public — tap to make private'],['Privé — tik om te delen','Private — tap to share'],
+  ['🌐 Openbaar op ranglijst','🌐 Public on leaderboard'],
+  ['🌐 Openbaar','🌐 Public'],['🔒 Privé','🔒 Private'],['Openbaar','Public'],['Privé','Private'],
   ['Per gym','Per gym'],
   ['Piramide Audit ✓','Pyramid Audit ✓'],['Piramide Audit','Pyramid Audit'],
   ['Poging','Attempt'],['Pogingen','Attempts'],
   ['Profiel bijgewerkt!','Profile updated!'],['Profiel geïmporteerd!','Profile imported!'],
+  ['Geïmporteerd profiel','Imported profile'],
   ['Profiel hernoemen','Rename profile'],['Profiel verwijderd','Profile deleted'],
+  ['★ Favoriet','★ Favorite'],['Favoriet','Favorite'],
+  ['↑ Importeer','↑ Import'],
+  ['Een bug gevonden, een idee, of een vraag? Laat het weten — je bericht komt direct bij de ontwikkelaar terecht.','Found a bug, have an idea, or a question? Let us know — your message goes straight to the developer.'],
+  ['Profiel','Profile'],
   ['Profiel verwijderen?','Delete profile?'],['Profiel verwijderen','Delete profile'],['Profielen','Profiles'],
   ['Project (optioneel)','Project (optional)'],['Project bewerken','Edit project'],['Project verwijderd','Project deleted'],
   ['Project verwijderen?','Delete project?'],['Projecten','Projects'],
@@ -1509,18 +1524,147 @@ const I18N_PHRASES=[
   ['Graad Doorbraak','Grade Breakthrough'],['8 weken gericht jouw PR verbeteren','8 weeks focused on improving your PR'],
   ['6 weken je flash-percentage verhogen','6 weeks improving your flash percentage'],
   ['Fingerboard Kracht','Fingerboard Strength'],['6 weken vingersterkte opbouwen','6 weeks building finger strength'],
+  ['Je hebt al geklommen vandaag — geef je vingers de rest van de dag.','You\'ve already climbed today — give your fingers the rest of the day.'],
+  ['sessies in 4 dagen is veel. Plan een rustdag voor optimale progressie.','sessions in 4 days is a lot. Plan a rest day for optimal progression.'],
+  ['Gisteren hard getraind en hoge weekbelasting — rust of doe mobiliteit.','Trained hard yesterday and high weekly load — rest or do mobility work.'],
+  ['dagen rust — je vingers zijn fris. Perfecte dag om te klimmen.','days rest — your fingers are fresh. Perfect day to climb.'],
+  ['2 dagen rust is voldoende herstel. Go!','2 days rest is enough recovery. Go!'],
+  ['Belasting is normaal. Voel je goed? Ga ervoor!','Load is normal. Feel good? Go for it!'],
+  ['Geen herstelwaarschuwingen — training is groen.','No recovery warnings — training is green.'],
+  ['Rust vandaag','Rest today'],['Klim vandaag!','Climb today!'],['Train vandaag?','Train today?'],
+  ['🫀 Vingerbelasting','🫀 Finger load'],
+  ['Vingers zijn fris en hersteld','Fingers are fresh and recovered'],
+  ['Matige belasting — herstel aanbevolen','Moderate load — recovery recommended'],
+  ['Hoge belasting — plan een rustdag','High load — plan a rest day'],
+  ['📅 Weekplan','📅 Week plan'],
+  ['Klimmen','Climb'],['Gedaan','Done'],['Rust','Rest'],
+  ['✨ Jouw statistieken','✨ Your statistics'],
+  ['Focuspunt voor vandaag','Focus point for today'],
+  ['📈 Graadprogressie','📈 Grade progression'],
+  ['Al ','Already '],[' dagen op ',' days at '],
+  ['Eerste sessie!','First session!'],['Welkom bij Flag it!','Welcome to Flag-It!'],
+  [' sessies gelogd — top bezig!',' sessions logged — great work!'],
+  [' sessies bij dezelfde gym. Een andere locatie = andere setters, stijlen en graden. Heel goed voor brede ontwikkeling.',' sessions at the same gym. A different location means different setters, styles and grades — great for broad development.'],
+  ['de doorbraak kan nu elk moment komen!','the breakthrough could come any moment now!'],
+  ['Op jouw progressietempo bereik je ','At your progress rate you\'ll reach '],
+  [' over ~',' in ~'],
+  ['3 sessies op comfortzone','3 sessions in comfort zone'],
+  ['Focus op techniek en lezen','Focus on technique and reading'],
+  ['Geen projecten — rustig opbouwen','No projects — build up steadily'],
+  ['Bewust voetplaatsing oefenen','Practice deliberate foot placement'],
+  ['Probeer routes 2× te flashen','Try to flash routes 2×'],
+  ['Kies 2 routes 1 graad boven PR','Choose 2 routes 1 grade above PR'],
+  ['Analyseer moves vóór je pakt','Analyze moves before you grab on'],
+  ['Leg beta vast in Projecten','Record beta in Projects'],
+  ['Max. 1 lichte sessie','Max. 1 light session'],
+  ['8 uur slaap per nacht','8 hours of sleep per night'],
+  ['Herhaal week 1 met meer volume','Repeat week 1 with more volume'],
+  ['2× hangboard sessie','2× hangboard session'],
+  ['Let op slaagpercentage in Stats','Watch your success rate in Stats'],
+  ['Klimt op jouw grens, minder routes','Climb at your limit, fewer routes'],
+  ['Probeer alle projectroutes opnieuw','Try all project routes again'],
+  ['Hangboard: voeg licht gewicht toe','Hangboard: add light weight'],
+  ['Volledig gericht op doelgraad','Fully focused on target grade'],
+  ['30 min warm-up voor elke sessie','30 min warm-up before every session'],
+  ['Registreer elke poging','Log every attempt'],
+  ['Lichte sessie + reflectie','Light session + reflection'],
+  ['Vergelijk PR voor/na plan','Compare PR before/after plan'],
+  ['Plan volgend blok op data','Plan next block based on data'],
+  ['Plan volgend blok','Plan next block'],
+  ['30 sec route lezen vóór je pakt','30 sec reading the route before you grab on'],
+  ['Loop moves na in gedachten','Mentally rehearse the moves'],
+  ['Log eerlijk: flash of top','Log honestly: flash or top'],
+  ['Klimt 1 graad onder PR','Climb 1 grade below PR'],
+  ['Doel: 80%+ flash-rate','Goal: 80%+ flash rate'],
+  ['Voetplaatsing bewust houden','Stay deliberate about foot placement'],
+  ['Pak routes zonder te twijfelen','Grab routes without hesitating'],
+  ['Oefen decisief klimmen','Practice decisive climbing'],
+  ['Minder rustpauzes per route','Fewer rest pauses per route'],
+  ['Bekijk flash-trend in Stats','Check your flash trend in Stats'],
+  ['Meer routes, niveau iets lager','More routes, slightly lower level'],
+  ['Flash-rate bijhouden na sessie','Track flash rate after session'],
+  ['Varieer route-types','Vary route types'],
+  ['Routes 1 graad boven gebruikelijk','Routes 1 grade above usual'],
+  ['Focus op eerste poging','Focus on first attempt'],
+  ['Evalueer flash-trend in Stats','Evaluate flash trend in Stats'],
+  ['Lichte sessie','Light session'],
+  ['Rust 3 min tussen sets','Rest 3 min between sets'],
+  ['2× per week, boulderen apart','2× per week, separate from bouldering'],
+  ['Voeg 1s toe aan elke hang','Add 1s to every hang'],
+  ['Probeer een 2e griptype','Try a 2nd grip type'],
+  ['Log hangtijd in Hangboard','Log hang time in Hangboard'],
+  ['3 sets per grip, 3 grips per sessie','3 sets per grip, 3 grips per session'],
+  ['Focus op volgreep & krim','Focus on full crimp & crimp'],
+  ['Volledig rusten tussen sets','Rest fully between sets'],
+  ['Halveer volume deze week','Halve volume this week'],
+  ['Boulderen mag wel','Bouldering is fine'],
+  ['Vingers rust gunnen','Give your fingers a rest'],
+  ['5–10% extra gewicht indien mogelijk','5–10% extra weight if possible'],
+  ['Minder reps, zwaarder','Fewer reps, heavier'],
+  ['Krim & open hand afwisselen','Alternate crimp & open hand'],
+  ['Max hang-test per grip bijhouden','Track max hang test per grip'],
+  ['Vergelijk met week 1','Compare with week 1'],
+  ['Je slaagkans op ','Your success rate on '],
+  ['% — kies bewust 3 ','% — deliberately choose 3 '],
+  ['-routes en analyseer de moves voor je pakt. ','-routes and analyze the moves before you grab on. '],
+  [' lukken al goed (',' are already doing well ('],
+  [' is je zwakste grip (gem. ',' is your weakest grip (avg. '],
+  ['s hangtijd). Voeg 2 extra sets toe aan je volgende hangboardsessie.','s hang time). Add 2 extra sets to your next hangboard session.'],
+  ['Probeer ','Try '],
+  ['Je PR staat op ','Your PR is at '],
+  ['-route die bij jouw stijl past en analyseer hem goed. Eén serieuze poging per sessie is genoeg.','-route that fits your style and analyze it well. One serious attempt per session is enough.'],
+  ['Je trainingsindex is ','Your training index is '],
+  ['% boven gemiddeld. Goed dat je hard klimt — zorg voor voldoende slaap en eiwitten.','% above average. Good that you\'re climbing hard — make sure you get enough sleep and protein.'],
+  ['Je vingers herstellen in 48 uur — plan een rustdag voor optimale progressie. Mobiliteit of lichte cardio mag wel.','Your fingers recover in 48 hours — plan a rest day for optimal progression. Mobility or light cardio is fine.'],
+  ['Jouw laatste sessie (','Your last session ('],
+  [' routes, gevoel 😓) was ',' routes, feeling 😓) was '],
+  ['. Neem rust of doe een mobiliteitsroutine.','. Take rest or do a mobility routine.'],
+  ['gisteren','yesterday'],
+  ['Plateau bij ','Plateau at '],
+  ['Kies bewust 2–3 routes op ','Deliberately choose 2–3 routes at '],
+  [', analyseer de moves en plan gerichte projectsessies. Wissel ook van gym of sector voor nieuwe stimuli.',', analyze the moves and plan focused project sessions. Also consider switching gym or sector for new stimuli.'],
+  ['Werk aan ','Work on '],
+  ['% slaagkans)','% success chance)'],
+  [' lukken goed (',' work well ('],
+  ['%), maar ','%), but '],
+  [' is een zwakke plek. Kies in je volgende sessie bewust ',' is a weak spot. In your next session, deliberately choose '],
+  ['-routes om dit te trainen.','-routes to train this.'],
+  ['% nu. Warm beter op en focus op lees-techniek: lees routes 30 seconden voor je pakt.','% now. Warm up better and focus on reading technique: read routes for 30 seconds before you grab on.'],
+  ['Na ','After '],
+  [' sessies is vingersterkte jouw grootste groeikans. Begin met 2× per week 5 sets max hangs — 10 minuten is genoeg.',' sessions, finger strength is your biggest growth opportunity. Start with 2× per week 5 sets of max hangs — 10 minutes is enough.'],
+  ['Plan 3× per week 5 sets max hangs tot falen. Bouw per week ~1s op. Op 10s switch je naar repeaters.','Plan 3× per week 5 sets of max hangs to failure. Build up ~1s per week. At 10s switch to repeaters.'],
+  ['s max hang — klaar voor repeaters! 7s hang / 3s rust × 6 reps, 2–3 sets per grip. Bouwt kracht én uithoudingsvermogen.','s max hang — ready for repeaters! 7s hang / 3s rest × 6 reps, 2–3 sets per grip. Builds strength and endurance.'],
+  ['s — indrukwekkend! Voeg 5–10% lichaamsgewicht toe en hang 5–7s, 5 sets per grip. Dit is de snelste doorbraakstrategie.','s — impressive! Add 5–10% bodyweight and hang 5–7s, 5 sets per grip. This is the fastest breakthrough strategy.'],
+  [' weken op rij actief!',' weeks active in a row!'],
+  [' weken op rij!',' weeks in a row!'],
+  ['Consistentie is de #1 voorspeller van progressie. Hou dit tempo vast — plan komende week je sessies alvast in je agenda.','Consistency is the #1 predictor of progress. Keep up this pace — plan next week\'s sessions in your calendar in advance.'],
+  [' heb je de hoogste slagingsrate (',' you have the highest success rate ('],
+  ['1 rustdag','1 rest day'],['2 rustdagen','2 rest days'],['3+ rustdagen','3+ rest days'],
+  ['routes geklommen, waarvan ','routes climbed, of which '],
+  [' geflasht',' flashed'],
+  ['Gemiddeld ','Average '],
+  [' routes per sessie',' routes per session'],
+  ['slagingsrate','success rate'],
   ['Graad-doel toevoegen','Add grade goal'],['Herhaling-doel toevoegen','Add repeat goal'],
+  ['Graad-doel','Grade goal'],['Herhaling-doel','Repeat goal'],
+  ['Gehaald!','Achieved!'],['Competitie','Competition'],
   ['Voeg je eerste project toe en houd bij hoe ver je komt op jouw droute.','Add your first project and track how far you get on your route.'],
   ['Rijen','Rows'],
   ['Route instellen','Set route'],['Route toegevoegd vanuit setter!','Route added from setter!'],['Route toevoegen →','Add route →'],
+  ['🏗️ Instellen','🏗️ Set'],
+  ['Route toevoegen','Add route'],
   ['Routes per graad (geslaagd)','Routes per grade (sent)'],
   ['Rust (sec)','Rest (sec)'],['Rusttimer','Rest timer'],
   ['Schrijf een reactie…','Write a comment…'],
   ['Sessie bewerken','Edit session'],['Sessie delen','Share session'],
+  ['Sessie openbaar','Session public'],['Sessie privé','Session private'],
+  ['klimmer','climber'],
   ['Sessie info','Session info'],['Sessie loggen','Log session'],
   ['Sessie opgeslagen — nieuwe sessie gestart!','Session saved — new session started!'],
   ['Sessie opslaan','Save session'],['Sessie replay','Session replay'],
   ['Sessie verlaten?','Leave session?'],['Sessie verwijderd','Session deleted'],['Sessie verwijderen?','Delete session?'],
+  ['Je hebt ','You have '],
+  [' gelogd. Dit concept blijft bewaard tot je het opslaat of expliciet opnieuw begint.',' logged. This draft stays saved until you save it or explicitly start over.'],
   ['Sessies','Sessions'],['Sessietijd','Session time'],['sessies','sessions'],['Sessie','Session'],
   ['— geen —','— none —'],['— Kies een gym —','— Choose a gym —'],
   ['slagingspercentage','success rate'],['Slagingspercentage','Success rate'],
@@ -1529,14 +1673,44 @@ const I18N_PHRASES=[
   ['Stel doelen in','Set goals'],['Stoke Radar','Stoke Radar'],
   ['Supabase niet geconfigureerd','Supabase not configured'],['Sync status','Sync status'],
   ['Teruggetr.','Withdr.'],['Toepassen ✓','Apply ✓'],['Toevoegen','Add'],
+  ['🎯 Actieve projecten','🎯 Active projects'],['💤 Teruggetrokken','💤 Withdrawn'],['Teruggetrokken','Withdrawn'],
   ['Top!','Top!'],
   ['Totaal routes','Total routes'],['Train vandaag?','Train today?'],['Trainingsbelasting','Training load'],
   ['Trainingsplan gestart!','Training plan started!'],['Trainingsplan gestopt','Training plan stopped'],['Doel verwijderd','Goal deleted'],
   ['Uitdagingen, tips voor jezelf, bijzonderheden...','Challenges, tips for yourself, details...'],
+  ['Vorige notitie: ','Previous note: '],
   ['Uitgelogd','Logged out'],
   ['Uitloggen / ander account','Log out / switch account'],['Uitloggen','Log out'],
   ['URL (https://...)','URL (https://...)'],
   ['Verbinding mislukt','Connection failed'],['Verbind je account','Connect your account'],
+  ['Sync mislukt','Sync failed'],
+  ['Offline — data wordt later gesynchroniseerd','Offline — data will sync later'],
+  ['☁ Niet geconfigureerd','☁ Not configured'],
+  ['Gesynchroniseerd ☁','Synced ☁'],['Synchroniseren…','Syncing…'],
+  ['Doorgaan met Google','Continue with Google'],
+  ['Vul eerst je e-mailadres in','Please enter your email address first'],
+  ['Reset-link verzonden! Controleer je e-mail.','Reset link sent! Check your email.'],
+  ['Verzenden mislukt','Send failed'],['Versturen mislukt','Send failed'],
+  ['Ongeldig e-mailadres of wachtwoord.','Invalid email address or password.'],
+  ['E-mail nog niet bevestigd. Controleer je inbox en klik op de bevestigingslink.','Email not yet confirmed. Check your inbox and click the confirmation link.'],
+  ['Dit e-mailadres is al in gebruik.','This email address is already in use.'],
+  ['Wachtwoord moet minimaal 6 tekens zijn.','Password must be at least 6 characters.'],
+  ['Wachtwoord moet minimaal 6 tekens zijn','Password must be at least 6 characters'],
+  ['Te veel pogingen. Probeer het later opnieuw.','Too many attempts. Try again later.'],
+  ['Netwerkfout. Controleer je internetverbinding.','Network error. Check your internet connection.'],
+  ['Vul alle velden in','Please fill in all fields'],
+  ['Ingelogd!','Logged in!'],
+  ['Inloggen mislukt','Login failed'],
+  ['Wachtwoorden komen niet overeen','Passwords do not match'],
+  ['Account aangemaakt! Controleer je e-mail en log dan in.','Account created! Check your email and then log in.'],
+  ['Account aangemaakt!','Account created!'],
+  ['Registreren mislukt','Sign up failed'],
+  ['Google-login mislukt','Google login failed'],
+  ['Google-login starten…','Starting Google login…'],
+  ['Welkom terug, ','Welcome back, '],
+  ['Cloud niet beschikbaar','Cloud not available'],
+  ['Bericht is verplicht','Message is required'],
+  ['Back-up importeren','Import backup'],
   ['Verder zonder account','Continue without account'],
   ['verwacht over','expected in'],
   ['Verlaten','Leave'],['Verlopen','Expired'],
@@ -1544,6 +1718,29 @@ const I18N_PHRASES=[
   ['Versturen','Send'],
   ['Verwijderd','Deleted'],['Verwijderen','Delete'],
   ['Vinger Gezondheid','Finger Health'],
+  ['Hoog risico','High risk'],['Matig risico','Moderate risk'],['Laag risico','Low risk'],
+  ['▶ Start rust','▶ Start rest'],['+ Set toevoegen','+ Add set'],['+ Blessure toevoegen','+ Add injury'],
+  ['Licht — voelbaar na klimmen','Mild — noticeable after climbing'],
+  ['Matig — pijn tijdens klimmen','Moderate — pain during climbing'],
+  ['Fors — beperkt klimmen','Significant — limits climbing'],
+  ['Ernstig — niet kunnen klimmen','Severe — unable to climb'],
+  ['Zwaar — volledige rust','Heavy — complete rest'],
+  ['s totaal','s total'],[' rust',' rest'],
+  ['Verhoogd herletselrisico','Increased re-injury risk'],
+  ['Licht','Mild'],['Fors','Significant'],['Ernstig','Severe'],['Matig','Moderate'],
+  ['voelbaar na klimmen','noticeable after climbing'],
+  ['pijn tijdens klimmen','pain during climbing'],
+  ['beperkt klimmen','limited climbing'],
+  ['niet kunnen klimmen','unable to climb'],
+  ['volledige rust','complete rest'],
+  ['A2 pulley (ringvinger)','A2 pulley (ring finger)'],
+  ['A2 pulley (middelvinger)','A2 pulley (middle finger)'],
+  ['A2 pulley (wijsvinger)','A2 pulley (index finger)'],
+  ['Biceps pees','Biceps tendon'],['Pols','Wrist'],
+  ['Elleboog (mediaal)','Elbow (medial)'],['Elleboog (lateraal)','Elbow (lateral)'],
+  ['Schouder','Shoulder'],['Rug/kern','Back/core'],['Anders','Other'],
+  ['Actief tonen in feed','Show as active in feed'],
+  ['Actief','Active'],
   ['Voeg eerst een gym toe','Add a gym first'],['Voeg eerst een set toe','Add a set first'],
   ['Voeg een route toe','Add a route'],['Voeg een set toe','Add a set'],
   ['Voeg Flag-It toe','Add Flag-It'],
@@ -1558,10 +1755,13 @@ const I18N_PHRASES=[
   ['Voor alle gebruikers tegelijk','For all users at once'],
   ['Vorige week','Last week'],['vorige maand','last month'],['deze maand','this month'],
   ['Vandaag gereset','Reset today'],['Vandaag','Today'],['vandaag','today'],
-  ['vaker','more often'],['minder','less'],['geleden','ago'],['dagen','days'],['dag','day'],
+  ['vaker','more often'],['minder','less'],['geleden','ago'],['dagen','days'],
+  ['zondag','Sunday'],['maandag','Monday'],['dinsdag','Tuesday'],['woensdag','Wednesday'],
+  ['donderdag','Thursday'],['vrijdag','Friday'],['zaterdag','Saturday'],
+  ['dag','day'],
   ['Wachtwoord vergeten?','Forgot password?'],['Wachtwoord (min. 6 tekens)','Password (min. 6 characters)'],['Wachtwoord','Password'],
   ['Weergavenaam','Display name'],['Wijzig','Change'],['Wijzigingen opslaan','Save changes'],
-  ['Wis rivaal','Clear rival'],['Wisselen','Switch'],['Wis','Clear'],
+  ['Wis rivaal','Clear rival'],['Wisselen','Switch'],['Wis','Clear'],['Weg','Gone'],
   ['is je zwakste type — kies in je volgende sessie bewust','is your weakest type — deliberately choose'],
   ['Zwakste route-types','Weakest route types'],
   ['Zoek klimmers via het zoekicoon','Search climbers via the search icon'],
@@ -1575,6 +1775,15 @@ const I18N_PHRASES=[
   ['kies bewust','deliberately choose'],
   ['routes op deze graad en analyseer de moves.','routes at this grade and analyze the moves.'],
   ['Zwakste:','Weakest:'],
+  ['Volgende graad','Next grade'],
+  ['🎯 Zwakke plekken','🎯 Weak spots'],
+  ['Gem. geslaagde graad per gym — vergelijkt moeilijkheidsinstelling','Avg. sent grade per gym — compares difficulty rating'],
+  ['Betrouwbaarheid: ','Confidence: '],
+  ['Voorspelde datum: ','Predicted date: '],
+  [' (gebaseerd op ',' (based on '],[' gesendte graden)',' sent grades)'],
+  ['Alles','All'],['aanbevolen','recommended'],['geslaagd','sent'],['referentie','reference'],
+  [' achter op schema 👀',' behind schedule 👀'],
+  ['gem. ','avg. '],
   ['Gepauzeerd op','Paused at'],['Gepauzeerd','Paused'],
   ['Aan het rusten...','Resting...'],['Pauzeren','Pause'],
   ['Gebruik timer (','Use timer ('],
@@ -1636,9 +1845,13 @@ function initI18nObserver(){
     for(const m of muts){
       m.addedNodes.forEach(n=>translateSubtree(n));
       if(m.type==='characterData'&&m.target.parentNode)translateSubtree(m.target);
+      if(m.type==='attributes'&&m.target.nodeType===1&&m.attributeName){
+        const el=m.target,attr=m.attributeName;
+        if(el.hasAttribute(attr)){const v=el.getAttribute(attr),t=_i18nSetIfChanged(v);if(t!==null)el.setAttribute(attr,t)}
+      }
     }
   });
-  observer.observe(document.body,{childList:true,subtree:true,characterData:true});
+  observer.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['placeholder','title','aria-label']});
 }
 initI18nObserver();
 
@@ -2526,7 +2739,7 @@ function renderFeed(){
         <div>
           <div class="activity-gym">${esc(s.gym||'Gym')}</div>
           <div class="activity-date">${fmtDate(s.date)} · ${s.routes.length} route${s.routes.length!==1?'s':''}${(s.sessionStart&&s.sessionEnd)?' · ⏱ '+fmtSecs(Math.floor((s.sessionEnd-s.sessionStart)/1000)):''}${feelStr}</div>
-          ${s.note?`<div class="activity-note">"${esc(s.note)}"</div>`:''}
+          ${s.note?`<div class="activity-note" data-no-i18n>"${esc(s.note)}"</div>`:''}
         </div>
         <div style="display:flex;align-items:flex-start;gap:4px">
           <div style="text-align:right;margin-right:8px"><div class="activity-max">${mg?mg.grade:'—'}</div><div class="activity-max-label">max</div></div>
@@ -2646,8 +2859,8 @@ const getFavGym=()=>{const f=gyms.find(g=>g.fav);return f?f.name:(gyms[0]?gyms[0
 function refreshNotePlaceholder(){
   const el=document.getElementById('inp-note');if(!el)return;
   const last=[...sessions].reverse().find(s=>s.note&&s.note.trim());
-  if(last){const p=last.note.trim();el.placeholder='Vorige notitie: "'+p.slice(0,60)+(p.length>60?'…':'')+'"';}
-  else el.placeholder='Uitdagingen, tips voor jezelf, bijzonderheden...';
+  if(last){const p=last.note.trim();el.placeholder=i18nTranslate('Vorige notitie: ')+'"'+p.slice(0,60)+(p.length>60?'…':'')+'"';}
+  else el.placeholder=i18nTranslate('Uitdagingen, tips voor jezelf, bijzonderheden...');
 }
 function refreshGymSelect(){
   const sel=document.getElementById('inp-gym-select'),cur=sel.value;
@@ -2858,7 +3071,7 @@ function updateSessStatsBar(){
   let maxIdx=-1,topped=0;
   cards.forEach(c=>{const id=c.id.replace('rc-','');const g=document.getElementById('rg-'+id)?.value;const r=document.getElementById('rr-'+id)?.value;const gi=GRADES.indexOf(g);if(gi>maxIdx)maxIdx=gi;if(r==='top'||r==='flash')topped++;});
   bar.className='sess-stats-bar has-routes';
-  bar.textContent=`${cards.length} route${cards.length!==1?'s':''} · Max: ${GRADES[maxIdx]||'—'} · ${topped} gelukt`;
+  bar.textContent=`${cards.length} route${cards.length!==1?'s':''} · Max: ${GRADES[maxIdx]||'—'} · ${topped} ${currentLang==='en'?'topped':'gelukt'}`;
 }
 
 function _collectRoutes(){
@@ -3361,7 +3574,7 @@ function renderHangPage(){
       <div>
         <div class="hang-card-date">${fmtDate(s.date)}</div>
         <div class="hang-card-sub">${s.sets.length} set${s.sets.length!==1?'s':''} · ${s.sets.reduce((a,b)=>a+(b.time*b.reps),0)}s totaal</div>
-        ${s.note?`<div class="hang-card-note">"${esc(s.note)}"</div>`:''}
+        ${s.note?`<div class="hang-card-note" data-no-i18n>"${esc(s.note)}"</div>`:''}
       </div>
       <button class="btn-delete" onclick="deleteHangSession(${s.id})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
@@ -4136,7 +4349,7 @@ function renderProjects(){
           ${statusClass==='project'?`<button class="btn-attempt" onclick="logAttempt(${p.id})">+ Poging</button>`:''}
         </div>
         ${p.highpoint?`<div class="project-note-preview">📍 Highpoint: ${esc(p.highpoint)}</div>`:''}
-        ${p.betaNotes?`<div class="project-beta-preview">📝 ${esc(p.betaNotes)}</div>`:''}
+        ${p.betaNotes?`<div class="project-beta-preview" data-no-i18n>📝 ${esc(p.betaNotes)}</div>`:''}
         <div class="project-card-actions">
           <button class="btn-edit-project" onclick="openProjectModal(${p.id})">Bewerken</button>
           <button class="btn-edit-project" onclick="showProjectLoreModal(${p.id})">📜 Lore</button>
@@ -4738,7 +4951,7 @@ function renderOnThisDay(){
     <div class="otd-icon">📅</div>
     <div>
       <div class="otd-title">Op deze dag vorig jaar</div>
-      <div class="otd-body">${esc(s.gym||'Onbekende gym')} · ${s.routes.length} routes${mg?` · max <strong style="color:var(--accent)">${esc(mg.grade)}</strong>`:''}${s.feel!=null?' · '+feelEmojis[s.feel]:''}${s.note?'<br><em>"'+esc(s.note)+'"</em>':''}</div>
+      <div class="otd-body">${esc(s.gym||'Onbekende gym')} · ${s.routes.length} routes${mg?` · max <strong style="color:var(--accent)">${esc(mg.grade)}</strong>`:''}${s.feel!=null?' · '+feelEmojis[s.feel]:''}${s.note?'<br><em data-no-i18n>"'+esc(s.note)+'"</em>':''}</div>
     </div>
   </div>`;
 }
@@ -4811,7 +5024,7 @@ function renderDagboek(){
     return`<div class="dagboek-entry" style="animation-delay:${i*STAGGER_DELAY_S}s">
       <div class="dagboek-date-lbl">${fmtDate(s.date)}</div>
       <div class="dagboek-gym">${esc(s.gym||'Sessie')}</div>
-      <div class="dagboek-note">"${esc(s.note)}"</div>
+      <div class="dagboek-note" data-no-i18n>"${esc(s.note)}"</div>
       <div class="dagboek-meta">
         ${mg?`<span>${mg.grade}</span>`:''}
         <span>${s.routes.length} routes</span>
@@ -4877,7 +5090,7 @@ function computeInjuryRisk(){
 
   // Active injuries
   const active=injuries.filter(i=>i.status==='active');
-  if(active.length>0){score+=25;factors.push({icon:'🩹',label:`${active.length} actieve blessure${active.length!==1?'s':''}`,detail:'Verhoogd herletselrisico'});}
+  if(active.length>0){score+=25;const _lbl=currentLang==='en'?`${active.length} active injur${active.length!==1?'ies':'y'}`:`${active.length} actieve blessure${active.length!==1?'s':''}`;factors.push({icon:'🩹',label:_lbl,detail:'Verhoogd herletselrisico'});}
 
   score=Math.min(100,Math.round(score));
   const level=score>=67?'danger':score>=34?'warning':'safe';

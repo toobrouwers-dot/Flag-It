@@ -181,7 +181,7 @@ async function renderSocialFeed() {
           <div class="social-max-grade">${maxG?.grade || '—'}</div>
         </div>
         <div class="social-heat-row">${heat}</div>
-        ${s.note ? `<div class="social-note">"${_s(s.note.slice(0, 100))}"</div>` : ''}
+        ${s.note ? `<div class="social-note" data-no-i18n>"${_s(s.note.slice(0, 100))}"</div>` : ''}
         <div class="social-footer">
           <button class="social-kudos-btn" id="kudos-btn-${s.id}" onclick="toggleKudos('${s.id}', this)">
             🤜 <span class="kudos-n">…</span>
@@ -254,7 +254,7 @@ async function showComments(sessionId) {
       <div class="comment-avatar">${_s(c.accounts?.emoji || '🧗')}</div>
       <div class="comment-body">
         <div class="comment-user">${_s(c.accounts?.username || 'klimmer')}</div>
-        <div class="comment-text">${_s(c.content)}</div>
+        <div class="comment-text" data-no-i18n>${_s(c.content)}</div>
       </div>
     </div>`).join('') || '<div style="text-align:center;color:var(--muted);padding:16px;font-size:13px">Nog geen reacties</div>';
 
@@ -315,7 +315,7 @@ async function showPublicProfile(userId, username) {
       <div style="font-size:44px">${_s(acct?.emoji || '🧗')}</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;text-transform:uppercase">${_s(acct?.display_name || acct?.username || username)}</div>
       <div style="color:var(--muted);font-size:13px;margin-top:2px">@${_s(acct?.username || username)}</div>
-      ${acct?.bio ? `<div style="font-size:13px;margin-top:6px;color:var(--text)">${_s(acct.bio)}</div>` : ''}
+      ${acct?.bio ? `<div style="font-size:13px;margin-top:6px;color:var(--text)" data-no-i18n>${_s(acct.bio)}</div>` : ''}
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px">
       <div class="stat-box"><div class="stat-num">${sess.length}</div><div class="stat-label">Sessies</div></div>

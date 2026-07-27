@@ -15,7 +15,7 @@ The app has a **Supabase backend** for cloud sync and social features. Core appl
 | `index.html` | Entire app — CSS, HTML, main JS (~5,600 lines) |
 | `cloud.js` | Supabase auth + multi-device sync (~785 lines) |
 | `social.js` | Kudos, follows, public profiles, feed, leaderboard, comments (~545 lines) |
-| `sw.js` | Service worker — offline caching (cache: `flagit-v22`) |
+| `sw.js` | Service worker — offline caching (cache: `flagit-v24`) |
 | `manifest.json` | PWA manifest |
 | `supabase_schema.sql` | Postgres schema + RLS policies for the Supabase backend |
 | `icons/` | PWA icons (192px, 512px) |
