@@ -1334,6 +1334,7 @@ const I18N_PATTERNS=[
   [/^Je trainingsbelasting deze week \((\d+)\) is (-?\d+)% hoger dan je 4-weeksgemiddelde \((\d+)\)\. Plan een rustdag of lichte sessie\.$/,
     'Your training load this week ($1) is $2% higher than your 4-week average ($3). Plan a rest day or a light session.'],
   [/^of$/,'or'],
+  [/^Week (\d+) van (\d+) · /,'Week $1 of $2 · '],
 ];
 const I18N_PHRASES=[
   ['Aanmaken','Create'],['Aanpakken →','Tackle it →'],['Aantal keer','Number of times'],
@@ -1807,6 +1808,25 @@ const I18N_PHRASES=[
   ['Verhalen zijn alleen in het Nederlands beschikbaar','Stories are only available in Dutch'],
   ['Klimverhaal','Climbing story'],['Nieuw verhaal','New story'],['Herschud','Reshuffle'],
   ['Poëtisch','Poetic'],['Episch','Epic'],['Droog','Dry'],['Delen','Share'],
+  ['Hoofdnavigatie','Main navigation'],['Dupliceer route','Duplicate route'],
+  ['bijv. tot 3e greep voor de eindgreep, of: de crux move lukt niet',"e.g. up to the 3rd hold before the final hold, or: the crux move isn't working"],
+  ['bijv. Linkervoet op de reglette, dan dynamisch naar de slooper boven','e.g. Left foot on the edge, then dynamic to the sloper above'],
+  ['Log je eerste bouldering sessie en begin met het bijhouden van je voortgang.','Log your first bouldering session and start tracking your progress.'],
+  ['Alle sessies, gyms en doelen van dit profiel worden permanent verwijderd.','All sessions, gyms and goals for this profile will be permanently deleted.'],
+  ['aan je startscherm','to your home screen'],
+  ['Tik op een vakje om een greep te plaatsen','Tap a cell to place a hold'],
+  ['Zoek een ','Find a '],
+  ['De reaper is wakker…','The reaper is awake…'],
+  ['Kijk achterom…','Look behind you…'],
+  ['Jij. Kom terug.','You. Come back.'],
+  [' dagen geen sessie. Hij wacht op je.'," days no session. He's waiting for you."],
+  [' dagen geen greep aangeraakt. De reaper is ongeduldig.',' days no hold touched. The reaper is getting impatient.'],
+  [' dagen weg — de reaper heeft je bijna te pakken.',' days gone — the reaper has almost got you.'],
+  ['Mijn klimsessie','My climbing session'],['Klimsessie','Climbing session'],
+  ['Gekopieerd naar klembord','Copied to clipboard'],
+  [' weken resterend',' weeks left'],['Laatste week!','Last week!'],
+  ['% boven gemiddeld','% above average'],
+  ['sessie','session'],
 ];
 I18N_PHRASES.sort((a,b)=>b[0].length-a[0].length);
 function i18nTranslate(str){
