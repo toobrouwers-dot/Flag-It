@@ -1317,6 +1317,26 @@ const TYPES=['Slab','Verticaal','Overhang','Cave','Dyno','Mantle','Pinch','Crimp
 const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch','Open hand','Jug'];
 
 /* ══════════════════════════════════════════
+   MARKETING ATTRIBUTION (utm_source, lang)
+   Vangt query params op vóór de I18N/taal-init hieronder
+   zodat een link als ?utm_source=instagram&lang=en zowel de
+   signup-bron als de taal op de eerste load al zet.
+══════════════════════════════════════════ */
+(function captureMarketingParams(){
+  const qp=new URLSearchParams(location.search);
+  const utmSource=qp.get('utm_source');
+  if(utmSource && !localStorage.getItem('flagit_signup_source_v1')){
+    localStorage.setItem('flagit_signup_source_v1',utmSource);
+  }
+  if(qp.get('lang')==='en'){
+    localStorage.setItem('flagit_lang_v1','en');
+  }
+  if(utmSource || qp.has('lang') || qp.has('utm_medium')){
+    history.replaceState(null,'',location.pathname);
+  }
+})();
+
+/* ══════════════════════════════════════════
    I18N — EN/NL taalkeuze
    NL blijft de brontaal (alle bestaande strings ongewijzigd).
    Vertaling gebeurt live in de DOM zodat geen van de ~200
@@ -5411,10 +5431,11 @@ function generateShareCard(){
   // Footer
   ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(0,H-48,W,1);
   ctx.fillStyle='rgba(175,169,236,.65)';ctx.font='500 11px Arial,sans-serif';ctx.textAlign='center';
-  ctx.fillText('Gelogd met Flag-It  🧗  github.com/flag-it',W/2,H-20);
+  ctx.fillText('@flagit.app  🧗  Try it free',W/2,H-20);
   // Show modal
   const img=c.toDataURL('image/png');
   document.getElementById('share-card-ov')?.remove();
+  const canShareFiles=!!(navigator.canShare && navigator.canShare({files:[new File([],'t.png',{type:'image/png'})]}));
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='share-card-ov';
   ov.innerHTML=`<div class="modal-box" style="max-height:85dvh">
     <div class="modal-title">Jouw Klimkaart 🧗</div>
@@ -5423,6 +5444,7 @@ function generateShareCard(){
     </div>
     <div style="display:flex;gap:8px">
       <button class="confirm-cancel" onclick="document.getElementById('share-card-ov').remove()">Sluiten</button>
+      ${canShareFiles?`<button class="btn-save" style="flex:2;padding:14px;font-size:17px" onclick="shareShareCard('${img}')">↗ Delen</button>`:''}
       <button class="btn-save" style="flex:2;padding:14px;font-size:17px" onclick="downloadShareCard('${img}')">↓ Downloaden</button>
     </div>
   </div>`;
@@ -5433,6 +5455,19 @@ function downloadShareCard(dataUrl){
   const a=document.createElement('a');a.href=dataUrl;a.download='flagit-klimkaart-'+new Date().toISOString().split('T')[0]+'.png';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   toast('Klimkaart gedownload!');
+}
+async function shareShareCard(dataUrl){
+  try{
+    const blob=await (await fetch(dataUrl)).blob();
+    const file=new File([blob],'flagit-klimkaart-'+new Date().toISOString().split('T')[0]+'.png',{type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:'Mijn Klimkaart'});
+    }else{
+      downloadShareCard(dataUrl);
+    }
+  }catch(e){
+    if(e && e.name!=='AbortError')downloadShareCard(dataUrl);
+  }
 }
 
 /* ══════════════════════════════════════════
