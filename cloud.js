@@ -58,7 +58,12 @@ async function cloudSignIn(email, pw) {
 }
 
 async function cloudSignUp(email, pw) {
-  const { data, error } = await db().auth.signUp({ email, password: pw });
+  const signupSource = localStorage.getItem('flagit_signup_source_v1') || 'direct';
+  const { data, error } = await db().auth.signUp({
+    email,
+    password: pw,
+    options: { data: { signup_source: signupSource } }
+  });
   if (error) throw error;
   return data.user;
 }

@@ -264,14 +264,16 @@ declare
   base_username text;
   final_username text;
   suffix int := 0;
+  source text;
 begin
   base_username := split_part(new.email, '@', 1);
   base_username := regexp_replace(base_username, '[^a-zA-Z0-9_]', '', 'g');
   if length(base_username) < 3 then base_username := 'klimmer'; end if;
   final_username := base_username;
+  source := coalesce(new.raw_user_meta_data->>'signup_source', 'direct');
   loop
     begin
-      insert into public.accounts(id, username) values(new.id, final_username);
+      insert into public.accounts(id, username, signup_source) values(new.id, final_username, source);
       exit;
     exception when unique_violation then
       suffix := suffix + 1;
@@ -307,6 +309,21 @@ create index on public.kudos(session_id);
 create index on public.comments(session_id);
 create index on public.follows(follower_id);
 create index on public.follows(following_id);
+
+-- ════════════════════════════════════════════════════════════
+-- MARKETING ATTRIBUTION
+-- Voer dit uit in de Supabase SQL Editor als add-on migratie,
+-- vóór (of samen met) de bijgewerkte handle_new_user()-functie
+-- hierboven die deze kolom invult.
+-- ════════════════════════════════════════════════════════════
+
+alter table public.accounts
+  add column if not exists signup_source text default 'direct';
+
+-- Bewust NIET toevoegen aan de "grant select (...)" kolomlijst
+-- verderop (zelfde reden als is_admin): alleen leesbaar via de
+-- SQL Editor (superuser), niet via de publieke API.
+-- Opvragen: select signup_source, count(*) from accounts group by 1 order by 2 desc;
 
 -- ════════════════════════════════════════════════════════════
 -- ADS INFRASTRUCTURE
