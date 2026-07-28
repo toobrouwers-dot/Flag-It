@@ -5391,9 +5391,9 @@ function generateShareCard(){
   });
   // Stats grid: 4 boxes
   const statItems=[
-    {lbl:'SESSIES',val:String(sessions.length)},
+    {lbl:currentLang==='en'?'SESSIONS':'SESSIES',val:String(sessions.length)},
     {lbl:'ROUTES',val:String(ar.length)},
-    {lbl:'SLAGINGS%',val:rate+'%'},
+    {lbl:currentLang==='en'?'SEND RATE':'SLAGINGS%',val:rate+'%'},
     {lbl:'STREAK',val:streak+(streak===1?' WK':' WK')}
   ];
   const sbW=(W-72)/2,sbH=80;
@@ -5414,7 +5414,7 @@ function generateShareCard(){
   if(topGrades.length){
     const pyY=448;const pyX=32;const pyW=W-64;
     ctx.fillStyle='rgba(127,119,221,.5)';ctx.font='600 10px Arial,sans-serif';ctx.textAlign='left';
-    ctx.fillText('GRADE PYRAMIDE',pyX,pyY-6);
+    ctx.fillText(currentLang==='en'?'GRADE PYRAMID':'GRADE PYRAMIDE',pyX,pyY-6);
     const maxCnt=Math.max(...topGrades.map(g=>cnt[g]||0),1);
     topGrades.forEach((g,i)=>{
       const barY=pyY+i*26;
