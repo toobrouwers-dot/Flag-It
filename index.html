@@ -1313,6 +1313,7 @@ select option{background:#1e1e1e}
 const STAGGER_DELAY_S=0.04;
 const GRADES=['4','4+','5','5+','5a','5b','5c','6a','6a+','6b','6b+','6c','6c+','7a','7a+','7b','7b+','7c','7c+','8a','8a+','8b','8b+'];
 const GRADE_COLORS=['#9FE1CB','#5DCAA5','#1D9E75','#0F6E56','#7EC8A0','#50B090','#2A9480','#B5D4F4','#85B7EB','#378ADD','#185FA5','#CECBF6','#AFA9EC','#7F77DD','#534AB7','#F5C4B3','#F0997B','#D85A30','#993C1D','#F4C0D1','#ED93B1','#D4537E','#993356'];
+const CHART_TICK_COLOR='#888'; // matches --muted; old #666/#555 tick labels fell below WCAG contrast vs the dark chart surface
 const TYPES=['Slab','Verticaal','Overhang','Cave','Dyno','Mantle','Pinch','Crimp','Sloper'];
 const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch','Open hand','Jug'];
 
@@ -3645,7 +3646,7 @@ function renderHangChart(){
   if(!canvas)return;
   if(chartH){chartH.destroy();chartH=null;}
   if(!pts.length)return;
-  chartH=new Chart(canvas,{type:'line',data:{labels:pts.map(p=>p.date.slice(5)),datasets:[{data:pts.map(p=>p.time),borderColor:'#e91e8c',backgroundColor:'rgba(233,30,140,0.1)',borderWidth:2,pointBackgroundColor:'#e91e8c',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#666',font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{beginAtZero:true,ticks:{color:'#666',font:{size:11},callback:v=>fmtSecs(v)},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+  chartH=new Chart(canvas,{type:'line',data:{labels:pts.map(p=>p.date.slice(5)),datasets:[{data:pts.map(p=>p.time),borderColor:'#e91e8c',backgroundColor:'rgba(233,30,140,0.1)',borderWidth:2,pointBackgroundColor:'#e91e8c',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{beginAtZero:true,ticks:{color:CHART_TICK_COLOR,font:{size:11},callback:v=>fmtSecs(v)},grid:{color:'rgba(255,255,255,0.05)'}}}}});
 }
 
 /* ══════════════════════════════════════════
@@ -3882,7 +3883,7 @@ function renderTLI(){
   const canvas=document.getElementById('chart-tli');
   if(!canvas)return;
   if(tliChart){tliChart.destroy();tliChart=null}
-  tliChart=new Chart(canvas,{type:'bar',data:{labels:data.map(d=>d.label),datasets:[{data:data.map(d=>d.tli),backgroundColor:data.map((_,i)=>i===data.length-1?'rgba(127,119,221,.85)':'rgba(127,119,221,.3)'),borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#666',font:{size:10}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+  tliChart=new Chart(canvas,{type:'bar',data:{labels:data.map(d=>d.label),datasets:[{data:data.map(d=>d.tli),backgroundColor:data.map((_,i)=>i===data.length-1?'rgba(127,119,221,.85)':'rgba(127,119,221,.3)'),borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:10}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:CHART_TICK_COLOR,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
 }
 
 /* ══════════════════════════════════════════
@@ -3918,12 +3919,12 @@ function renderStats(){
   const maxPS=[],chartSessions=[];
   sessions.forEach(s=>{const mg=maxGrade(s.routes);if(mg){maxPS.push({date:s.date,idx:gi(mg.grade)});chartSessions.push(s);}});
   if(chartP)chartP.destroy();
-  chartP=new Chart(document.getElementById('chart-progress'),{type:'line',data:{labels:maxPS.map(s=>s.date.slice(5)),datasets:[{data:maxPS.map(s=>s.idx),borderColor:'#7f77dd',backgroundColor:'rgba(127,119,221,0.12)',borderWidth:2,pointBackgroundColor:'#7f77dd',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,items)=>{if(items.length>0)showSessionDetailModal(chartSessions[items[0].index]);},plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#666',font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{min:0,max:GRADES.length-1,ticks:{color:'#666',font:{size:11},callback:v=>GRADES[v]||'',stepSize:2},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+  chartP=new Chart(document.getElementById('chart-progress'),{type:'line',data:{labels:maxPS.map(s=>s.date.slice(5)),datasets:[{data:maxPS.map(s=>s.idx),borderColor:'#7f77dd',backgroundColor:'rgba(127,119,221,0.12)',borderWidth:2,pointBackgroundColor:'#7f77dd',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,items)=>{if(items.length>0)showSessionDetailModal(chartSessions[items[0].index]);},plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{min:0,max:GRADES.length-1,ticks:{color:CHART_TICK_COLOR,font:{size:11},callback:v=>GRADES[v]||'',stepSize:2},grid:{color:'rgba(255,255,255,0.05)'}}}}});
   renderTLI();
 
   const counts={};GRADES.forEach(g=>counts[g]=0);allR.filter(r=>r.result!=='poging').forEach(r=>counts[r.grade]++);const used=GRADES.filter(g=>counts[g]>0);
   if(chartG)chartG.destroy();
-  chartG=new Chart(document.getElementById('chart-grades'),{type:'bar',data:{labels:used.length?used:['—'],datasets:[{data:used.length?used.map(g=>counts[g]):[0],backgroundColor:used.map(g=>GRADE_COLORS[GRADES.indexOf(g)]||'#444'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#666',font:{size:11}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:'#666',font:{size:11},stepSize:1},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+  chartG=new Chart(document.getElementById('chart-grades'),{type:'bar',data:{labels:used.length?used:['—'],datasets:[{data:used.length?used.map(g=>counts[g]):[0],backgroundColor:used.map(g=>GRADE_COLORS[GRADES.indexOf(g)]||'#444'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:CHART_TICK_COLOR,font:{size:11},stepSize:1},grid:{color:'rgba(255,255,255,0.05)'}}}}});
 
   renderPyramid();
   renderPyramidAudit();
@@ -5333,7 +5334,7 @@ function renderStokeRadar(){
       plugins:{legend:{display:false}},
       scales:{r:{
         min:0,max:3,
-        ticks:{color:'#555',font:{size:10},stepSize:1,callback:v=>['😓','😐','💪','🔥'][v]||v,backdropColor:'transparent'},
+        ticks:{color:CHART_TICK_COLOR,font:{size:10},stepSize:1,callback:v=>['😓','😐','💪','🔥'][v]||v,backdropColor:'transparent'},
         grid:{color:'rgba(255,255,255,.07)'},
         angleLines:{color:'rgba(255,255,255,.07)'},
         pointLabels:{color:'#aaa',font:{size:11,family:"'Barlow Condensed',sans-serif",weight:'700'}}
