@@ -473,3 +473,92 @@ as $$
 $$;
 
 grant execute on function public.check_is_admin() to anon, authenticated;
+
+-- ════════════════════════════════════════════════════════════
+-- RLS PERFORMANCE + ONTBREKENDE FK-INDEXES
+-- Voer dit uit in de Supabase SQL Editor als add-on migratie.
+--
+-- 1) Elke RLS policy hieronder riep auth.uid() ongewrapt aan in de
+--    using/with check-expressie, wat Postgres dwingt de functie per
+--    rij opnieuw te evalueren. Wrapped als (select auth.uid()) wordt
+--    de uitkomst één keer gecachet (initPlan) — zelfde gedrag en
+--    beveiliging, 5-10x sneller op grotere tabellen. Zie:
+--    https://supabase.com/docs/guides/database/postgres/row-level-security#rls-performance-recommendations
+-- 2) kudos.from_user_id, comments.user_id en feedback.user_id zijn
+--    foreign keys naar accounts(id) zonder eigen index — nodig voor
+--    een snelle ON DELETE CASCADE / SET NULL bij account-verwijdering
+--    (anders full table scan per FK per verwijderd account).
+-- ════════════════════════════════════════════════════════════
+
+drop policy if exists "accounts_own_write" on public.accounts;
+create policy "accounts_own_write" on public.accounts for all
+  using (id = (select auth.uid())) with check (id = (select auth.uid()));
+
+drop policy if exists "sessions_own" on public.sessions;
+create policy "sessions_own" on public.sessions for all
+  using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+
+drop policy if exists "gyms_own" on public.gyms;
+create policy "gyms_own" on public.gyms for all
+  using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+
+drop policy if exists "goals_own" on public.goals;
+create policy "goals_own" on public.goals for all
+  using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+
+drop policy if exists "hang_sessions_own" on public.hang_sessions;
+create policy "hang_sessions_own" on public.hang_sessions for all
+  using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+
+drop policy if exists "projects_own" on public.projects;
+create policy "projects_own" on public.projects for all
+  using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+
+drop policy if exists "injuries_own" on public.injuries;
+create policy "injuries_own" on public.injuries for all
+  using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+
+drop policy if exists "competitions_own" on public.competitions;
+create policy "competitions_own" on public.competitions for all
+  using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+
+drop policy if exists "gym_resets_own" on public.gym_resets;
+create policy "gym_resets_own" on public.gym_resets for all
+  using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+
+drop policy if exists "active_plans_own" on public.active_plans;
+create policy "active_plans_own" on public.active_plans for all
+  using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+
+drop policy if exists "follows_read" on public.follows;
+create policy "follows_read" on public.follows for select using ((select auth.uid()) is not null);
+drop policy if exists "follows_insert" on public.follows;
+create policy "follows_insert" on public.follows for insert with check (follower_id = (select auth.uid()));
+drop policy if exists "follows_delete" on public.follows;
+create policy "follows_delete" on public.follows for delete using (follower_id = (select auth.uid()));
+
+drop policy if exists "kudos_insert" on public.kudos;
+create policy "kudos_insert" on public.kudos for insert with check (from_user_id = (select auth.uid()));
+drop policy if exists "kudos_delete" on public.kudos;
+create policy "kudos_delete" on public.kudos for delete using (from_user_id = (select auth.uid()));
+
+drop policy if exists "comments_insert" on public.comments;
+create policy "comments_insert" on public.comments for insert with check (user_id = (select auth.uid()));
+drop policy if exists "comments_delete" on public.comments;
+create policy "comments_delete" on public.comments for delete using (user_id = (select auth.uid()));
+
+drop policy if exists "Admin writes settings" on public.app_settings;
+create policy "Admin writes settings" on public.app_settings for all
+  using (exists (select 1 from public.accounts where id = (select auth.uid()) and is_admin = true));
+
+drop policy if exists "Admin writes sponsor" on public.sponsored_card;
+create policy "Admin writes sponsor" on public.sponsored_card for all
+  using (exists (select 1 from public.accounts where id = (select auth.uid()) and is_admin = true));
+
+drop policy if exists "feedback_select_admin_only" on public.feedback;
+create policy "feedback_select_admin_only" on public.feedback for select
+  using (exists (select 1 from public.accounts where id = (select auth.uid()) and is_admin = true));
+
+create index if not exists kudos_from_user_id_idx on public.kudos(from_user_id);
+create index if not exists comments_user_id_idx on public.comments(user_id);
+create index if not exists feedback_user_id_idx on public.feedback(user_id);

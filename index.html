@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Flag it">
 <meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="Flag It is een gratis bouldering- en hangboard-tracker: log sessies en routes, volg je voortgang en PR's, stel doelen in en train met vrienden.">
 <title>Flag it</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -203,7 +204,8 @@ select option{background:#1e1e1e}
 .ad-unit{display:flex;align-items:center;justify-content:center;background:var(--surface);border:.5px solid var(--border);border-radius:12px;margin:0 20px 12px;min-height:50px;overflow:hidden;position:relative}
 .ad-unit.ad-banner{min-height:60px}
 .ad-unit.ad-rect{min-height:260px}
-.ad-label{position:absolute;top:4px;right:8px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;opacity:.6}
+.ad-label{position:absolute;top:4px;right:8px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .sponsored-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;margin:0 20px 12px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:background .15s;text-decoration:none;color:inherit}
 .sponsored-card:active{background:var(--surface2)}
 .sponsored-logo{width:44px;height:44px;border-radius:10px;object-fit:contain;background:var(--surface2);flex-shrink:0}
@@ -898,6 +900,9 @@ select option{background:#1e1e1e}
 </head>
 <body>
 
+<main id="app-main">
+<h1 class="sr-only">Flag It — bouldering tracker</h1>
+
 <!-- PROFILE SCREEN -->
 <div id="profile-screen">
   <div class="ps-header">
@@ -964,8 +969,8 @@ select option{background:#1e1e1e}
   </div>
   <div id="feed-tab-feed">
     <div id="filter-bar" class="filter-bar">
-      <select id="filter-gym" onchange="renderFeed()"><option value="">Alle gyms</option></select>
-      <select id="filter-grade" onchange="renderFeed()"><option value="">Min. graad</option></select>
+      <select id="filter-gym" onchange="renderFeed()" aria-label="Filter op gym"><option value="">Alle gyms</option></select>
+      <select id="filter-grade" onchange="renderFeed()" aria-label="Filter op minimale graad"><option value="">Min. graad</option></select>
       <button class="btn-filter-clear" id="filter-clear-btn" onclick="clearFilters()">Wis</button>
     </div>
     <div id="nudge-section"></div>
@@ -1012,7 +1017,7 @@ select option{background:#1e1e1e}
           </div>
         </div>
       </div>
-      <div class="input-row"><div class="field"><label>Notitie (optioneel)</label><textarea id="inp-note" data-no-i18n placeholder="Uitdagingen, tips voor jezelf, bijzonderheden..." oninput="_saveDraftDebounced()"></textarea></div></div>
+      <div class="input-row"><div class="field"><label for="inp-note">Notitie (optioneel)</label><textarea id="inp-note" data-no-i18n placeholder="Uitdagingen, tips voor jezelf, bijzonderheden..." oninput="_saveDraftDebounced()"></textarea></div></div>
       <div class="feel-section">
         <div class="feel-label">Hoe voelde de sessie?</div>
         <div class="feel-row">
@@ -1168,7 +1173,7 @@ select option{background:#1e1e1e}
     <div id="gym-list" style="margin-bottom:16px"></div>
     <div class="form-section-title" style="padding:0 0 10px">Gym toevoegen</div>
     <div class="add-gym-row">
-      <input type="text" id="inp-new-gym" placeholder="bijv. Monk, ClimbUp, Bjoeks...">
+      <input type="text" id="inp-new-gym" placeholder="bijv. Monk, ClimbUp, Bjoeks..." aria-label="Naam van de gym">
       <button class="btn-add-gym" onclick="addGym()">Voeg toe</button>
     </div>
     <div class="form-section-title" style="padding:16px 0 10px">Gym Resets</div>
@@ -1264,8 +1269,8 @@ select option{background:#1e1e1e}
 
     <!-- New hang session form -->
     <div class="form-section-title" style="padding:0 0 10px">Nieuwe hangsessie</div>
-    <div class="input-row"><div class="field"><label>Datum</label><input type="date" id="hang-date"></div></div>
-    <div class="input-row"><div class="field"><label>Notitie (optioneel)</label><textarea id="hang-note" placeholder="Bijv. na bouldering, vermoeid, etc." style="height:64px"></textarea></div></div>
+    <div class="input-row"><div class="field"><label for="hang-date">Datum</label><input type="date" id="hang-date"></div></div>
+    <div class="input-row"><div class="field"><label for="hang-note">Notitie (optioneel)</label><textarea id="hang-note" placeholder="Bijv. na bouldering, vermoeid, etc." style="height:64px"></textarea></div></div>
     <div id="hang-set-cards"></div>
     <button class="btn-add-route" onclick="addHangSetCard()" style="margin-bottom:16px">+ Set toevoegen</button>
     <button class="btn-save-hang" onclick="saveHangSession()">Hangsessie opslaan</button>
@@ -1281,6 +1286,8 @@ select option{background:#1e1e1e}
 
 <!-- COACH (lege shell — content zit in analyse-tab-coach) -->
 <div id="page-coach" class="page"></div>
+
+</main>
 
 <!-- NAV -->
 <nav class="bottom-nav" role="navigation" aria-label="Hoofdnavigatie">
