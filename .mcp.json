@@ -3,6 +3,10 @@
     "supabase": {
       "type": "http",
       "url": "https://mcp.supabase.com/mcp?project_ref=rnaykehkgfqqzhhumaub"
+    },
+    "accesslint": {
+      "command": "npx",
+      "args": ["-y", "@accesslint/mcp@latest"]
     }
   }
 }
