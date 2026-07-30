@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flag It — Post 3 · Slide 2 · iPhone / Safari</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="mocks.css">
+<style>
+  .head { position: absolute; top: 172px; left: var(--pad); z-index: 15; }
+  h2.headline-sm { font-size: 62px; margin-top: 18px; }
+  .cols {
+    position: absolute;
+    top: 336px; left: var(--pad); right: var(--pad); bottom: 150px;
+    z-index: 15;
+    display: grid;
+    grid-template-columns: 470px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  .ui-col { padding-top: 4px; }
+</style>
+</head>
+<body>
+<div class="post">
+  <div class="bg-gradient"></div>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <div class="brand">
+    <img class="brand-mark" src="../../../icons/icon-512.png" alt="">
+    <div class="brand-word">Flag<span>It</span></div>
+  </div>
+  <div class="slide-no"><b>02</b> / 04</div>
+
+  <div class="head">
+    <span class="kicker" data-c="kicker">iPhone · Safari</span>
+    <h2 class="headline-sm" data-c="headline">Share <em>→</em> Add to Home Screen</h2>
+  </div>
+
+  <div class="cols">
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-t">
+          <span data-c="s1">Open Flag It in <b>Safari</b></span>
+          <div class="step-s" data-c="s1s">It has to be Safari — Chrome on iOS can't install web apps.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-t">
+          <span data-c="s2">Tap the <b>Share</b> icon</span>
+          <div class="step-s" data-c="s2s">The square with the arrow, in the bottom bar.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-t">
+          <span data-c="s3">Choose <b>Add to Home Screen</b></span>
+          <div class="step-s" data-c="s3s">Scroll down a little if you don't see it, then tap Add.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ui-col">
+      <!-- Safari bottom toolbar, share icon ringed -->
+      <div class="ui-card">
+        <div class="sf-bar">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg viewBox="0 0 24 24" style="opacity:.35"><polyline points="9 18 15 12 9 6"/></svg>
+          <span class="ring sf-share">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 15V3"/><polyline points="8 7 12 3 16 7"/>
+              <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>
+            </svg>
+          </span>
+          <svg viewBox="0 0 24 24" style="opacity:.55"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></svg>
+          <svg viewBox="0 0 24 24" style="opacity:.55"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+        </div>
+      </div>
+
+      <!-- Share sheet, "Add to Home Screen" ringed -->
+      <div class="ui-card">
+        <div class="sheet-head">
+          <img src="../../../icons/icon-512.png" alt="">
+          <div>
+            <div class="t">Flag it</div>
+            <div class="u" data-c="host">flagit — options ›</div>
+          </div>
+        </div>
+        <div class="row dim"><span data-c="r1">Copy</span>
+          <svg class="gl" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+        </div>
+        <div class="row dim"><span data-c="r2">Add Bookmark</span>
+          <svg class="gl" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="row hi"><span data-c="r3">Add to Home Screen</span>
+          <svg class="gl" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+        </div>
+        <div class="row dim"><span data-c="r4">Add to Reading List</span>
+          <svg class="gl" viewBox="0 0 24 24"><path d="M4 19.5V6a2 2 0 0 1 2-2h13v16H6.5A2.5 2.5 0 0 0 4 22.5z"/></svg>
+        </div>
+      </div>
+      <div class="point">↑ <span data-c="point">Tap this one</span></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>@flagit.app</span>
+  </div>
+  <div class="swipe"><span data-c="swipe">Android next</span> →</div>
+</div>
+
+<script src="kit.js"></script>
+<script>
+window.COPY = {
+  en: {
+    kicker: 'iPhone · Safari',
+    headline: 'Share <em>→</em> Add to Home Screen',
+    s1: 'Open Flag It in <b>Safari</b>', s1s: "It has to be Safari — Chrome on iOS can't install web apps.",
+    s2: 'Tap the <b>Share</b> icon', s2s: 'The square with the arrow, in the bottom bar.',
+    s3: 'Choose <b>Add to Home Screen</b>', s3s: "Scroll down a little if you don't see it, then tap Add.",
+    host: 'flagit — options ›',
+    r1: 'Copy', r2: 'Add Bookmark', r3: 'Add to Home Screen', r4: 'Add to Reading List',
+    point: 'Tap this one', swipe: 'Android next'
+  },
+  nl: {
+    kicker: 'iPhone · Safari',
+    headline: 'Deel <em>→</em> Zet op beginscherm',
+    s1: 'Open Flag It in <b>Safari</b>', s1s: 'Het moet Safari zijn — Chrome op iOS kan geen web-apps installeren.',
+    s2: 'Tik op het <b>Deel</b>-icoon', s2s: 'Het vierkantje met de pijl, in de balk onderin.',
+    s3: 'Kies <b>Zet op beginscherm</b>', s3s: 'Scroll even door als je het niet ziet, tik daarna op Voeg toe.',
+    host: 'flagit — opties ›',
+    r1: 'Kopieer', r2: 'Bladwijzer', r3: 'Zet op beginscherm', r4: 'Voeg toe aan leeslijst',
+    point: 'Deze dus', swipe: 'Android hierna'
+  }
+};
+applyCopy();
+</script>
+</body>
+</html>

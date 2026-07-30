@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flag It — Post 2 · Screenshot showcase</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css">
+<style>
+  .head {
+    position: absolute;
+    top: 174px; left: var(--pad); right: var(--pad);
+    z-index: 18;
+  }
+  h2.headline-sm { font-size: 70px; max-width: 900px; }
+  .sub { margin-top: 18px; font-size: 24px; color: rgba(245,245,245,.62); max-width: 730px; line-height: 1.4; }
+  .head .chips { margin-top: 24px; }
+
+  /* Back phone — the log form: "this is what you type in" */
+  .phone.back {
+    position: absolute;
+    left: 66px; bottom: -178px;
+    width: 312px;
+    transform: rotate(-6deg);
+    opacity: .94;
+    z-index: 11;
+  }
+  .phone.back .phone-screen { border-radius: 34px; }
+  .phone.back { border-radius: 42px; padding: 9px; }
+  .phone.back .phone-island { height: 19px; top: 16px; }
+
+  /* Front phone — the payoff: the grade-progression chart */
+  .phone.front {
+    position: absolute;
+    right: 58px; bottom: -282px;
+    width: 400px;
+    transform: rotate(3.5deg);
+    z-index: 12;
+  }
+
+  .fade-bottom {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 210px; z-index: 16;
+    background: linear-gradient(180deg, transparent, rgba(10,10,10,.94) 52%, #0a0a0a 88%);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div class="post">
+  <div class="bg-gradient"></div>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <div class="brand">
+    <img class="brand-mark" src="../../../icons/icon-512.png" alt="">
+    <div class="brand-word">Flag<span>It</span></div>
+  </div>
+
+  <div class="head">
+    <h2 class="headline-sm" data-c="headline">See your progress<br><em>at a glance.</em></h2>
+    <p class="sub" data-c="sub">Every route you log feeds the charts. Grades, PRs, training load — no spreadsheet required.</p>
+    <div class="chips">
+      <span class="chip"><span class="dot"></span><span data-c="chip1">Grade progression</span></span>
+      <span class="chip"><span class="dot green"></span><span data-c="chip2">Personal records</span></span>
+      <span class="chip"><span class="dot amber"></span><span data-c="chip3">Training load</span></span>
+    </div>
+  </div>
+
+  <div class="phone back">
+    <div class="phone-screen">
+      <div class="phone-island"></div>
+      <img id="shot-log" src="screens/screen-log.en.png" alt="">
+    </div>
+  </div>
+  <div class="phone front">
+    <div class="phone-screen">
+      <div class="phone-island"></div>
+      <img id="shot-stats" src="screens/screen-stats.en.png" alt="">
+    </div>
+  </div>
+
+  <div class="fade-bottom"></div>
+
+  <div class="footer">
+    <span>@flagit.app</span>
+    <span class="free" data-c="free">Free · No app store</span>
+  </div>
+</div>
+
+<script src="kit.js"></script>
+<script>
+window.COPY = {
+  en: {
+    headline: 'See your progress<br><em>at a glance.</em>',
+    sub: 'Every route you log feeds the charts. Grades, PRs, training load — no spreadsheet required.',
+    chip1: 'Grade progression', chip2: 'Personal records', chip3: 'Training load',
+    free: 'Free · No app store'
+  },
+  nl: {
+    headline: 'Je voortgang<br><em>in één oogopslag.</em>',
+    sub: 'Elke route die je logt voedt de grafieken. Graden, PR&rsquo;s, trainingsbelasting — zonder spreadsheet.',
+    chip1: 'Graadprogressie', chip2: 'Persoonlijke records', chip3: 'Trainingsbelasting',
+    free: 'Gratis · Geen app store'
+  }
+};
+applyCopy();
+// Point the mockups at the screenshots for the active language
+document.getElementById('shot-log').src = 'screens/screen-log.' + LANG + '.png';
+document.getElementById('shot-stats').src = 'screens/screen-stats.' + LANG + '.png';
+</script>
+</body>
+</html>
