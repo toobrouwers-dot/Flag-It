@@ -1,4 +1,4 @@
-# Flag It — Instagram launch series
+# FlagIt — Instagram launch series
 
 A 3-post launch set for Instagram. Everything is 1080 × 1080 and shares one
 brand system: the app's own palette, the app's own typeface, and the logo
@@ -12,7 +12,9 @@ lockup pinned to the same spot on every graphic.
 
 Each file also exists in a Dutch variant with a `.nl` suffix
 (`post-1-launch.nl.png`, …). Post the language that matches your audience —
-the app itself ships NL by default with an EN toggle, so both are live copy.
+the app ships **English by default** with a Dutch toggle, so both are live copy.
+Pair the Dutch set with a `&lang=nl` link (see [Captions](#captions)) so the
+landing page matches the post.
 
 ---
 
@@ -55,8 +57,9 @@ source shows up in your own data:
 https://toobrouwers-dot.github.io/Flag-It/?utm_source=instagram
 ```
 
-Add `&lang=en` to that link when you post the English set — the app will open
-in English on first load.
+Add `&lang=nl` when you post the **Dutch** set — that is the one that needs it.
+English is the app's default, so the English set needs no language parameter
+(`&lang=en` is harmless, just redundant).
 
 > Heads-up: that URL is derived from the Pages workflow plus the manifest
 > `scope` (`/Flag-It/`). Confirm it resolves before it goes in the bio, and
@@ -65,7 +68,7 @@ in English on first load.
 ### Post 1 — Launch
 
 **EN**
-> Flag It is live 🚀
+> FlagIt is live 🚀
 >
 > A free bouldering + hangboard tracker built for the wall, not the desk.
 > Log your routes between attempts, watch your grade curve climb, and set
@@ -81,7 +84,7 @@ in English on first load.
 > #bouldering #klimmen #climbingtraining #hangboard #boulderen #climbinglife #sendit #pwa
 
 **NL**
-> Flag It is live 🚀
+> FlagIt is live 🚀
 >
 > Een gratis boulder- en hangboardtracker, gemaakt voor aan de muur — niet
 > voor achter je bureau. Log je routes tussen de pogingen door, zie je
@@ -131,7 +134,7 @@ in English on first load.
 **EN**
 > Make it feel like a real app 📲 (swipe)
 >
-> Flag It is a web app, so there's nothing to download — but two taps put it
+> FlagIt is a web app, so there's nothing to download — but two taps put it
 > on your home screen with its own icon, full-screen, no browser bars.
 >
 > iPhone: open it in Safari → Share → Add to Home Screen
@@ -147,7 +150,7 @@ in English on first load.
 **NL**
 > Laat het voelen als een echte app 📲 (swipe)
 >
-> Flag It is een web-app, dus er valt niets te downloaden — maar met twee
+> FlagIt is een web-app, dus er valt niets te downloaden — maar met twee
 > tikken staat hij op je beginscherm, met eigen icoon en schermvullend,
 > zonder browserbalken.
 >
