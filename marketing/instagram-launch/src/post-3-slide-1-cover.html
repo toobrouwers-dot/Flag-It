@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flag It — Post 3 · Slide 1 · Cover</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="mocks.css">
+<style>
+  .content {
+    position: absolute; inset: 0; z-index: 15;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 0 var(--pad) 130px;
+  }
+  h1.headline { font-size: 100px; max-width: 880px; }
+  .tagline { margin-top: 30px; max-width: 600px; }
+  .kicker { align-self: flex-start; }
+  .rule { width: 132px; height: 7px; background: var(--accent); border-radius: 4px; margin: 32px 0 0; }
+
+  /* A single oversized app icon, lifting off the wall */
+  .hero-icon {
+    position: absolute;
+    right: 84px; bottom: 172px;
+    width: 306px; height: 306px;
+    z-index: 12;
+    transform: rotate(-8deg);
+    filter: drop-shadow(0 40px 90px rgba(0,0,0,.75)) drop-shadow(0 0 120px rgba(127,119,221,.45));
+  }
+  .hero-icon img { width: 100%; height: 100%; border-radius: 70px; display: block; }
+</style>
+</head>
+<body>
+<div class="post">
+  <div class="bg-gradient"></div>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <div class="brand">
+    <img class="brand-mark" src="../../../icons/icon-512.png" alt="">
+    <div class="brand-word">Flag<span>It</span></div>
+  </div>
+  <div class="slide-no"><b>01</b> / 04</div>
+
+  <div class="hero-icon"><img src="../../../icons/icon-512.png" alt=""></div>
+
+  <div class="content">
+    <div><span class="kicker" data-c="kicker">30-second setup</span></div>
+    <h1 class="headline" data-c="headline">Put Flag It on your <em>home screen.</em></h1>
+    <div class="rule"></div>
+    <p class="tagline" data-c="tagline">No app store, no download. Two taps and it opens full-screen like a native app — and keeps working offline.</p>
+  </div>
+
+  <div class="footer">
+    <span>@flagit.app</span>
+  </div>
+  <div class="swipe"><span data-c="swipe">Swipe</span> →</div>
+</div>
+
+<script src="kit.js"></script>
+<script>
+window.COPY = {
+  en: {
+    kicker: '30-second setup',
+    headline: 'Put Flag It on your <em>home screen.</em>',
+    tagline: 'No app store, no download. Two taps and it opens full-screen like a native app — and keeps working offline.',
+    swipe: 'Swipe'
+  },
+  nl: {
+    kicker: 'Klaar in 30 seconden',
+    headline: 'Zet Flag It op je <em>beginscherm.</em>',
+    tagline: 'Geen app store, geen download. Twee tikken en hij opent schermvullend als een echte app — en blijft offline werken.',
+    swipe: 'Swipe'
+  }
+};
+applyCopy();
+</script>
+</body>
+</html>

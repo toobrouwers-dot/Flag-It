@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flag It — Post 3 · Slide 4 · Done</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="mocks.css">
+<style>
+  .head { position: absolute; top: 180px; left: var(--pad); z-index: 15; width: 520px; }
+  h1.headline { font-size: 96px; }
+  .tagline { margin-top: 26px; font-size: 25px; }
+  .head .chips { margin-top: 34px; }
+  .head .chip { margin-bottom: 0; }
+
+  /* Home-screen frame on the right */
+  .home-phone {
+    position: absolute;
+    right: 74px; top: 210px;
+    width: 372px;
+    z-index: 14;
+    border-radius: 46px;
+    padding: 10px;
+    background: #0d0d10;
+    box-shadow: 0 0 0 2px rgba(255,255,255,.10), 0 40px 90px rgba(0,0,0,.72), 0 0 130px rgba(127,119,221,.24);
+  }
+  .home-inner {
+    border-radius: 38px;
+    overflow: hidden;
+    background: linear-gradient(170deg, #241d5c 0%, #14112c 45%, #0c0b18 100%);
+    padding-top: 44px;
+    padding-bottom: 26px;
+  }
+  .status {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 30px 6px;
+    font-size: 18px; font-weight: 600; color: rgba(255,255,255,.75);
+  }
+  .status .bars { display: flex; gap: 4px; align-items: flex-end; }
+  .status .bars i { width: 4px; background: rgba(255,255,255,.75); display: block; border-radius: 1px; }
+  .dock {
+    margin: 8px 22px 0;
+    padding: 16px 18px;
+    border-radius: 26px;
+    background: rgba(255,255,255,.06);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+  .cta {
+    position: absolute;
+    left: var(--pad); bottom: 176px;
+    z-index: 16;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 34px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.6px;
+    color: var(--accent2);
+    width: 520px;
+    line-height: 1.15;
+  }
+</style>
+</head>
+<body>
+<div class="post">
+  <div class="bg-gradient"></div>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <div class="brand">
+    <img class="brand-mark" src="../../../icons/icon-512.png" alt="">
+    <div class="brand-word">Flag<span>It</span></div>
+  </div>
+  <div class="slide-no"><b>04</b> / 04</div>
+
+  <div class="home-phone">
+    <div class="home-inner">
+      <div class="status">
+        <span>9:41</span>
+        <span class="bars"><i style="height:7px"></i><i style="height:10px"></i><i style="height:13px"></i><i style="height:16px"></i></span>
+      </div>
+      <div class="home-grid">
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot real"><div class="app-ico"><img src="../../../icons/icon-512.png" alt=""></div><div class="lbl">Flag it</div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+        <div class="app-slot"><div class="app-ico"></div><div class="lbl"></div></div>
+      </div>
+      <div class="dock">
+        <div class="app-ico"></div><div class="app-ico"></div><div class="app-ico"></div><div class="app-ico"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="head">
+    <h1 class="headline" data-c="headline">That&rsquo;s it. <em>You&rsquo;re in.</em></h1>
+    <p class="tagline" data-c="tagline">It now opens like any other app on your phone.</p>
+    <div class="chips">
+      <span class="chip"><span class="dot"></span><span data-c="chip1">Full screen</span></span>
+      <span class="chip"><span class="dot green"></span><span data-c="chip2">Works offline</span></span>
+      <span class="chip"><span class="dot amber"></span><span data-c="chip3">Always up to date</span></span>
+    </div>
+  </div>
+
+  <div class="cta" data-c="cta">Link in bio →<br>Go flag your first send.</div>
+
+  <div class="footer">
+    <span>@flagit.app</span>
+    <span class="free" data-c="free">Free · No app store</span>
+  </div>
+</div>
+
+<script src="kit.js"></script>
+<script>
+window.COPY = {
+  en: {
+    headline: 'That&rsquo;s it. <em>You&rsquo;re in.</em>',
+    tagline: 'It now opens like any other app on your phone.',
+    chip1: 'Full screen', chip2: 'Works offline', chip3: 'Always up to date',
+    cta: 'Link in bio →<br>Go flag your first send.',
+    free: 'Free · No app store'
+  },
+  nl: {
+    headline: 'Klaar. <em>Je zit erin.</em>',
+    tagline: 'Vanaf nu opent hij als elke andere app op je telefoon.',
+    chip1: 'Schermvullend', chip2: 'Werkt offline', chip3: 'Altijd up-to-date',
+    cta: 'Link in bio →<br>Vlag je eerste top.',
+    free: 'Gratis · Geen app store'
+  }
+};
+applyCopy();
+</script>
+</body>
+</html>

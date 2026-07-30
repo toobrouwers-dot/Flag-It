@@ -1,0 +1,175 @@
+/* ══════════════════════════════════════════
+   FLAG IT — Instagram launch series
+   Browser-UI fragments for the "Add to Home Screen" carousel.
+   These are stylised, generic representations of the Safari and
+   Chrome menus — enough to recognise the step, not a pixel copy.
+══════════════════════════════════════════ */
+
+/* Shared card the fragments sit in */
+.ui-card {
+  border-radius: 22px;
+  background: #1c1c1e;
+  border: 1px solid rgba(255, 255, 255, .10);
+  box-shadow: 0 26px 60px rgba(0, 0, 0, .6);
+  overflow: hidden;
+}
+.ui-card + .ui-card { margin-top: 26px; }
+
+/* Highlight ring for the element the step is about */
+.ring {
+  position: relative;
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 14px;
+  background: rgba(127, 119, 221, .16);
+}
+
+/* ── Safari-style bottom toolbar ── */
+.sf-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 26px;
+  background: #2b2b2e;
+}
+.sf-bar svg { width: 34px; height: 34px; stroke: #d6d6da; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.sf-bar .sf-share { padding: 8px 12px; }
+.sf-bar .sf-share svg { stroke: #fff; }
+
+/* Safari URL pill */
+.sf-url {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 18px 24px;
+  background: #2b2b2e;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  font-size: 22px;
+  color: #d6d6da;
+}
+.sf-url .lock { width: 20px; height: 20px; stroke: #9a9aa0; fill: none; stroke-width: 2; }
+
+/* ── iOS share-sheet rows ── */
+.sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 26px;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+.sheet-head img { width: 52px; height: 52px; border-radius: 12px; }
+.sheet-head .t { font-size: 24px; font-weight: 600; color: #f2f2f5; line-height: 1.2; }
+.sheet-head .u { font-size: 19px; color: #8e8e93; }
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 26px;
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+  font-size: 25px;
+  color: #f2f2f5;
+}
+.row:last-child { border-bottom: none; }
+.row.dim { color: #8e8e93; }
+.row.hi { background: rgba(127, 119, 221, .18); color: #fff; font-weight: 600; }
+.row .gl { width: 30px; height: 30px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .9; }
+.row.hi .gl { stroke: var(--accent2); opacity: 1; }
+
+/* ── Chrome-style top bar + overflow menu ── */
+.cr-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  background: #202124;
+}
+.cr-pill {
+  flex: 1;
+  background: #303134;
+  border-radius: 40px;
+  padding: 14px 22px;
+  font-size: 21px;
+  color: #cdcdd2;
+}
+.cr-dots { display: flex; flex-direction: column; gap: 5px; padding: 8px 10px; }
+.cr-dots i { width: 6px; height: 6px; border-radius: 50%; background: #e3e3e6; display: block; }
+
+/* Pointer label that names the tap target */
+.point {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent2);
+}
+
+/* ── Numbered steps ── */
+.steps { display: flex; flex-direction: column; gap: 30px; }
+.step { display: flex; gap: 22px; align-items: flex-start; }
+.step-n {
+  flex: 0 0 auto;
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  background: rgba(127, 119, 221, .18);
+  border: 1.5px solid rgba(127, 119, 221, .55);
+  color: var(--accent2);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 30px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.step-t {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.08;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  padding-top: 4px;
+}
+.step-t b { color: var(--accent); font-weight: 800; }
+.step-s {
+  font-family: 'Barlow', sans-serif;
+  font-size: 21px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: rgba(245, 245, 245, .55);
+  margin-top: 6px;
+  line-height: 1.35;
+}
+
+/* ── Home-screen grid (final slide) ── */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px 26px;
+  padding: 34px 30px;
+}
+.app-ico {
+  aspect-ratio: 1;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .05);
+}
+.app-slot { text-align: center; }
+.app-slot .lbl {
+  margin-top: 10px;
+  font-size: 17px;
+  color: rgba(255, 255, 255, .35);
+  height: 20px;
+}
+.app-slot.real .app-ico {
+  background: none;
+  border: none;
+  box-shadow: 0 0 0 3px var(--accent), 0 0 34px rgba(127, 119, 221, .75);
+  overflow: hidden;
+}
+.app-slot.real .app-ico img { width: 100%; height: 100%; display: block; border-radius: 22px; }
+.app-slot.real .lbl { color: #fff; font-weight: 600; }

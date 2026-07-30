@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flag It — Post 1 · Launch</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css">
+<style>
+  .wall { position: absolute; inset: 0; z-index: 0; }
+  .wall-shade {
+    position: absolute; inset: 0; z-index: 1;
+    background:
+      radial-gradient(ellipse 70% 60% at 12% 8%, rgba(127,119,221,.30) 0%, transparent 62%),
+      linear-gradient(180deg, rgba(10,10,10,.30) 0%, rgba(10,10,10,.60) 38%, rgba(10,10,10,.90) 74%, #0a0a0a 100%);
+  }
+  .content {
+    position: absolute; inset: 0; z-index: 10;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: var(--pad);
+    padding-bottom: 168px;
+  }
+  h1.headline { font-size: 112px; margin: 28px 0 0; }
+  .rule { width: 132px; height: 7px; background: var(--accent); border-radius: 4px; margin: 34px 0 26px; }
+  .tagline { max-width: 800px; }
+  .chips { margin-top: 34px; }
+</style>
+</head>
+<body>
+<div class="post">
+  <div class="wall" id="wall"></div>
+  <div class="wall-shade"></div>
+
+  <div class="brand">
+    <img class="brand-mark" src="../../../icons/icon-512.png" alt="">
+    <div class="brand-word">Flag<span>It</span></div>
+  </div>
+
+  <div class="content">
+    <div><span class="kicker" data-c="kicker">Now live 🚀</span></div>
+    <h1 class="headline" data-c="headline">Track your climbs.<br><em>Flag your sends.</em></h1>
+    <div class="rule"></div>
+    <p class="tagline" data-c="tagline">
+      The free bouldering &amp; hangboard tracker. Log every route, watch your grades
+      climb, and never lose a session again.
+    </p>
+    <div class="chips">
+      <span class="chip"><span class="dot"></span><span data-c="chip1">Log sessions</span></span>
+      <span class="chip"><span class="dot green"></span><span data-c="chip2">Track PRs</span></span>
+      <span class="chip"><span class="dot amber"></span><span data-c="chip3">Hit your goals</span></span>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span data-c="url">@flagit.app</span>
+    <span class="free" data-c="free">Free · No app store</span>
+  </div>
+</div>
+
+<script src="kit.js"></script>
+<script>
+window.COPY = {
+  en: {
+    kicker: 'Now live 🚀',
+    headline: 'Track your climbs.<br><em>Flag your sends.</em>',
+    tagline: 'The free bouldering &amp; hangboard tracker. Log every route, watch your grades climb, and never lose a session again.',
+    chip1: 'Log sessions', chip2: 'Track PRs', chip3: 'Hit your goals',
+    free: 'Free · No app store'
+  },
+  nl: {
+    kicker: 'Nu live 🚀',
+    headline: 'Log je klimsessies.<br><em>Vlag je tops.</em>',
+    tagline: 'De gratis boulder- &amp; hangboardtracker. Leg elke route vast, zie je graden stijgen en verlies nooit meer een sessie.',
+    chip1: 'Sessies loggen', chip2: 'PR&rsquo;s volgen', chip3: 'Doelen halen',
+    free: 'Gratis · Geen app store'
+  }
+};
+applyCopy();
+buildWall(document.getElementById('wall'), { seed: 11, holdCount: 15 });
+</script>
+</body>
+</html>

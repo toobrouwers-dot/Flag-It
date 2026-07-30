@@ -1,0 +1,249 @@
+/* ══════════════════════════════════════════
+   FLAG IT — Instagram launch series
+   Shared brand layer. Every value here is lifted
+   straight from the app (index.html :root + .ss-* rules)
+   so the posts and the product read as one thing.
+══════════════════════════════════════════ */
+
+:root {
+  /* Palette — identical to the app's :root block */
+  --bg: #0a0a0a;
+  --surface: #181818;
+  --surface2: #232323;
+  --border: rgba(255, 255, 255, .09);
+  --accent: #7f77dd;
+  --accent2: #afa9ec;
+  --text: #f5f5f5;
+  --muted: #888;
+  --success: #4caf50;
+  --flash: #ffc107;
+  --danger: #e53935;
+
+  /* Deep purple used by the app's hero gradient */
+  --deep1: #1c1650;
+  --deep2: #100d2a;
+  --deep3: #0c0b1a;
+
+  /* Canvas */
+  --pad: 72px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 1080px;
+  height: 1080px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.post {
+  position: relative;
+  width: 1080px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--bg);
+  isolation: isolate;
+}
+
+/* ── Shared background: the app's hero gradient, scaled up ── */
+.bg-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, var(--deep1) 0%, var(--deep2) 30%, var(--deep3) 58%, var(--bg) 88%);
+}
+.bg-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 75% 65% at 15% 0%, rgba(127, 119, 221, .28) 0%, transparent 65%);
+}
+.bg-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 90% 80% at 50% 45%, transparent 35%, rgba(0, 0, 0, .72) 100%);
+}
+/* Faint grid — echoes the app's chart gridlines */
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(127, 119, 221, .055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(127, 119, 221, .055) 1px, transparent 1px);
+  background-size: 90px 90px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 40%, #000 0%, transparent 78%);
+}
+
+/* ── Logo lockup — same position on every post in the series ── */
+.brand {
+  position: absolute;
+  top: var(--pad);
+  left: var(--pad);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 20;
+}
+.brand-mark {
+  width: 62px;
+  height: 62px;
+  border-radius: 16px;
+  display: block;
+}
+.brand-word {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 50px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: .9;
+  color: var(--text);
+}
+.brand-word span { color: var(--accent); }
+
+/* Footer handle / URL — also fixed across the series */
+.footer {
+  position: absolute;
+  left: var(--pad);
+  right: var(--pad);
+  bottom: var(--pad);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 20;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2.4px;
+  color: rgba(175, 169, 236, .72);
+}
+.footer .free {
+  color: rgba(245, 245, 245, .5);
+}
+
+/* ── Type scale ── */
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border-radius: 40px;
+  background: rgba(127, 119, 221, .16);
+  border: 1.5px solid rgba(127, 119, 221, .45);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: var(--accent2);
+}
+h1.headline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  line-height: .86;
+  font-size: 122px;
+}
+h1.headline em { font-style: normal; color: var(--accent); }
+h2.headline-sm {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: .9;
+  font-size: 78px;
+}
+h2.headline-sm em { font-style: normal; color: var(--accent); }
+.tagline {
+  font-size: 27px;
+  font-weight: 500;
+  line-height: 1.42;
+  color: rgba(245, 245, 245, .7);
+}
+
+/* Feature chips — mirror the app's .route-chip */
+.chips { display: flex; flex-wrap: wrap; gap: 12px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid var(--border);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 25px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: rgba(245, 245, 245, .88);
+}
+.chip .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--accent); }
+.chip .dot.green { background: var(--success); }
+.chip .dot.amber { background: var(--flash); }
+
+/* ── Phone mockup ── */
+.phone {
+  position: relative;
+  border-radius: 54px;
+  background: #0d0d10;
+  padding: 11px;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, .10),
+    0 42px 90px rgba(0, 0, 0, .72),
+    0 0 130px rgba(127, 119, 221, .20);
+}
+.phone-screen {
+  position: relative;
+  border-radius: 44px;
+  overflow: hidden;
+  background: var(--bg);
+  display: block;
+}
+.phone-screen img { display: block; width: 100%; }
+.phone-island {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32%;
+  height: 26px;
+  border-radius: 20px;
+  background: #000;
+  z-index: 3;
+}
+
+/* Slide counter for the carousel */
+.slide-no {
+  position: absolute;
+  top: var(--pad);
+  right: var(--pad);
+  z-index: 20;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(175, 169, 236, .55);
+}
+.slide-no b { color: var(--accent); }
+
+/* "Swipe" hint */
+.swipe {
+  position: absolute;
+  right: var(--pad);
+  bottom: var(--pad);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
