@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Flag it">
+<meta name="apple-mobile-web-app-title" content="FlagIt">
 <meta name="theme-color" content="#0a0a0a">
-<meta name="description" content="Flag It is a free bouldering and hangboard tracker: log sessions and routes, follow your progress and PRs, set goals and train with friends.">
-<title>Flag it</title>
+<meta name="description" content="FlagIt is a free bouldering and hangboard tracker: log sessions and routes, follow your progress and PRs, set goals and train with friends.">
+<title>FlagIt</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -901,13 +901,13 @@ select option{background:#1e1e1e}
 <body>
 
 <main id="app-main">
-<h1 class="sr-only">Flag It — bouldering tracker</h1>
+<h1 class="sr-only">FlagIt — bouldering tracker</h1>
 
 <!-- PROFILE SCREEN -->
 <div id="profile-screen">
   <div class="ps-header">
-    <img src="./icons/icon-192.png" alt="Flag It" class="ps-logo">
-    <div class="ps-title">Flag<span>it</span></div>
+    <img src="./icons/icon-192.png" alt="FlagIt" class="ps-logo">
+    <div class="ps-title">Flag<span>It</span></div>
     <div class="ps-sub">Kies jouw profiel</div>
   </div>
   <div class="ps-section-label">Profielen</div>
@@ -921,9 +921,9 @@ select option{background:#1e1e1e}
 <!-- START SCREEN -->
 <div id="start-screen">
   <div class="ss-logo-wrap">
-    <img src="./icons/icon-192.png" alt="Flag It" class="ss-logo">
+    <img src="./icons/icon-192.png" alt="FlagIt" class="ss-logo">
   </div>
-  <div class="ss-title">Flag<span>it</span></div>
+  <div class="ss-title">Flag<span>It</span></div>
   <div class="ss-sub">Jouw bouldering tracker</div>
   <div class="ss-features">
     <div class="ss-feat"><span class="ss-feat-icon">🧗</span><span class="ss-feat-text">Log routes &amp; sessies</span></div>
@@ -943,7 +943,7 @@ select option{background:#1e1e1e}
         <div id="cloud-sync-dot" class="cloud-sync-dot" title="Sync status"></div>
       </div>
     </div>
-    <div class="hero-name"><span id="hero-profile-name">Flag it</span><img src="./icons/icon-192.png" alt="" class="hero-logo"></div>
+    <div class="hero-name"><span id="hero-profile-name">FlagIt</span><img src="./icons/icon-192.png" alt="" class="hero-logo"></div>
     <div class="stats-row">
       <div class="stat-box"><div class="stat-num" id="hs-sessions">0</div><div class="stat-label">Sessies</div></div>
       <div class="stat-box"><div class="stat-num" id="hs-routes">0</div><div class="stat-label">Routes</div></div>
@@ -1575,7 +1575,7 @@ const I18N_PHRASES=[
   ['Focuspunt voor vandaag','Focus point for today'],
   ['📈 Graadprogressie','📈 Grade progression'],
   ['Al ','Already '],[' dagen op ',' days at '],
-  ['Eerste sessie!','First session!'],['Welkom bij Flag it!','Welcome to Flag-It!'],
+  ['Eerste sessie!','First session!'],['Welkom bij FlagIt!','Welcome to FlagIt!'],
   [' sessies gelogd — top bezig!',' sessions logged — great work!'],
   [' sessies bij dezelfde gym. Een andere locatie = andere setters, stijlen en graden. Heel goed voor brede ontwikkeling.',' sessions at the same gym. A different location means different setters, styles and grades — great for broad development.'],
   ['de doorbraak kan nu elk moment komen!','the breakthrough could come any moment now!'],
@@ -1776,7 +1776,7 @@ const I18N_PHRASES=[
   ['Actief','Active'],
   ['Voeg eerst een gym toe','Add a gym first'],['Voeg eerst een set toe','Add a set first'],
   ['Voeg een route toe','Add a route'],['Voeg een set toe','Add a set'],
-  ['Voeg Flag-It toe','Add Flag-It'],
+  ['Voeg FlagIt toe','Add FlagIt'],
   ['Voeg hieronder een graad- of herhaling-doel toe.','Add a grade or repeat goal below.'],
   ['Voeg je Supabase-sleutels toe aan cloud.js','Add your Supabase keys to cloud.js'],
   ['Voeg toe','Add'],
@@ -1839,7 +1839,7 @@ const I18N_PHRASES=[
   ['Hangboard','Hangboard'],
   ['Verhalen zijn alleen in het Nederlands beschikbaar','Stories are only available in Dutch'],
   ['Mijn klimverhaal','My climbing story'],['Klimverhaal','Climbing story'],['Nieuw verhaal','New story'],['Herschud','Reshuffle'],
-  ['— gelogd met Flag-It 🏔️','— logged with Flag-It 🏔️'],
+  ['— gelogd met FlagIt 🏔️','— logged with FlagIt 🏔️'],
   ['Poëtisch','Poetic'],['Episch','Epic'],['Droog','Dry'],['Delen','Share'],
   ['Hoofdnavigatie','Main navigation'],['Dupliceer route','Duplicate route'],
   ['bijv. tot 3e greep voor de eindgreep, of: de crux move lukt niet',"e.g. up to the 3rd hold before the final hold, or: the crux move isn't working"],
@@ -2097,8 +2097,8 @@ function switchProfile(){
   ps.id='profile-screen';
   ps.innerHTML=`
     <div class="ps-header">
-      <img src="./icons/icon-192.png" alt="Flag It" class="ps-logo">
-      <div class="ps-title">Flag<span>it</span></div>
+      <img src="./icons/icon-192.png" alt="FlagIt" class="ps-logo">
+      <div class="ps-title">Flag<span>It</span></div>
       <div class="ps-sub">Kies jouw profiel</div>
     </div>
     <div class="ps-section-label">Profielen</div>
@@ -2602,7 +2602,7 @@ function initInstallPrompt(){
       banner.innerHTML=`
         <div class="install-banner-icon">🧗</div>
         <div class="install-banner-text">
-          <div class="install-banner-title">Voeg Flag-It toe</div>
+          <div class="install-banner-title">Voeg FlagIt toe</div>
           aan je startscherm
         </div>
         <div class="install-banner-btns">
@@ -2645,7 +2645,7 @@ function getMilestones(){
     if(sorted.length>=n){
       ms.push({date:sorted[n-1].date,emoji:n===1?'🧗':'🏆',
         title:n===1?'Eerste sessie!':n+' sessies!',
-        sub:n===1?'Welkom bij Flag it!':'Al '+n+' sessies gelogd — top bezig!'});
+        sub:n===1?'Welkom bij FlagIt!':'Al '+n+' sessies gelogd — top bezig!'});
     }
   });
 
@@ -4037,7 +4037,7 @@ function shareSession(id){
     mg?i18nTranslate(`Max graad: ${mg.grade}`):'',
     i18nTranslate(`${s.routes.length} routes · ${tops} top${tops!==1?'s':''} · ${flashes} flash${flashes!==1?'es':''} · ${pct}% geslaagd`),
     s.note?`"${s.note}"`:'',
-    i18nTranslate('— gelogd met Flag-It 🏔️')
+    i18nTranslate('— gelogd met FlagIt 🏔️')
   ].filter(Boolean).join('\n');
   const btn=document.querySelector(`button[onclick="shareSession(${id})"]`);
   if(navigator.share){
@@ -4355,7 +4355,7 @@ function _shareStory(sessionId){
   const story=generateSessionStory(s,_storyState.tone,_storyState.nonce);
   /* Het verhaal zelf blijft Nederlands (zie data-no-i18n in de modal);
      alleen de ondertekening wordt vertaald. */
-  const text=`📖 ${story}\n\n${i18nTranslate('— gelogd met Flag-It 🏔️')}`;
+  const text=`📖 ${story}\n\n${i18nTranslate('— gelogd met FlagIt 🏔️')}`;
   if(navigator.share){
     navigator.share({title:i18nTranslate('Mijn klimverhaal'),text}).catch(()=>{});
   }else if(navigator.clipboard){
@@ -5389,8 +5389,10 @@ function generateShareCard(){
   ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
   // Header: logo word
   ctx.fillStyle='#7f77dd';ctx.font='900 64px Impact,Arial Black,sans-serif';ctx.textAlign='left';
+  // "FLAGIT" is één woord zonder spatie: meet FLAG op zodat IT er direct tegenaan staat,
+  // ongeacht welke font-fallback de browser kiest (de oude hardcoded x=196 ging uit van een spatie).
   ctx.fillText('FLAG',32,82);
-  ctx.fillStyle='#f5f5f5';ctx.fillText('IT',196,82);
+  ctx.fillStyle='#f5f5f5';ctx.fillText('IT',32+ctx.measureText('FLAG').width,82);
   // Profile name
   ctx.fillStyle='rgba(175,169,236,.7)';ctx.font='600 13px Arial,sans-serif';
   ctx.fillText((profileEmoji+' '+profileName).toUpperCase(),32,108);

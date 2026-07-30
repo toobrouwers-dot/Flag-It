@@ -1,5 +1,5 @@
 /* ============================================================
-   Flag-It Cloud — Supabase Integration
+   FlagIt Cloud — Supabase Integration
    ============================================================
    Setup:
    1. Create a project at https://supabase.com
@@ -381,8 +381,8 @@ function showAuthScreen() {
   el.innerHTML = `
     <div class="auth-inner">
       <div class="auth-logo-wrap">
-        <img src="./icons/icon-192.png" class="auth-logo" alt="Flag It">
-        <div class="auth-title">Flag<span>it</span></div>
+        <img src="./icons/icon-192.png" class="auth-logo" alt="FlagIt">
+        <div class="auth-title">Flag<span>It</span></div>
         <div class="auth-sub">Account verbinden</div>
       </div>
       <div class="auth-tabs">
@@ -510,8 +510,8 @@ function showLoginFirstScreen(onDone) {
   el.innerHTML = `
     <div class="auth-inner">
       <div class="auth-logo-wrap">
-        <img src="./icons/icon-192.png" class="auth-logo" alt="Flag It">
-        <div class="auth-title">Flag<span>it</span></div>
+        <img src="./icons/icon-192.png" class="auth-logo" alt="FlagIt">
+        <div class="auth-title">Flag<span>It</span></div>
         <div class="auth-sub">Jouw bouldering tracker</div>
       </div>
       <div id="lfs-content">

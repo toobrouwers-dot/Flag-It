@@ -1,5 +1,5 @@
 /* ============================================================
-   Flag-It Social — Kudos, volgen, feed, comments, ranglijst
+   FlagIt Social — Kudos, volgen, feed, comments, ranglijst
    Depends on: cloud.js (db(), cloudCurrentUser(), cloudReady())
    ============================================================ */
 

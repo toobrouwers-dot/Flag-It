@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════
-   FLAG IT — Instagram launch series
+   FLAGIT — Instagram launch series
    Shared helpers for the post templates:
      · applyCopy()  — swaps EN/NL copy from window.COPY via ?lang=
      · buildWall()  — draws a procedural bouldering-wall background

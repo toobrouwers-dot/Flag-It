@@ -1,5 +1,5 @@
 -- ============================================================
--- Flag-It Supabase Schema
+-- FlagIt Supabase Schema
 -- 1. Create a project at supabase.com
 -- 2. Paste this into your SQL Editor and run it
 -- 3. Enable Google OAuth: Authentication → Providers → Google

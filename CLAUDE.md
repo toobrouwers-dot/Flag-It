@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Flag-It is a **vanilla HTML/CSS/JS Progressive Web App (PWA)** for tracking bouldering sessions and hangboard training on mobile. There is no build system, no package manager, and no test framework. The UI ships in **English by default**, with Dutch available via a toggle. Note the split: English is what users see, but **Dutch is the source language in the code** — see [Internationalization (i18n)](#internationalization-i18n).
+FlagIt is a **vanilla HTML/CSS/JS Progressive Web App (PWA)** for tracking bouldering sessions and hangboard training on mobile. There is no build system, no package manager, and no test framework. The UI ships in **English by default**, with Dutch available via a toggle. Note the split: English is what users see, but **Dutch is the source language in the code** — see [Internationalization (i18n)](#internationalization-i18n).
 
 The app has a **Supabase backend** for cloud sync and social features. Core application logic lives in `index.html` (~6,900 lines), with cloud and social logic split into separate files.
 
@@ -15,7 +15,7 @@ The app has a **Supabase backend** for cloud sync and social features. Core appl
 | `index.html` | Entire app — CSS, HTML, main JS (~6,900 lines) |
 | `cloud.js` | Supabase auth + multi-device sync (~790 lines) |
 | `social.js` | Kudos, follows, public profiles, feed, leaderboard, comments (~560 lines) |
-| `sw.js` | Service worker — offline caching (cache: `flagit-v30`) |
+| `sw.js` | Service worker — offline caching (cache: `flagit-v31`) |
 | `manifest.json` | PWA manifest |
 | `supabase_schema.sql` | Postgres schema + RLS policies for the Supabase backend |
 | `icons/` | PWA icons (192px, 512px) |
@@ -29,7 +29,7 @@ The app has a **Supabase backend** for cloud sync and social features. Core appl
 
 **To deploy:** Push to `main` — GitHub Actions (`.github/workflows/deploy.yml`) automatically deploys to GitHub Pages.
 
-**Service worker cache:** Bump the cache name in `sw.js` (`flagit-v29` → `flagit-v30`, etc.) whenever making changes that need to invalidate cached assets for existing users. Also add any new static files to the `ASSETS` array.
+**Service worker cache:** Bump the cache name in `sw.js` (`flagit-v30` → `flagit-v31`, etc.) whenever making changes that need to invalidate cached assets for existing users. Also add any new static files to the `ASSETS` array.
 
 **CI gate — `Validate files`:** the deploy workflow fails the build if `index.html` is missing `</html>`, or if `sw.js` has no cache entry for `cloud.js`, `social.js`, `index.html`, or `manifest.json`. Adding a new static asset to the `sw.js` cache array is therefore not just a convention — for those four files it is enforced, and forgetting it breaks the deploy rather than silently shipping a stale cache.
 
@@ -238,6 +238,8 @@ Both write into the DOM, so the i18n observer covers them — but the `navigator
 
 `generateShareCard()` draws a shareable PNG on a `<canvas>` via `ctx.fillText`, then `downloadShareCard()` / `shareShareCard()` save or share it (`navigator.share` with a `File`).
 
+The FLAG/IT wordmark is two `fillText` calls so the halves can differ in color; `IT` is positioned with `32 + ctx.measureText('FLAG').width`. Do not reintroduce a hardcoded x-offset — the font stack is `Impact, Arial Black, sans-serif`, and a value tuned for Impact overlaps the letters on every device that falls back.
+
 **Canvas text is invisible to the i18n MutationObserver.** Every label drawn with `fillText` must branch on `currentLang` (or go through `i18nTranslate()`) explicitly — e.g. the grade-pyramid heading does `currentLang==='en'?'GRADE PYRAMID':'GRADE PYRAMIDE'`. This is the most common way a string ends up untranslated for English users.
 
 ### Marketing attribution
@@ -287,6 +289,12 @@ Feature areas that are easy to miss because they have no page of their own:
 - **XSS protection:** User-supplied strings must be HTML-escaped before insertion into `innerHTML`. The utility is **`esc()`** in `index.html`. There is no `escHtml()` — writing one from memory has already shipped a crash bug once. `social.js` is a separate file and uses its own `_s()` helper.
 
   The two are **not** interchangeable: `_s()` also escapes `'` as `&#39;`, `esc()` does not. That matters because inline `onclick="fn('${…}')"` handlers put the value inside a single-quoted JS string, where an unescaped apostrophe breaks out — the bug fixed in `e0adff0` (XSS via username in onclick handlers). Rule of thumb: `esc()` is fine for text content and double-quoted attributes; anything interpolated into a single-quoted inline handler argument needs `'`-escaping too. Prefer passing an id into the handler and looking the record up, rather than interpolating user text at all.
+- **Product name is `FlagIt`** — one word, capital F and I, no space and no hyphen. Use it in all user-visible copy, titles, alt text and docs. Three things keep the older spellings and must **not** be renamed:
+  - `flagit_*` localStorage keys and the `flagit-vNN` cache name — renaming these orphans every existing user's data.
+  - `/Flag-It/` in `manifest.json` (`start_url`, `scope`, icon paths) and the Pages URL — that is the **repository** name, not the product name.
+  - `@flagit.app` and the `flagit-backup-*` / `flagit-klimkaart-*` download filenames — lowercase slug convention.
+
+  The two-tone wordmark is `Flag<span>It</span>` (the span carries the accent color; CSS uppercases it to FLAGIT). On the share-card canvas the same wordmark is two `fillText` calls, positioned with `measureText` rather than a hardcoded offset — see [Klimkaart share card](#klimkaart-share-card-canvas).
 - **Mobile-first:** The layout targets max-width 430px. Use CSS `env(safe-area-inset-*)` for fixed bottom elements.
 - **English UI, Dutch source strings:** All source strings (HTML markup + JS template literals) are written in Dutch — keep new strings in Dutch. English is a runtime translation layer on top (see [Internationalization (i18n)](#internationalization-i18n)). Because English is the **default** language, a new Dutch string with no `I18N_PHRASES` entry is visible Dutch text for nearly every user — so adding the entry is required, not optional. Text that never reaches the DOM (`navigator.share` payloads, canvas `fillText`, `alert()`) is not covered by the observer and must call `i18nTranslate()` explicitly, or branch on `currentLang`.
 - **PWA offline:** All new static assets must be listed in the `sw.js` cache array and the cache version bumped. CI enforces this for the four core files.
@@ -295,7 +303,7 @@ Feature areas that are easy to miss because they have no page of their own:
 
 ## Extending the App
 
-Flag-It is actively developed — new features and pages are welcome. Follow these patterns:
+FlagIt is actively developed — new features and pages are welcome. Follow these patterns:
 
 ### Adding a new page
 
