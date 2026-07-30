@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Flag-It is a **vanilla HTML/CSS/JS Progressive Web App (PWA)** for tracking bouldering sessions and hangboard training on mobile. There is no build system, no package manager, and no test framework. The UI language is **Dutch**.
+Flag-It is a **vanilla HTML/CSS/JS Progressive Web App (PWA)** for tracking bouldering sessions and hangboard training on mobile. There is no build system, no package manager, and no test framework. The UI ships in **English by default**, with Dutch available via a toggle. Note the split: English is what users see, but **Dutch is the source language in the code** — see [Internationalization (i18n)](#internationalization-i18n).
 
 The app has a **Supabase backend** for cloud sync and social features. Core application logic lives in `index.html` (~5,600 lines), with cloud and social logic split into separate files.
 
@@ -80,7 +80,7 @@ All state lives in global arrays, persisted to **localStorage** and optionally s
 | (cloud dirty) | `flagit_cloud_dirty_{profileId}` | Pending sync changes per table (cloud.js) |
 | (auth) | `flagit_auth` | Supabase auth session (cloud.js) |
 | (install prompt) | `flagit_install_dismissed_v1` | PWA install banner dismiss state |
-| (language) | `flagit_lang_v1` | UI language: `'nl'` (default) or `'en'` (global, no suffix) |
+| (language) | `flagit_lang_v1` | UI language: `'en'` (default) or `'nl'` (global, no suffix) |
 
 **Mutation pattern:** Mutate the array directly → call the corresponding save function (`save()`, `saveGyms()`, `saveGoals()`, `saveHang()`, etc.). There is no reactive binding.
 
@@ -175,14 +175,19 @@ Uses two globals: `editMode` (boolean) and `editSessionId` (string). The save fo
 
 ### Internationalization (i18n)
 
-The app supports **Dutch (default) and English**, chosen via a toggle in Meer → Taal / Language. Rather than threading a `t('key')` call through every one of the ~200 `render*()` functions, translation happens as a **live DOM pass**, defined near the top of the `<script>` block in `index.html` (right after the `GRADES`/`TYPES`/`GRIPS` constants):
+The app supports **English (default) and Dutch**, chosen via a toggle in Meer → Language / Taal. Rather than threading a `t('key')` call through every one of the ~200 `render*()` functions, translation happens as a **live DOM pass**, defined near the top of the `<script>` block in `index.html` (right after the `GRADES`/`TYPES`/`GRIPS` constants).
 
-- `currentLang` (`'nl'`|`'en'`) is read from `localStorage['flagit_lang_v1']` at load time. `setLang(lang)` persists the choice and calls `location.reload()` — a full reload is the simplest way to safely re-render everything in the new language.
+**Two directions that are easy to confuse:** English is the *default UI language*, but Dutch is still the *source language in the code*. Every string is authored in Dutch and translated to English at runtime — so "English is the default" means the translation layer runs for nearly every user, not that the source was rewritten.
+
+- `currentLang` (`'en'`|`'nl'`) is read from `localStorage['flagit_lang_v1']` at load time, **defaulting to `'en'`** when no choice has been stored. `setLang(lang)` persists the choice and calls `location.reload()` — a full reload is the simplest way to safely re-render everything in the new language. A user who explicitly picked Dutch keeps it; only users with no stored preference get English.
+- A `?lang=en` / `?lang=nl` query param (handled by `captureMarketingParams()`, which runs *before* the i18n init) writes the preference on first load, so marketing links can deep-link into either language.
+- `initI18nObserver()` also mirrors `currentLang` onto `document.documentElement.lang`; the static `<html lang="en">` attribute and `manifest.json` (`lang`, `description`, shortcut names) are English, since neither is reachable by the DOM observer.
 - `LOCALE()` returns `'en-US'`/`'nl-NL'` for use in `toLocaleDateString`/`toLocaleString` calls (`fmtDate`, `dateBucket`, etc.) so dates/weekdays/months localize correctly.
 - `I18N_PATTERNS` (regex → replacement) and `I18N_PHRASES` (plain NL substring → EN substring, sorted longest-first) together define the translation. `i18nTranslate(str)` applies patterns then phrases; it is a no-op when `currentLang !== 'en'`.
 - `translateSubtree(node)` walks text nodes plus `placeholder`/`title`/`aria-label` attributes, only writing back when the translated value actually differs (writing back an unchanged value would re-trigger the observer below and loop).
 - A single `MutationObserver` on `document.body` (installed once via `initI18nObserver()`) calls `translateSubtree` on every added/changed node when `currentLang === 'en'`. Because every `render*()` function already works by reassigning `innerHTML`, this one observer transparently covers all current and future dynamic content — no per-function changes needed.
-- Since NL is the untouched source language, adding a new Dutch string needs **no code change** for Dutch. To make it appear translated in English, add an `['Dutch phrase','English phrase']` entry to `I18N_PHRASES` (or a regex to `I18N_PATTERNS` if the string has interpolated values). Prefer the longest, most specific phrase that makes sense — the sort-by-length means longer entries are substituted before shorter/generic ones, avoiding accidental partial-word matches (e.g. `'Wisselen'` must have its own entry so the generic `'Wis'→'Clear'` rule doesn't mangle it into `'Clearselen'`).
+- The observer only sees `document.body`. Text that never lands in the DOM — `navigator.share({title,text})` payloads, canvas `ctx.fillText()` labels, `alert()` — must be translated explicitly with `i18nTranslate()` or branched on `currentLang`. Prefer `toast()` over `alert()` for exactly this reason. When translating a string that embeds user content (a session note, a gym name), translate the surrounding parts separately so the user's own text is left alone — the DOM equivalent is the `data-no-i18n` attribute.
+- Since NL is the untouched source language, adding a new Dutch string needs **no code change** for Dutch. To make it appear in English — which is what nearly every user sees — add an `['Dutch phrase','English phrase']` entry to `I18N_PHRASES` (or a regex to `I18N_PATTERNS` if the string has interpolated values). Prefer the longest, most specific phrase that makes sense — the sort-by-length means longer entries are substituted before shorter/generic ones, avoiding accidental partial-word matches (e.g. `'Wisselen'` must have its own entry so the generic `'Wis'→'Clear'` rule doesn't mangle it into `'Clearselen'`).
 
 ### Finding functions
 
@@ -194,7 +199,7 @@ profile management → data persistence → feed rendering → forms → charts 
 
 - **XSS protection:** User-supplied strings must be HTML-escaped before insertion into `innerHTML`. Use the existing `escHtml()` utility function for this.
 - **Mobile-first:** The layout targets max-width 430px. Use CSS `env(safe-area-inset-*)` for fixed bottom elements.
-- **Dutch UI, EN/NL toggle:** All source strings (HTML markup + JS template literals) are written in Dutch — keep new strings in Dutch. English is a runtime translation layer on top (see [Internationalization (i18n)](#internationalization-i18n)); when adding new user-facing text, no code change is required for English support, but add an entry to the `I18N_PHRASES` dictionary in `index.html` if the string should be translatable.
+- **English UI, Dutch source strings:** All source strings (HTML markup + JS template literals) are written in Dutch — keep new strings in Dutch. English is a runtime translation layer on top (see [Internationalization (i18n)](#internationalization-i18n)). Because English is now the **default** language, a new Dutch string with no `I18N_PHRASES` entry is visible Dutch text for nearly every user — so adding the entry is required, not optional. Text that never reaches the DOM (`navigator.share` payloads, canvas `fillText`, `alert()`) is not covered by the observer and must call `i18nTranslate()` explicitly, or branch on `currentLang`.
 - **PWA offline:** All new static assets must be listed in the `sw.js` cache array and the cache version bumped.
 - **No build system** — keep logic self-contained; avoid introducing npm dependencies or build tools.
 - **Cloud-aware mutations:** If a data mutation should sync to Supabase, mark the relevant table dirty via the cloud.js dirty-tracking mechanism after saving to localStorage.

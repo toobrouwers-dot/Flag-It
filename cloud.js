@@ -693,7 +693,8 @@ async function saveAccountSettings() {
   const displayName = document.getElementById('acct-displayname')?.value?.trim();
   const bio         = document.getElementById('acct-bio')?.value?.trim();
   const isPublic    = document.getElementById('acct-public')?.checked ?? true;
-  if (!username) { alert('Gebruikersnaam is verplicht'); return; }
+  // Via toast i.p.v. alert: alert() omzeilt de i18n-DOM-vertaling.
+  if (!username) { if (typeof toast === 'function') toast('Gebruikersnaam is verplicht'); return; }
   try {
     await cloudUpdateAccount({ username, display_name: displayName, bio, is_public: isPublic });
     document.querySelector('.modal-overlay')?.remove();
@@ -703,7 +704,7 @@ async function saveAccountSettings() {
     if (user) cloudUpdateAuthBadge(user, { username, display_name: displayName });
     _syncAccountToProfile({ display_name: displayName, username });
   } catch(e) {
-    alert('Opslaan mislukt: ' + (e.message || ''));
+    if (typeof toast === 'function') toast('Opslaan mislukt: ' + (e.message || ''));
   }
 }
 

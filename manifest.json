@@ -1,7 +1,9 @@
 {
   "name": "Flag it",
   "short_name": "Flag it",
-  "description": "Bouldering sessie tracker",
+  "description": "Bouldering session tracker",
+  "lang": "en",
+  "dir": "ltr",
   "start_url": "/Flag-It/",
   "scope": "/Flag-It/",
   "display": "standalone",
@@ -37,7 +39,7 @@
   ],
   "shortcuts": [
     {
-      "name": "Sessie loggen",
+      "name": "Log session",
       "short_name": "Log",
       "url": "/Flag-It/",
       "icons": [{ "src": "/Flag-It/icons/icon-192.png", "sizes": "192x192" }]

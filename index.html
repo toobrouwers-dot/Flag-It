@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Flag it">
 <meta name="theme-color" content="#0a0a0a">
-<meta name="description" content="Flag It is een gratis bouldering- en hangboard-tracker: log sessies en routes, volg je voortgang en PR's, stel doelen in en train met vrienden.">
+<meta name="description" content="Flag It is a free bouldering and hangboard tracker: log sessions and routes, follow your progress and PRs, set goals and train with friends.">
 <title>Flag it</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -1165,10 +1165,10 @@ select option{background:#1e1e1e}
   </div>
   <div id="meer-tab-gyms">
   <div class="gyms-content">
-    <div class="form-section-title" style="padding:0 0 10px">Taal / Language</div>
+    <div class="form-section-title" style="padding:0 0 10px">Language / Taal</div>
     <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button class="btn-export btn-lang" id="btn-lang-nl" onclick="setLang('nl')" style="flex:1;text-align:center">🇳🇱 Nederlands</button>
       <button class="btn-export btn-lang" id="btn-lang-en" onclick="setLang('en')" style="flex:1;text-align:center">🇬🇧 English</button>
+      <button class="btn-export btn-lang" id="btn-lang-nl" onclick="setLang('nl')" style="flex:1;text-align:center">🇳🇱 Nederlands</button>
     </div>
     <div id="gym-list" style="margin-bottom:16px"></div>
     <div class="form-section-title" style="padding:0 0 10px">Gym toevoegen</div>
@@ -1327,7 +1327,7 @@ const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch',
 /* ══════════════════════════════════════════
    MARKETING ATTRIBUTION (utm_source, lang)
    Vangt query params op vóór de I18N/taal-init hieronder
-   zodat een link als ?utm_source=instagram&lang=en zowel de
+   zodat een link als ?utm_source=instagram&lang=nl zowel de
    signup-bron als de taal op de eerste load al zet.
 ══════════════════════════════════════════ */
 (function captureMarketingParams(){
@@ -1336,8 +1336,9 @@ const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch',
   if(utmSource && !localStorage.getItem('flagit_signup_source_v1')){
     localStorage.setItem('flagit_signup_source_v1',utmSource);
   }
-  if(qp.get('lang')==='en'){
-    localStorage.setItem('flagit_lang_v1','en');
+  const lang=qp.get('lang');
+  if(lang==='en'||lang==='nl'){
+    localStorage.setItem('flagit_lang_v1',lang);
   }
   if(utmSource || qp.has('lang') || qp.has('utm_medium')){
     history.replaceState(null,'',location.pathname);
@@ -1346,11 +1347,13 @@ const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch',
 
 /* ══════════════════════════════════════════
    I18N — EN/NL taalkeuze
-   NL blijft de brontaal (alle bestaande strings ongewijzigd).
-   Vertaling gebeurt live in de DOM zodat geen van de ~200
+   EN is de standaardtaal van de app; NL is opt-in via de toggle
+   in Meer (of ?lang=nl). NL blijft wel de brontaal in de code:
+   alle strings worden in het Nederlands geschreven en live in de
+   DOM naar het Engels vertaald, zodat geen van de ~200
    render*()-functies aangeraakt hoeft te worden.
 ══════════════════════════════════════════ */
-let currentLang=localStorage.getItem('flagit_lang_v1')||'nl';
+let currentLang=localStorage.getItem('flagit_lang_v1')||'en';
 function LOCALE(){return currentLang==='en'?'en-US':'nl-NL'}
 function setLang(lang){
   if(lang!==currentLang){localStorage.setItem('flagit_lang_v1',lang);location.reload();}
@@ -1394,7 +1397,8 @@ const I18N_PHRASES=[
   ['Eerste sessie loggen','Log your first session'],
   ['Ernst (1 = licht, 5 = zwaar)','Severity (1 = mild, 5 = severe)'],
   ['Feedback versturen','Send feedback'],['Feedback','Feedback'],['Feed','Feed'],
-  ['Filters wissen','Clear filters'],['Flash-percentage:','Flash percentage:'],['Flash','Flash'],
+  ['Filters wissen','Clear filters'],['Filter op minimale graad','Filter by minimum grade'],['Filter op gym','Filter by gym'],
+  ['Flash-percentage:','Flash percentage:'],['Flash','Flash'],
   ['Gebruikersnaam is verplicht','Username is required'],['Gebruikersnaam','Username'],
   ['Geen hogere graden — je hebt de top bereikt!','No higher grades — you\'ve reached the top!'],
   ['Geen klimmers gevonden','No climbers found'],['Geen posts','No posts'],['Geen projecten','No projects'],
@@ -1834,7 +1838,8 @@ const I18N_PHRASES=[
   ['Afgelopen','Past'],
   ['Hangboard','Hangboard'],
   ['Verhalen zijn alleen in het Nederlands beschikbaar','Stories are only available in Dutch'],
-  ['Klimverhaal','Climbing story'],['Nieuw verhaal','New story'],['Herschud','Reshuffle'],
+  ['Mijn klimverhaal','My climbing story'],['Klimverhaal','Climbing story'],['Nieuw verhaal','New story'],['Herschud','Reshuffle'],
+  ['— gelogd met Flag-It 🏔️','— logged with Flag-It 🏔️'],
   ['Poëtisch','Poetic'],['Episch','Epic'],['Droog','Dry'],['Delen','Share'],
   ['Hoofdnavigatie','Main navigation'],['Dupliceer route','Duplicate route'],
   ['bijv. tot 3e greep voor de eindgreep, of: de crux move lukt niet',"e.g. up to the 3rd hold before the final hold, or: the crux move isn't working"],
@@ -1888,6 +1893,7 @@ function updateLangButtons(){
   en.classList.toggle('active',currentLang==='en');
 }
 function initI18nObserver(){
+  document.documentElement.lang=currentLang;
   if(currentLang==='en')translateSubtree(document.body);
   updateLangButtons();
   const observer=new MutationObserver(muts=>{
@@ -4024,16 +4030,18 @@ function shareSession(id){
   const flashes=s.routes.filter(r=>r.result==='flash').length;
   const tops=s.routes.filter(r=>r.result==='top').length;
   const pct=s.routes.length?Math.round((flashes+tops)/s.routes.length*100):0;
+  /* Share-tekst gaat nooit door de DOM, dus per regel expliciet
+     vertalen — de notitie blijft onvertaald (gebruikerstekst). */
   const lines=[
-    `🧗 ${s.gym||'Klimsessie'} — ${fmtDate(s.date)}`,
-    mg?`Max graad: ${mg.grade}`:'',
-    `${s.routes.length} routes · ${tops} top${tops!==1?'s':''} · ${flashes} flash${flashes!==1?'es':''} · ${pct}% geslaagd`,
+    `🧗 ${s.gym||i18nTranslate('Klimsessie')} — ${fmtDate(s.date)}`,
+    mg?i18nTranslate(`Max graad: ${mg.grade}`):'',
+    i18nTranslate(`${s.routes.length} routes · ${tops} top${tops!==1?'s':''} · ${flashes} flash${flashes!==1?'es':''} · ${pct}% geslaagd`),
     s.note?`"${s.note}"`:'',
-    '— gelogd met Flag-It 🏔️'
+    i18nTranslate('— gelogd met Flag-It 🏔️')
   ].filter(Boolean).join('\n');
   const btn=document.querySelector(`button[onclick="shareSession(${id})"]`);
   if(navigator.share){
-    navigator.share({title:'Mijn klimsessie',text:lines}).catch(()=>{});
+    navigator.share({title:i18nTranslate('Mijn klimsessie'),text:lines}).catch(()=>{});
   }else if(navigator.clipboard){
     navigator.clipboard.writeText(lines).then(()=>{
       if(btn){const orig=btn.innerHTML;btn.innerHTML='✓';setTimeout(()=>{btn.innerHTML=orig;},1500);}
@@ -4345,9 +4353,11 @@ function _shuffleStory(sessionId){
 function _shareStory(sessionId){
   const s=sessions.find(x=>x.id===sessionId);if(!s)return;
   const story=generateSessionStory(s,_storyState.tone,_storyState.nonce);
-  const text=`📖 ${story}\n\n— gelogd met Flag-It 🏔️`;
+  /* Het verhaal zelf blijft Nederlands (zie data-no-i18n in de modal);
+     alleen de ondertekening wordt vertaald. */
+  const text=`📖 ${story}\n\n${i18nTranslate('— gelogd met Flag-It 🏔️')}`;
   if(navigator.share){
-    navigator.share({title:'Mijn klimverhaal',text}).catch(()=>{});
+    navigator.share({title:i18nTranslate('Mijn klimverhaal'),text}).catch(()=>{});
   }else if(navigator.clipboard){
     navigator.clipboard.writeText(text).then(()=>toast('Gekopieerd naar klembord')).catch(()=>{});
   }
