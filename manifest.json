@@ -10,7 +10,10 @@
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
   "orientation": "portrait",
-  "categories": ["sports", "productivity"],
+  "categories": [
+    "sports",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "/Flag-It/icons/icon-192.png",
@@ -41,8 +44,38 @@
     {
       "name": "Log session",
       "short_name": "Log",
-      "url": "/Flag-It/",
-      "icons": [{ "src": "/Flag-It/icons/icon-192.png", "sizes": "192x192" }]
+      "description": "Start a new bouldering session",
+      "url": "/Flag-It/?p=log",
+      "icons": [
+        {
+          "src": "/Flag-It/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Quick send",
+      "short_name": "Quick",
+      "description": "Log a single top in two taps",
+      "url": "/Flag-It/?p=quicktop",
+      "icons": [
+        {
+          "src": "/Flag-It/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Hangboard",
+      "short_name": "Hang",
+      "description": "Hangboard training and timers",
+      "url": "/Flag-It/?p=hang",
+      "icons": [
+        {
+          "src": "/Flag-It/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

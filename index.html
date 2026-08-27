@@ -366,6 +366,7 @@ select option{background:#1e1e1e}
 /* TOAST */
 .toast{position:fixed;bottom:calc(80px + var(--safe-bot));left:50%;transform:translateX(-50%) translateY(20px);background:var(--success);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 24px;border-radius:40px;opacity:0;transition:all .3s;z-index:200;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-action{margin-left:14px;padding-left:14px;border-left:1px solid rgba(255,255,255,.35);text-decoration:underline;text-underline-offset:2px}
 
 /* PULL-TO-REFRESH */
 @keyframes ptrSpin{to{transform:translateX(-50%) rotate(360deg)}}
@@ -939,6 +940,7 @@ select option{background:#1e1e1e}
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
       <div class="hero-greeting">Jouw stats</div>
       <div style="display:flex;align-items:center;gap:6px">
+        <div id="offline-badge" class="cloud-badge cloud-badge-off" style="display:none">Offline</div>
         <div id="cloud-auth-badge"></div>
         <div id="cloud-sync-dot" class="cloud-sync-dot" title="Sync status"></div>
       </div>
@@ -1065,6 +1067,7 @@ select option{background:#1e1e1e}
   <div id="analyse-tab-stats">
   <div class="stats-content">
     <div id="insights-section"></div>
+    <div id="charts-offline-note"></div>
     <div class="pr-row">
       <div class="pr-card"><div class="pr-label">Hoogste top</div><div class="pr-grade" id="pr-top">—</div><div class="pr-date" id="pr-top-date"></div></div>
       <div class="pr-card"><div class="pr-label">Hoogste flash</div><div class="pr-grade flash" id="pr-flash">—</div><div class="pr-date" id="pr-flash-date"></div></div>
@@ -1227,6 +1230,8 @@ select option{background:#1e1e1e}
       <div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sets gelogd</div>
     </div>
 
+    <div id="charts-offline-note-hang"></div>
+
     <div class="chart-card" style="margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
         <div class="chart-card-title">Hangtijd progressie</div>
@@ -1340,7 +1345,12 @@ const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch',
   if(lang==='en'||lang==='nl'){
     localStorage.setItem('flagit_lang_v1',lang);
   }
-  if(utmSource || qp.has('lang') || qp.has('utm_medium')){
+  // Deep link vanaf een app-shortcut (?p=log). Allowlist, geen vrije input.
+  // De waarde moet hier in een globale: replaceState() hieronder wist de
+  // querystring, dus later opnieuw uit location.search lezen kan niet meer.
+  const page=qp.get('p');
+  if(page&&/^[a-z]{1,12}$/.test(page))window._bootPage=page;
+  if(utmSource || qp.has('lang') || qp.has('p') || qp.has('utm_medium')){
     history.replaceState(null,'',location.pathname);
   }
 })();
@@ -1859,6 +1869,8 @@ const I18N_PHRASES=[
   ['Gekopieerd naar klembord','Copied to clipboard'],
   [' weken resterend',' weeks left'],['Laatste week!','Last week!'],
   ['% boven gemiddeld','% above average'],
+  ['Ongedaan maken','Undo'],
+  ['Grafieken zijn offline niet beschikbaar. Ze komen terug zodra je weer verbinding hebt.','Charts are unavailable offline. They come back as soon as you are online again.'],
   ['sessie','session'],
 ];
 I18N_PHRASES.sort((a,b)=>b[0].length-a[0].length);
@@ -2311,12 +2323,34 @@ function saveProjectLore(){
   try{localStorage.setItem(PLRK,JSON.stringify(projectLoreCache))}catch(e){toast('Opslaan mislukt','#e53935')}
 }
 // Generiek verwijder-patroon: muteer array in place, bewaar, her-render.
-function deleteItem(arr,id,saveFn,renderFn){
+// Het verwijderde item blijft in _lastDeleted staan zodat undoDelete() het
+// op zijn oude plek kan terugzetten — één toast houdt alle deleteflows af.
+let _lastDeleted=null;
+function deleteItem(arr,id,saveFn,renderFn,onUndo){
   const idx=arr.findIndex(x=>x.id===id);
-  if(idx===-1)return;
+  if(idx===-1)return false;
+  _lastDeleted={arr,item:arr[idx],idx,saveFn,renderFn,onUndo};
   arr.splice(idx,1);
   saveFn();
   renderFn();
+  return true;
+}
+function undoDelete(){
+  const d=_lastDeleted;
+  if(!d)return;
+  _lastDeleted=null;
+  d.arr.splice(Math.min(d.idx,d.arr.length),0,d.item);
+  // sessies staan op datum gesorteerd; na herstel opnieuw sorteren zodat de feed klopt
+  if(d.arr===sessions)sessions.sort((a,b)=>a.date.localeCompare(b.date));
+  if(typeof d.onUndo==='function')d.onUndo(d.item);
+  d.saveFn();
+  d.renderFn();
+  toast('Hersteld');
+}
+// Verwijderen mét vangnet: toont een toast waarmee je het meteen terugdraait.
+function deleteWithUndo(arr,id,saveFn,renderFn,msg,onUndo){
+  if(!deleteItem(arr,id,saveFn,renderFn,onUndo))return;
+  toast(msg,'#e53935',{label:'Ongedaan maken',fn:undoDelete});
 }
 function loadArr(k,fb){
   try{
@@ -2338,6 +2372,27 @@ function getPR(type){const r=allRoutes().filter(x=>type==='flash'?x.result==='fl
 function maxGrade(routes){const t=routes.filter(r=>r.result!=='poging');if(!t.length)return null;return t.reduce((b,r)=>gi(r.grade)>gi(b.grade)?r:b,t[0])}
 function getResultColor(res){return res==='top'?'var(--success)':res==='flash'?'var(--flash)':'var(--attempt)'}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+/* Chart.js komt van een CDN. Bij een koude start zonder internet bestaat hij
+   niet; de grafieken slaan zichzelf dan over in plaats van te crashen, en we
+   leggen één keer per pagina uit waarom ze leeg zijn. */
+function _chartsAvailable(){return typeof Chart!=='undefined'}
+function _renderChartsOfflineNote(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.innerHTML=_chartsAvailable()?'':'<div class="chart-card" style="text-align:center;color:var(--muted);font-size:13px">Grafieken zijn offline niet beschikbaar. Ze komen terug zodra je weer verbinding hebt.</div>';
+}
+function initOfflineBadge(){
+  const el=document.getElementById('offline-badge');
+  if(!el)return;
+  const upd=()=>{el.style.display=navigator.onLine?'none':''};
+  window.addEventListener('offline',upd);
+  window.addEventListener('online',()=>{
+    upd();
+    _renderChartsOfflineNote('charts-offline-note');
+    _renderChartsOfflineNote('charts-offline-note-hang');
+  });
+  upd();
+}
 const haptic=(ms=10)=>{if(navigator.vibrate)navigator.vibrate(ms)};
 function dateBucket(dateStr){
   const today=new Date().toISOString().split('T')[0];
@@ -2471,11 +2526,23 @@ function confirmNavLeave(){
   showPage(target);
 }
 
-function toast(msg,color){
+let _toastTimer=null;
+// action = {label, fn} maakt de toast klikbaar en verlengt hem naar 6s (undo-patroon).
+function toast(msg,color,action){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.style.background=color||'var(--success)';
-  t.style.pointerEvents='none';t.style.cursor='';t.onclick=null;
-  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)
+  clearTimeout(_toastTimer);
+  t.onclick=null;
+  if(action&&typeof action.fn==='function'){
+    t.innerHTML=`<span>${esc(msg)}</span><span class="toast-action">${esc(action.label)}</span>`;
+    t.style.pointerEvents='auto';t.style.cursor='pointer';
+    t.onclick=()=>{clearTimeout(_toastTimer);t.onclick=null;t.style.pointerEvents='none';t.style.cursor='';t.classList.remove('show');action.fn();};
+  }else{
+    t.textContent=msg;
+    t.style.pointerEvents='none';t.style.cursor='';
+  }
+  t.style.background=color||'var(--success)';
+  t.classList.add('show');
+  _toastTimer=setTimeout(()=>t.classList.remove('show'),action?6000:2200);
 }
 
 /* ══════════════════════════════════════════
@@ -2889,7 +2956,7 @@ function deleteSession(id){
   const s=sessions.find(x=>x.id===id);if(!s)return;
   showDeleteConfirm('Sessie verwijderen?',`${esc(s.gym||'Gym')} — ${fmtDate(s.date)}`,()=>confirmDelete(id));
 }
-function confirmDelete(id){haptic(8);deleteItem(sessions,id,save,renderFeed);toast('Sessie verwijderd','#e53935')}
+function confirmDelete(id){haptic(8);deleteWithUndo(sessions,id,save,renderFeed,'Sessie verwijderd')}
 
 function editSession(id){
   const s=sessions.find(x=>x.id===id);if(!s)return;
@@ -2940,8 +3007,7 @@ function deleteGym(id){
   showDeleteConfirm('Gym verwijderen?',esc(g.name),()=>confirmDeleteGym(id));
 }
 function confirmDeleteGym(id){
-  deleteItem(gyms,id,()=>{if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms()},()=>{renderGymsPage();refreshGymSelect()});
-  toast('Gym verwijderd','#e53935');
+  deleteWithUndo(gyms,id,()=>{if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms()},()=>{renderGymsPage();refreshGymSelect()},'Gym verwijderd');
 }
 function renderGymsPage(){
   const list=document.getElementById('gym-list');
@@ -3298,7 +3364,7 @@ function addCountGoal(){
   goals.push({id:Date.now(),type:'count',grade,result,count,deadline,createdAt:new Date().toISOString().split('T')[0]});
   saveGoals();renderGoals();toast('Doel toegevoegd!');
 }
-function deleteGoal(id){deleteItem(goals,id,saveGoals,renderGoals);toast('Doel verwijderd','#e53935')}
+function deleteGoal(id){deleteWithUndo(goals,id,saveGoals,renderGoals,'Doel verwijderd')}
 
 function renderGoals(){
   const trashSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>`;
@@ -3604,11 +3670,11 @@ function deleteHangSession(id){
   showDeleteConfirm('Hangsessie verwijderen?',`${esc(fmtDate(s.date))} · ${s.sets.length} set${s.sets.length!==1?'s':''}`,()=>confirmDeleteHangSession(id));
 }
 function confirmDeleteHangSession(id){
-  deleteItem(hangSessions,id,saveHang,renderHangPage);
-  toast('Verwijderd','#e53935');
+  deleteWithUndo(hangSessions,id,saveHang,renderHangPage,'Verwijderd');
 }
 
 function renderHangPage(){
+  _renderChartsOfflineNote('charts-offline-note-hang');
   renderFingerHealth();
   // PR per grip: langste hangtijd
   const prRow=document.getElementById('hang-pr-row');
@@ -3659,6 +3725,7 @@ function renderHangChart(){
   if(!canvas)return;
   if(chartH){chartH.destroy();chartH=null;}
   if(!pts.length)return;
+  if(!_chartsAvailable())return;
   chartH=new Chart(canvas,{type:'line',data:{labels:pts.map(p=>p.date.slice(5)),datasets:[{data:pts.map(p=>p.time),borderColor:'#e91e8c',backgroundColor:'rgba(233,30,140,0.1)',borderWidth:2,pointBackgroundColor:'#e91e8c',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{beginAtZero:true,ticks:{color:CHART_TICK_COLOR,font:{size:11},callback:v=>fmtSecs(v)},grid:{color:'rgba(255,255,255,0.05)'}}}}});
 }
 
@@ -3896,6 +3963,7 @@ function renderTLI(){
   const canvas=document.getElementById('chart-tli');
   if(!canvas)return;
   if(tliChart){tliChart.destroy();tliChart=null}
+  if(!_chartsAvailable())return;
   tliChart=new Chart(canvas,{type:'bar',data:{labels:data.map(d=>d.label),datasets:[{data:data.map(d=>d.tli),backgroundColor:data.map((_,i)=>i===data.length-1?'rgba(127,119,221,.85)':'rgba(127,119,221,.3)'),borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:10}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:CHART_TICK_COLOR,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
 }
 
@@ -3929,15 +3997,16 @@ function renderStats(){
     }else feelEl.innerHTML='';
   }
 
+  _renderChartsOfflineNote('charts-offline-note');
   const maxPS=[],chartSessions=[];
   sessions.forEach(s=>{const mg=maxGrade(s.routes);if(mg){maxPS.push({date:s.date,idx:gi(mg.grade)});chartSessions.push(s);}});
-  if(chartP)chartP.destroy();
-  chartP=new Chart(document.getElementById('chart-progress'),{type:'line',data:{labels:maxPS.map(s=>s.date.slice(5)),datasets:[{data:maxPS.map(s=>s.idx),borderColor:'#7f77dd',backgroundColor:'rgba(127,119,221,0.12)',borderWidth:2,pointBackgroundColor:'#7f77dd',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,items)=>{if(items.length>0)showSessionDetailModal(chartSessions[items[0].index]);},plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{min:0,max:GRADES.length-1,ticks:{color:CHART_TICK_COLOR,font:{size:11},callback:v=>GRADES[v]||'',stepSize:2},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+  if(chartP){chartP.destroy();chartP=null}
+  if(_chartsAvailable())chartP=new Chart(document.getElementById('chart-progress'),{type:'line',data:{labels:maxPS.map(s=>s.date.slice(5)),datasets:[{data:maxPS.map(s=>s.idx),borderColor:'#7f77dd',backgroundColor:'rgba(127,119,221,0.12)',borderWidth:2,pointBackgroundColor:'#7f77dd',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,items)=>{if(items.length>0)showSessionDetailModal(chartSessions[items[0].index]);},plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{min:0,max:GRADES.length-1,ticks:{color:CHART_TICK_COLOR,font:{size:11},callback:v=>GRADES[v]||'',stepSize:2},grid:{color:'rgba(255,255,255,0.05)'}}}}});
   renderTLI();
 
   const counts={};GRADES.forEach(g=>counts[g]=0);allR.filter(r=>r.result!=='poging').forEach(r=>counts[r.grade]++);const used=GRADES.filter(g=>counts[g]>0);
-  if(chartG)chartG.destroy();
-  chartG=new Chart(document.getElementById('chart-grades'),{type:'bar',data:{labels:used.length?used:['—'],datasets:[{data:used.length?used.map(g=>counts[g]):[0],backgroundColor:used.map(g=>GRADE_COLORS[GRADES.indexOf(g)]||'#444'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:CHART_TICK_COLOR,font:{size:11},stepSize:1},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+  if(chartG){chartG.destroy();chartG=null}
+  if(_chartsAvailable())chartG=new Chart(document.getElementById('chart-grades'),{type:'bar',data:{labels:used.length?used:['—'],datasets:[{data:used.length?used.map(g=>counts[g]):[0],backgroundColor:used.map(g=>GRADE_COLORS[GRADES.indexOf(g)]||'#444'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:CHART_TICK_COLOR,font:{size:11},stepSize:1},grid:{color:'rgba(255,255,255,0.05)'}}}}});
 
   renderPyramid();
   renderPyramidAudit();
@@ -4441,9 +4510,12 @@ function deleteProject(id){
   showDeleteConfirm('Project verwijderen?',esc(p.grade+(p.name?' · '+p.name:'')+(p.gym?' @ '+p.gym:'')),()=>confirmDeleteProject(id));
 }
 function confirmDeleteProject(id){
-  deleteItem(projects,id,saveProjects,renderProjects);
-  if(projectLoreCache[id]){delete projectLoreCache[id];saveProjectLore();}
-  toast('Project verwijderd','#e53935');
+  // Quest Lore hoort bij het project: bewaren zodat undo ook de lore terugzet.
+  const lore=projectLoreCache[id];
+  if(lore){delete projectLoreCache[id];saveProjectLore();}
+  deleteWithUndo(projects,id,saveProjects,renderProjects,'Project verwijderd',()=>{
+    if(lore){projectLoreCache[id]=lore;saveProjectLore();}
+  });
 }
 
 function openProjectModal(id){
@@ -4836,8 +4908,7 @@ function deleteComp(id){
   showDeleteConfirm('Competitie verwijderen?',esc(c.name),()=>confirmDeleteComp(id));
 }
 function confirmDeleteComp(id){
-  deleteItem(competitions,id,saveCompetitions,()=>{renderCompSection();renderCompCountdown()});
-  toast('Competitie verwijderd','#e53935');
+  deleteWithUndo(competitions,id,saveCompetitions,()=>{renderCompSection();renderCompCountdown()},'Competitie verwijderd');
 }
 
 /* ══════════════════════════════════════════
@@ -5253,7 +5324,7 @@ function toggleInjuryStatus(id){
   if(inj){inj.status=inj.status==='active'?'recovered':'active';saveInjuries();renderFingerHealth();}
 }
 
-function deleteInjury(id){deleteItem(injuries,id,saveInjuries,renderFingerHealth);toast('Verwijderd','#e53935')}
+function deleteInjury(id){deleteWithUndo(injuries,id,saveInjuries,renderFingerHealth,'Verwijderd')}
 
 /* ══════════════════════════════════════════
    GRADE PYRAMID AUDITOR
@@ -5312,6 +5383,7 @@ function renderStokeRadar(){
   const el=document.getElementById('stoke-radar-section');
   if(!el)return;
   if(stokeRadarChart){stokeRadarChart.destroy();stokeRadarChart=null;}
+  if(!_chartsAvailable()){el.innerHTML='';return;}
   const feelSessions=sessions.filter(s=>s.feel!=null);
   if(feelSessions.length<5){el.innerHTML='';return;}
   const typeTotal={};const typeCnt={};
@@ -6227,6 +6299,7 @@ function initApp(profileId){
     navigator.serviceWorker.addEventListener('message',e=>{
       if(e.data?.type==='SW_UPDATED'){
         const t=document.getElementById('toast');
+        clearTimeout(_toastTimer);
         t.textContent='Nieuwe versie — tik om te herladen';
         t.style.background='var(--accent)';
         t.style.cursor='pointer';
@@ -6241,6 +6314,7 @@ function initApp(profileId){
     initSwipeNav();
     initPullToRefresh();
     initInstallPrompt();
+    initOfflineBadge();
     if(typeof cloudInitAuthListener==='function')cloudInitAuthListener();
   }
 
@@ -6277,6 +6351,23 @@ function initApp(profileId){
     const el=document.getElementById('start-screen');
     if(el)el.remove();
   }
+
+  _applyBootPage();
+}
+
+/* Deep link uit een PWA-shortcut afhandelen. showPage() vangt de drie
+   ingetrokken id's (sociaal/coach/hang) zelf al af, dus die mogen mee. */
+const BOOT_PAGES=[...PAGE_ORDER,'sociaal','coach','hang'];
+function _applyBootPage(){
+  const p=window._bootPage;
+  if(!p)return;
+  window._bootPage=null;
+  if(p==='quicktop'){
+    showPage('log');
+    setTimeout(()=>openQuickTop('top'),350);
+    return;
+  }
+  if(BOOT_PAGES.includes(p))showPage(p);
 }
 
 /* ══════════════════════════════════════════
