@@ -1,10 +1,11 @@
-const CACHE = 'flagit-v31';
+const CACHE = 'flagit-v32';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './cloud.js',
   './social.js',
+  './beta.js',
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];

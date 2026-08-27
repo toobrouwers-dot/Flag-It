@@ -105,6 +105,43 @@ body.nav-transitioning{overflow:hidden}
 .btn-voice.continuous{border-color:var(--accent);background:rgba(127,119,221,.14);color:var(--accent);animation:voicePulse 1.3s ease-in-out infinite}
 @keyframes voicePulse{0%,100%{opacity:1}50%{opacity:.55}}
 .voice-hint{font-size:11px;color:var(--muted);margin:-6px 0 12px;line-height:1.4}
+/* ── GRAAD-KALIBRATOR ────────────────────────────────── */
+.calib-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px}
+.calib-verdict{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;line-height:1.05;text-transform:uppercase;letter-spacing:.3px}
+.calib-scale{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,#d93a3a,rgba(136,136,136,.35),#3ea15e);margin:12px 0 6px}
+.calib-scale-pin{position:absolute;top:-4px;width:3px;height:14px;border-radius:2px;background:var(--text);transform:translateX(-1.5px)}
+.calib-scale-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:14px}
+.calib-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.calib-grade{width:34px;flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;text-align:right}
+.calib-bars{flex:1;display:flex;flex-direction:column;gap:3px}
+.calib-bar{height:7px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden}
+.calib-bar span{display:block;height:100%;border-radius:4px}
+.calib-pct{width:74px;flex-shrink:0;text-align:right;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.calib-legend{display:flex;gap:14px;font-size:11px;color:var(--muted);margin:10px 0 4px}
+.calib-legend i{display:inline-block;width:10px;height:6px;border-radius:3px;margin-right:5px}
+.calib-rank-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:.5px solid var(--border);font-size:13px}
+.calib-rank-row:last-child{border-bottom:0}
+.calib-note{font-size:11px;color:var(--muted);line-height:1.45;margin-top:12px}
+.calib-select{width:100%;margin-bottom:12px}
+/* ── GYM BETA BOARD ──────────────────────────────────── */
+.beta-box{max-width:420px;width:100%}
+.beta-gym{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);margin:-10px 0 12px}
+.beta-list{overflow-y:auto;flex:1;min-height:60px;margin-bottom:8px}
+.beta-item{background:var(--surface2);border:.5px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:8px}
+.beta-item-top{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.beta-tag{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);background:rgba(255,255,255,.06);border-radius:20px;padding:2px 8px}
+.beta-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;border:.5px solid rgba(255,255,255,.3)}
+.beta-when{margin-left:auto;font-size:11px;color:var(--muted)}
+.beta-body{font-size:14px;line-height:1.45;color:var(--text);white-space:pre-wrap;word-break:break-word}
+.beta-foot{display:flex;align-items:center;gap:10px;margin-top:8px}
+.beta-who{font-size:12px;color:var(--muted)}
+.beta-act{margin-left:auto;background:none;border:none;color:var(--muted);font-family:'Barlow',sans-serif;font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
+.beta-act:hover{color:var(--danger)}
+.beta-form-row{display:flex;gap:8px;margin-bottom:8px}
+.beta-form-row .form-input{flex:1;min-width:0}
+.btn-gym-beta{background:none;border:.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Barlow',sans-serif;font-size:12px;padding:6px 10px;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s}
+.btn-gym-beta:active{color:var(--accent);border-color:var(--accent)}
+.btn-route-beta{background:none;border:none;color:var(--accent);font-family:'Barlow',sans-serif;font-size:12px;text-decoration:underline;cursor:pointer;padding:4px 0}
 .chip-top .dot{background:var(--success)}.chip-flash .dot{background:var(--flash)}.chip-poging .dot{background:var(--attempt)}
 
 .btn-delete{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s,border-color .2s;min-width:44px;min-height:44px}
@@ -1146,6 +1183,7 @@ select option{background:#1e1e1e}
     <div id="dna-section"></div>
     <div class="chart-card"><div class="chart-card-title">Per gym</div><div id="stats-gyms"><div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sessies</div></div></div>
     <div id="color-stat-section"></div>
+    <div id="calibrator-section"></div>
     <div id="grade-norm-section"></div>
     <div id="weakness-section"></div>
     <div id="oracle-section"></div>
@@ -1265,6 +1303,9 @@ select option{background:#1e1e1e}
       <div class="spotify-arrow">→</div>
     </a>
 
+    <div class="form-section-title" style="padding:20px 0 10px">Gym-statistieken</div>
+    <div id="stats-optout-section"></div>
+
     <div class="form-section-title" style="padding:20px 0 10px">Profiel</div>
     <div id="profile-mgmt-section"></div>
     <div class="form-section-title" style="padding:20px 0 10px">Feedback</div>
@@ -1375,6 +1416,7 @@ select option{background:#1e1e1e}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="cloud.js"></script>
 <script src="social.js"></script>
+<script src="beta.js"></script>
 <script>
 /* ══════════════════════════════════════════
    CONSTANTS
@@ -1450,6 +1492,9 @@ const I18N_PATTERNS=[
   [/^(\d+) van (\d+) sessies$/,'$1 of $2 sessions'],
   [/(\d+)× bingo/g,'$1x bingo'],
   [/(\d+)\/9 gehaald/,'$1/9 done'],
+  [/^([\d.,]+) graad zachter$/,'$1 grade softer'],
+  [/^([\d.,]+) graad harder$/,'$1 grade harder'],
+
   [/^Week (\d+) van (\d+) · /,'Week $1 of $2 · '],
 ];
 const I18N_PHRASES=[
@@ -1983,6 +2028,41 @@ const I18N_PHRASES=[
   ['weken op rij bingo','weeks of bingo in a row'],
   ['Weekbingo','Weekly bingo'],['Rij compleet','Line complete'],
   ['Klim-DNA','Climbing DNA'],['Mijn Klim-DNA','My Climbing DNA'],
+  ['Graad-kalibrator','Grade calibrator'],['Gym-statistieken','Gym statistics'],
+  ['Beta board','Beta board'],['Beta delen','Share beta'],['Plaatsen','Post'],
+  ['📋 Deel deze beta met je gym','📋 Share this beta with your gym'],
+  ['Nog geen beta voor deze gym — wees de eerste.','No beta for this gym yet — be the first.'],
+  ['Log in om beta te lezen en te delen.','Sign in to read and share beta.'],
+  ['Beta board is nu niet beschikbaar.','Beta board is unavailable right now.'],
+  ['Beta board niet beschikbaar','Beta board unavailable'],
+  ['Beta laden mislukt.','Could not load beta.'],
+  ['Beta geplaatst!','Beta posted!'],['Beta verwijderd','Beta removed'],
+  ['Beta verborgen','Beta hidden'],['Beta verbergen?','Hide beta?'],
+  ['Beta verwijderen?','Remove beta?'],['Beta plaatsen mislukt','Could not post beta'],
+  ['Beta is te lang','Beta is too long'],['Verbergen mislukt','Could not hide'],
+  ['Dagelijkse limiet bereikt — morgen weer','Daily limit reached — try again tomorrow'],
+  ['Log in om beta te delen','Sign in to share beta'],
+  ['Schrijf eerst je beta','Write your beta first'],
+  ['Kies eerst een gym','Pick a gym first'],
+  ['Hiel rechts op de volgreep, dan crossen naar de sloper...','Right heel on the jug, then cross to the sloper...'],
+  ['Sector (optioneel)','Sector (optional)'],
+  ['Verbergen','Hide'],['Laden…','Loading…'],
+  ['Gyms van zacht naar hard','Gyms from soft to hard'],
+  ['In lijn met het gemiddelde','In line with the average'],
+  ['Deze gym','This gym'],['Gemiddeld','Average'],['Jij hier','You here'],
+  ['Harder','Harder'],['Zachter','Softer'],
+  ['Nog te weinig gedeelde data om gyms te vergelijken.','Not enough shared data yet to compare gyms.'],
+  ['Kalibratie is nu niet beschikbaar.','Calibration is unavailable right now.'],
+  ['Kalibratie heeft even internet nodig.','Calibration needs a connection.'],
+  ['Gegevens ophalen…','Fetching data…'],['Ververs','Refresh'],
+  ['Indicatie op basis van zelf-gerapporteerde data, geen norm. Alleen geanonimiseerde totalen, en pas vanaf 5 klimmers per graad.','Indication based on self-reported data, not a standard. Anonymised totals only, and only from 5 climbers per grade.'],
+  ['Bijgewerkt ','Updated '],
+  ['Mijn data meetellen','Include my data'],
+  ['Anoniem, alleen als totaal per gym en graad. Voedt de graad-kalibrator.','Anonymous, only as a total per gym and grade. Feeds the grade calibrator.'],
+  ['Log in om dit te kunnen instellen.','Sign in to change this.'],
+  ['Je data telt weer mee','Your data counts again'],
+  ['Je data telt niet meer mee','Your data no longer counts'],
+  ['Instelling opslaan mislukt','Could not save the setting'],
   ['🎤 Inspreken','🎤 Speak'],['🎤 Luistert…','🎤 Listening…'],['🎤 Blijft luisteren','🎤 Staying on'],
   ['Route inspreken','Speak a route'],
   ['Zeg bijvoorbeeld "zes b plus top overhang". Spraakherkenning loopt via je browser.','Say for example "six b plus top overhang". Speech recognition runs through your browser.'],
@@ -2567,7 +2647,7 @@ function _doPageRender(id){
   if(id==='home'){renderFeed();if(feedTab==='sociaal')renderSociaalPage();}
   if(id==='stats'){if(analyseTab==='stats')renderStats();else renderCoach();}
   if(id==='goals'){renderGoals();if(doelenTab==='projects')renderProjects();}
-  if(id==='gyms'){if(meerTab==='gyms'){renderGymsPage();renderProfileMgmt();renderOwnerControls();renderFeedbackAdmin();}else renderHangPage();}
+  if(id==='gyms'){if(meerTab==='gyms'){renderGymsPage();renderProfileMgmt();renderOwnerControls();renderFeedbackAdmin();renderStatsOptOut();}else renderHangPage();}
   if(id==='log'){refreshGymSelect();refreshNotePlaceholder();_ensureLogFormSeeded();renderQuickRouteChips();refreshSectorDatalist();}
   // Legacy: werking bij directe showPage calls naar verwijderde tabs
   if(id==='sociaal')renderSociaalPage();
@@ -2597,7 +2677,7 @@ function showPage(id,direction){
   // kaart meteen terug. _isLogFormBlank() is de bestaande definitie van
   // "er staat niets in".
   const onLogPage=document.querySelector('.page.active')?.id==='page-log';
-  if(id!=='log'&&onLogPage&&!editMode&&!_isLogFormBlank()){
+  if(id!=='log'&&onLogPage&&!editMode&&_logFormHasUserInput()){
     pendingNavTarget=id;showNavLeaveConfirm();return;
   }
   haptic();
@@ -3214,6 +3294,24 @@ function addGym(){
   if(gyms.find(g=>g.name.toLowerCase()===name.toLowerCase())){toast('Gym bestaat al','#e53935');return}
   gyms.push({id:Date.now(),name,fav:gyms.length===0});saveGyms();inp.value='';renderGymsPage();refreshGymSelect();toast('Gym toegevoegd!')
 }
+// Beta board openen vanaf de gymlijst: alleen het id gaat de handler in.
+function openBetaForGym(id){
+  const g=gyms.find(x=>x.id===id);
+  if(!g)return;
+  if(typeof openBetaBoard!=='function'){toast('Beta board niet beschikbaar','#e53935');return;}
+  openBetaBoard(g.name);
+}
+// ...of vanaf een routekaart tijdens het loggen, met graad/kleur/sector vooringevuld.
+function openBetaForRoute(cardId){
+  if(typeof openBetaBoard!=='function'){toast('Beta board niet beschikbaar','#e53935');return;}
+  const gym=document.getElementById('inp-gym-select')?.value||'';
+  if(!gym){toast('Kies eerst een gym','#e53935');return;}
+  openBetaBoard(gym,{
+    grade:document.getElementById('rg-'+cardId)?.value||'',
+    color:document.getElementById('rcl-'+cardId)?.value||'',
+    sector:document.getElementById('rsec-'+cardId)?.value||''
+  });
+}
 function setFav(id){gyms.forEach(g=>g.fav=(g.id===id));saveGyms();renderGymsPage();refreshGymSelect()}
 function deleteGym(id){
   const g=gyms.find(x=>x.id===id);if(!g)return;
@@ -3225,7 +3323,7 @@ function confirmDeleteGym(id){
 function renderGymsPage(){
   const list=document.getElementById('gym-list');
   if(!gyms.length){list.innerHTML='<div class="empty-state" style="padding:30px 0"><div>Nog geen gyms — voeg er een toe hieronder.</div></div>';}
-  else{list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${esc(g.name)}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-fav ${g.fav?'active':''}" onclick="setFav(${g.id})">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-delete" onclick="deleteGym(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')}
+  else{list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${esc(g.name)}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-gym-beta" onclick="openBetaForGym(${g.id})">📋 Beta</button><button class="btn-fav ${g.fav?'active':''}" onclick="setFav(${g.id})">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-delete" onclick="deleteGym(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')}
   renderResetSection();
   renderQuietTime();
 }
@@ -3364,6 +3462,7 @@ function addRouteCard(grade='6a',attempts=1,result='poging',type='',projectId=nu
       <div class="field"><label>Sector</label><input type="text" id="rsec-${id}" list="sector-options" value="${esc(sector)}" placeholder="bijv. Kolom" onclick="event.stopPropagation()" oninput="_saveDraftDebounced()"></div>
       <div class="field"><label>Route-notitie</label><input type="text" id="rnote-${id}" value="${esc(rnote)}" placeholder="hiel rechts, dan crossen" onclick="event.stopPropagation()" oninput="_saveDraftDebounced()"></div>
       ${projectRow}
+      <div class="field full"><button type="button" class="btn-route-beta" onclick="event.stopPropagation();openBetaForRoute(${id})">📋 Deel deze beta met je gym</button></div>
     </div>
   </div>
   <input type="hidden" id="rr-${id}" value="${result}">`;
@@ -3506,19 +3605,28 @@ function _collectRoutes(){
 /* ══════════════════════════════════════════
    LOG DRAFT — autosave in-progress (unsaved) session
 ══════════════════════════════════════════ */
-function _isLogFormBlank(){
+// Heeft de gebruiker zelf iets ingevuld? De gym telt hier bewust NIET mee:
+// refreshGymSelect() vult je favoriete of laatst gebruikte gym alvast in,
+// en dat is geen invoer om een navigatiewaarschuwing voor te geven.
+function _logFormHasUserInput(){
   const cards=document.querySelectorAll('#route-cards .route-card');
-  if(cards.length>1)return false;
-  if(document.getElementById('inp-note')?.value.trim())return false;
-  if(document.getElementById('inp-gym-select')?.value)return false;
-  if(currentFeel!=null)return false;
-  if(!cards.length)return true;
+  if(cards.length>1)return true;
+  if(document.getElementById('inp-note')?.value.trim())return true;
+  if(currentFeel!=null)return true;
+  if(!cards.length)return false;
   const id=cards[0].id.replace('rc-','');
-  const g=document.getElementById('rg-'+id)?.value,t=document.getElementById('rt-'+id)?.value,a=parseInt(document.getElementById('ra-'+id)?.textContent)||1,r=document.getElementById('rr-'+id)?.value;
-  if(document.getElementById('rcl-'+id)?.value)return false;
-  if((document.getElementById('rsec-'+id)?.value||'').trim())return false;
-  if((document.getElementById('rnote-'+id)?.value||'').trim())return false;
-  return g==='6a'&&t===''&&a===1&&r==='poging';
+  if(document.getElementById('rcl-'+id)?.value)return true;
+  if((document.getElementById('rsec-'+id)?.value||'').trim())return true;
+  if((document.getElementById('rnote-'+id)?.value||'').trim())return true;
+  const g=document.getElementById('rg-'+id)?.value,t=document.getElementById('rt-'+id)?.value,
+        a=parseInt(document.getElementById('ra-'+id)?.textContent)||1,r=document.getElementById('rr-'+id)?.value;
+  return!(g==='6a'&&t===''&&a===1&&r==='poging');
+}
+// Voor het concept telt de gym wél mee: een gekozen gym alleen is niets
+// om op te slaan, maar samen met invoer hoort hij in het concept.
+function _isLogFormBlank(){
+  if(_logFormHasUserInput())return false;
+  return!document.getElementById('inp-gym-select')?.value;
 }
 let _draftSaveTimer=null;
 function _saveDraftDebounced(){clearTimeout(_draftSaveTimer);_draftSaveTimer=setTimeout(saveDraft,400);}
@@ -4502,6 +4610,7 @@ function renderStats(){
     }).join('')
     :'<div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sessies</div>';
   renderColorStats();
+  renderGradeCalibrator();
   renderDnaCard();
   renderGradeNorm();
   renderWeaknessDetector();
@@ -4588,6 +4697,223 @@ function renderGradeNorm(){
 /* ══════════════════════════════════════════
    SOCIALE LAAG — SESSIE DELEN (Feature 8)
 ══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   GRAAD-KALIBRATOR
+   Is jouw gym zacht of hard? De RPC levert geanonimiseerde totalen per
+   (gym, graad); hier vertalen we het verschil in slagingspercentage naar
+   graadstappen. Methode: bouw de globale curve p(g) over alle gyms, zoek
+   voor het percentage van jouw gym bij graad g de globale graad g' met
+   hetzelfde percentage, en neem g - g'. Positief = zachter.
+══════════════════════════════════════════ */
+const CALIB_CACHE_KEY='flagit_calib_cache_v1';   // globaal: gym-data is niet profielgebonden
+const CALIB_MAX_AGE=24*60*60*1000;
+const gymKeyOf=n=>String(n||'').trim().toLowerCase();
+let _calibLoading=false,_calibFocusGym=null;
+
+function _loadCalibCache(){
+  try{
+    const raw=localStorage.getItem(CALIB_CACHE_KEY);
+    if(!raw)return null;
+    const c=JSON.parse(raw);
+    if(c&&Array.isArray(c.rows))return c;
+  }catch(e){}
+  return null;
+}
+function _saveCalibCache(rows){
+  try{localStorage.setItem(CALIB_CACHE_KEY,JSON.stringify({ts:Date.now(),rows}))}catch(e){}
+}
+// Globale curve: slagingspercentage per graad over alle gyms, daarna
+// niet-stijgend gemaakt. Echte data hobbelt; zonder die correctie is de
+// curve niet omkeerbaar.
+function _globalCurve(rows){
+  const agg={};
+  rows.forEach(r=>{
+    const i=gi(r.grade);
+    if(i<0)return;
+    const a=agg[i]||(agg[i]={s:0,t:0});
+    a.s+=Number(r.sends)||0;a.t+=Number(r.routes_total)||0;
+  });
+  const curve=Object.keys(agg).map(Number).sort((a,b)=>a-b)
+    .filter(i=>agg[i].t>0).map(i=>({idx:i,p:agg[i].s/agg[i].t}));
+  for(let i=1;i<curve.length;i++)curve[i].p=Math.min(curve[i].p,curve[i-1].p);
+  return curve;
+}
+function _invertCurve(curve,p){
+  if(curve.length<2)return null;
+  if(p>=curve[0].p)return curve[0].idx;
+  const last=curve[curve.length-1];
+  if(p<=last.p)return last.idx;
+  for(let i=1;i<curve.length;i++){
+    const a=curve[i-1],b=curve[i];
+    if(p<=a.p&&p>=b.p){
+      const span=a.p-b.p;
+      return a.idx+(b.idx-a.idx)*(span>0?(a.p-p)/span:0);
+    }
+  }
+  return null;
+}
+function computeGradeCalibration(rows){
+  if(!rows||!rows.length)return null;
+  const curve=_globalCurve(rows);
+  if(curve.length<3)return null;
+  const byGym={};
+  rows.forEach(r=>{
+    const i=gi(r.grade);
+    if(i<0)return;
+    const g=byGym[r.gym_key]||(byGym[r.gym_key]={key:r.gym_key,grades:{}});
+    g.grades[i]={sends:Number(r.sends)||0,total:Number(r.routes_total)||0,climbers:Number(r.climbers)||0};
+  });
+  const gyms=Object.values(byGym).map(g=>{
+    const offs=[];
+    Object.keys(g.grades).map(Number).forEach(i=>{
+      const d=g.grades[i];
+      if(!d.total)return;
+      const gPrime=_invertCurve(curve,d.sends/d.total);
+      if(gPrime===null)return;
+      offs.push(i-gPrime);            // positief = zachter dan gemiddeld
+    });
+    return{...g,offsets:offs,softness:offs.length>=3?offs.reduce((a,b)=>a+b,0)/offs.length:null};
+  }).filter(g=>g.softness!==null);
+  if(!gyms.length)return null;
+  return{curve,gyms:gyms.sort((a,b)=>b.softness-a.softness),globalAt:i=>{
+    const p=curve.find(c=>c.idx===i);return p?p.p:null;
+  }};
+}
+// Jouw eigen cijfers in die gym, uit je lokale sessies.
+function _ownRates(gymKey){
+  const out={};
+  sessions.forEach(s=>{
+    if(gymKeyOf(s.gym)!==gymKey)return;
+    (s.routes||[]).forEach(r=>{
+      const i=gi(r.grade);
+      if(i<0)return;
+      const a=out[i]||(out[i]={s:0,t:0});
+      a.t++;if(r.result!=='poging')a.s++;
+    });
+  });
+  return out;
+}
+function _calibVerdict(soft){
+  const abs=Math.abs(soft).toFixed(1);
+  if(soft>=.15)return`${abs} graad zachter`;
+  if(soft<=-.15)return`${abs} graad harder`;
+  return'In lijn met het gemiddelde';
+}
+function setCalibGym(key){_calibFocusGym=key;renderGradeCalibrator();}
+function refreshCalibration(){
+  try{localStorage.removeItem(CALIB_CACHE_KEY)}catch(e){}
+  renderGradeCalibrator();
+}
+function renderGradeCalibrator(){
+  const el=document.getElementById('calibrator-section');
+  if(!el)return;
+  const cache=_loadCalibCache();
+  const stale=!cache||Date.now()-cache.ts>CALIB_MAX_AGE;
+  if(stale&&!_calibLoading&&typeof cloudGradeCalibration==='function'&&navigator.onLine){
+    _calibLoading=true;
+    cloudGradeCalibration(null).then(rows=>{
+      _calibLoading=false;
+      if(rows){_saveCalibCache(rows);renderGradeCalibrator();}
+      else if(!cache)el.innerHTML=_calibCard('<div style="color:var(--muted);font-size:13px">Kalibratie is nu niet beschikbaar.</div>');
+    }).catch(()=>{_calibLoading=false;});
+  }
+  if(!cache){
+    if(_calibLoading)el.innerHTML=_calibCard('<div style="color:var(--muted);font-size:13px">Gegevens ophalen…</div>');
+    else if(!navigator.onLine)el.innerHTML=_calibCard('<div style="color:var(--muted);font-size:13px">Kalibratie heeft even internet nodig.</div>');
+    else el.innerHTML='';
+    return;
+  }
+  const calib=computeGradeCalibration(cache.rows);
+  if(!calib){
+    el.innerHTML=_calibCard('<div style="color:var(--muted);font-size:13px">Nog te weinig gedeelde data om gyms te vergelijken.</div>');
+    return;
+  }
+  // Focusgym: je keuze, anders je favoriet, anders je meest bezochte.
+  const mine=[...new Set(sessions.map(s=>gymKeyOf(s.gym)).filter(Boolean))];
+  const withData=calib.gyms.filter(g=>mine.includes(g.key));
+  const fav=gymKeyOf((gyms.find(g=>g.fav)||{}).name);
+  const focusKey=_calibFocusGym&&calib.gyms.some(g=>g.key===_calibFocusGym)
+    ?_calibFocusGym
+    :(withData.find(g=>g.key===fav)||withData[0]||calib.gyms[0]).key;
+  const focus=calib.gyms.find(g=>g.key===focusKey);
+  const label=(sessions.find(s=>gymKeyOf(s.gym)===focusKey)||{}).gym||focusKey;
+  const own=_ownRates(focusKey);
+  const pin=Math.max(0,Math.min(100,50+focus.softness*50));   // -1..+1 graad over de balk
+  const grades=Object.keys(focus.grades).map(Number).sort((a,b)=>a-b);
+  const rows=grades.map(i=>{
+    const d=focus.grades[i];
+    const gymPct=d.total?d.sends/d.total:0;
+    const gp=calib.globalAt(i);
+    const o=own[i];
+    return`<div class="calib-row">
+      <div class="calib-grade" style="color:${GRADE_COLORS[i]||'var(--muted)'}">${esc(GRADES[i]||'?')}</div>
+      <div class="calib-bars">
+        <div class="calib-bar"><span style="width:${Math.round(gymPct*100)}%;background:${GRADE_COLORS[i]||'var(--accent)'}"></span></div>
+        <div class="calib-bar"><span style="width:${Math.round((gp||0)*100)}%;background:rgba(255,255,255,.28)"></span></div>
+        ${o&&o.t>=3?`<div class="calib-bar"><span style="width:${Math.round(o.s/o.t*100)}%;background:var(--accent)"></span></div>`:''}
+      </div>
+      <div class="calib-pct">${Math.round(gymPct*100)}% / ${gp!==null?Math.round(gp*100):'—'}%</div>
+    </div>`;
+  }).join('');
+  const picker=withData.length>1
+    ?`<select class="calib-select form-input" onchange="setCalibGym(this.value)">${withData.map(g=>{
+        const nm=(sessions.find(s=>gymKeyOf(s.gym)===g.key)||{}).gym||g.key;
+        return`<option value="${esc(g.key)}"${g.key===focusKey?' selected':''}>${esc(nm)}</option>`;
+      }).join('')}</select>`
+    :'';
+  const rank=calib.gyms.slice(0,8).map(g=>{
+    const nm=(sessions.find(s=>gymKeyOf(s.gym)===g.key)||{}).gym||g.key;
+    return`<div class="calib-rank-row"><span${g.key===focusKey?' style="color:var(--accent);font-weight:600"':''} data-no-i18n>${esc(nm)}</span><span style="color:var(--muted)">${_calibVerdict(g.softness)}</span></div>`;
+  }).join('');
+  const updated=new Date(cache.ts).toLocaleDateString(LOCALE(),{day:'numeric',month:'short'});
+  el.innerHTML=_calibCard(`
+    ${picker}
+    <div class="calib-head">
+      <div class="calib-verdict" style="color:${focus.softness>=.15?'var(--success)':focus.softness<=-.15?'var(--danger)':'var(--text)'}" data-no-i18n>${esc(label)}</div>
+    </div>
+    <div class="calib-verdict" style="font-size:20px;color:var(--muted)">${_calibVerdict(focus.softness)}</div>
+    <div class="calib-scale"><div class="calib-scale-pin" style="left:${pin}%"></div></div>
+    <div class="calib-scale-lbl"><span>Harder</span><span>Zachter</span></div>
+    ${rows}
+    <div class="calib-legend">
+      <span><i style="background:var(--success)"></i>Deze gym</span>
+      <span><i style="background:rgba(255,255,255,.28)"></i>Gemiddeld</span>
+      <span><i style="background:var(--accent)"></i>Jij hier</span>
+    </div>
+    <div class="form-section-title" style="padding:14px 0 6px">Gyms van zacht naar hard</div>
+    ${rank}
+    <div class="calib-note">Indicatie op basis van zelf-gerapporteerde data, geen norm. Alleen geanonimiseerde totalen, en pas vanaf 5 klimmers per graad. Bijgewerkt ${updated}. <a href="#" onclick="event.preventDefault();refreshCalibration()" style="color:var(--accent)">Ververs</a></div>
+  `);
+}
+function _calibCard(inner){
+  return`<div class="chart-card"><div class="chart-card-title">Graad-kalibrator</div>${inner}</div>`;
+}
+
+/* Opt-out: wie niet mee wil tellen in de gym-statistieken. */
+async function renderStatsOptOut(){
+  const el=document.getElementById('stats-optout-section');
+  if(!el)return;
+  if(typeof cloudGetStatsOptOut!=='function'){el.innerHTML='';return;}
+  const user=typeof cloudCurrentUser==='function'?await cloudCurrentUser().catch(()=>null):null;
+  if(!user){
+    el.innerHTML='<div style="font-size:13px;color:var(--muted)">Log in om dit te kunnen instellen.</div>';
+    return;
+  }
+  const optOut=await cloudGetStatsOptOut();
+  el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <div>
+      <div style="font-size:14px;font-weight:600">Mijn data meetellen</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Anoniem, alleen als totaal per gym en graad. Voedt de graad-kalibrator.</div>
+    </div>
+    <input type="checkbox" id="inp-stats-optin" ${optOut?'':'checked'} style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--accent)" onchange="toggleStatsOptOut(this)">
+  </div>`;
+}
+async function toggleStatsOptOut(el){
+  const ok=await cloudSetStatsOptOut(!el.checked);
+  if(!ok){el.checked=!el.checked;toast('Instelling opslaan mislukt','#e53935');return;}
+  toast(el.checked?'Je data telt weer mee':'Je data telt niet meer mee');
+}
+
 function shareSession(id){
   const s=sessions.find(x=>x.id===id);if(!s)return;
   const mg=maxGrade(s.routes);

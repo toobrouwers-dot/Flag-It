@@ -789,3 +789,41 @@ async function cloudGetFeedback() {
     return [];
   }
 }
+
+// ── GRADE CALIBRATION (F6) ────────────────────────────────
+// De RPC aggregeert server-side over alle sessies en geeft uitsluitend
+// counts terug — geen rijen, geen user_ids, en pas vanaf 5 klimmers per
+// (gym, graad). Zie de migratie onderaan supabase_schema.sql.
+async function cloudGradeCalibration(gymKey) {
+  if (!cloudReady()) return null;
+  try {
+    const { data, error } = await db().rpc('grade_calibration', { p_gym_key: gymKey || null });
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.warn('[cloud] grade_calibration error:', e);
+    return null;
+  }
+}
+
+async function cloudGetStatsOptOut() {
+  if (!cloudReady()) return false;
+  try {
+    const user = await cloudCurrentUser();
+    if (!user) return false;
+    const { data } = await db().from('accounts')
+      .select('stats_opt_out').eq('id', user.id).maybeSingle();
+    return !!(data && data.stats_opt_out);
+  } catch (e) { return false; }
+}
+
+async function cloudSetStatsOptOut(optOut) {
+  if (!cloudReady()) return false;
+  try {
+    const user = await cloudCurrentUser();
+    if (!user) return false;
+    const { error } = await db().from('accounts')
+      .update({ stats_opt_out: !!optOut }).eq('id', user.id);
+    return !error;
+  } catch (e) { return false; }
+}
