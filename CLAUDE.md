@@ -6,17 +6,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Flag-It is a **vanilla HTML/CSS/JS Progressive Web App (PWA)** for tracking bouldering sessions and hangboard training on mobile. There is no build system, no package manager, and no test framework. The UI ships in **English by default**, with Dutch available via a toggle. Note the split: English is what users see, but **Dutch is the source language in the code** — see [Internationalization (i18n)](#internationalization-i18n).
 
-The app has a **Supabase backend** for cloud sync and social features. Core application logic lives in `index.html` (~6,900 lines), with cloud and social logic split into separate files.
+The app has a **Supabase backend** for cloud sync and social features. Core application logic lives in `index.html` (~8,200 lines), with cloud, social and beta-board logic split into separate files.
 
 ## File Structure
 
 | File | Purpose |
 |---|---|
-| `index.html` | Entire app — CSS, HTML, main JS (~6,900 lines) |
+| `index.html` | Entire app — CSS, HTML, main JS (~8,200 lines) |
 | `cloud.js` | Supabase auth + multi-device sync (~790 lines) |
 | `social.js` | Kudos, follows, public profiles, feed, leaderboard, comments (~560 lines) |
-| `sw.js` | Service worker — offline caching (cache: `flagit-v30`) |
-| `manifest.json` | PWA manifest |
+| `beta.js` | Gym Beta Board — shared route beta per gym (~245 lines) |
+| `sw.js` | Service worker — offline caching (cache: `flagit-v32`, plus `flagit-cdn-v1`) |
+| `manifest.json` | PWA manifest — includes three app shortcuts pointing at `?p=` deep links |
 | `supabase_schema.sql` | Postgres schema + RLS policies for the Supabase backend |
 | `icons/` | PWA icons (192px, 512px) |
 | `marketing/instagram-launch/` | **Separate** Node + Playwright subproject for launch graphics — see [Marketing subproject](#marketing-subproject) |
@@ -29,11 +30,13 @@ The app has a **Supabase backend** for cloud sync and social features. Core appl
 
 **To deploy:** Push to `main` — GitHub Actions (`.github/workflows/deploy.yml`) automatically deploys to GitHub Pages.
 
-**Service worker cache:** Bump the cache name in `sw.js` (`flagit-v29` → `flagit-v30`, etc.) whenever making changes that need to invalidate cached assets for existing users. Also add any new static files to the `ASSETS` array.
+**Service worker cache:** Bump the cache name in `sw.js` (`flagit-v31` → `flagit-v32`, etc.) whenever making changes that need to invalidate cached assets for existing users. Also add any new static files to the `ASSETS` array.
+
+`sw.js` keeps **two** caches. `ASSETS` (in `CACHE`) holds the first-party files; `CDN_CACHE` (`flagit-cdn-v1`) holds Chart.js, Supabase JS and Google Fonts under a stale-while-revalidate strategy, keyed on an allowlist of four origins. The `activate` handler deliberately spares `CDN_CACHE` when it sweeps old caches, so bumping the app version does not re-download the CDN payload. Note why this needs its own branch: the first-party strategy only caches `res.status === 200`, and cross-origin responses are opaque, so CDN files were never cached at all before.
 
 **CI gate — `Validate files`:** the deploy workflow fails the build if `index.html` is missing `</html>`, or if `sw.js` has no cache entry for `cloud.js`, `social.js`, `index.html`, or `manifest.json`. Adding a new static asset to the `sw.js` cache array is therefore not just a convention — for those four files it is enforced, and forgetting it breaks the deploy rather than silently shipping a stale cache.
 
-**Open decision (offline CDN):** the service worker caches only first-party files; Chart.js, Supabase JS and Google Fonts come from CDNs with no offline fallback. A fully offline cold load therefore loses charts and cloud features (the rest works). This is a deliberate trade-off until the product owner decides whether the three CDN URLs should get a runtime cache-first strategy in `sw.js`.
+**Offline (resolved):** the CDN files are now cached at runtime (see above), so a cold load without a connection keeps its charts and fonts once they have been fetched at least once. On a first-ever load with no connection Chart.js is still absent; `_chartsAvailable()` guards every `new Chart()` call and `_renderChartsOfflineNote()` explains the gap on Analyse and Hangboard instead of throwing. An offline badge sits next to the cloud badge in the hero.
 
 ### Marketing subproject
 
@@ -47,9 +50,9 @@ This does **not** contradict the app's "no build system" rule — that rule gove
 
 | Section | Lines | Contents |
 |---|---|---|
-| `<style>` block | 16–899 | All CSS, dark theme, accent color `#7f77dd` |
-| HTML markup | 901–1,311 | Page `<div>` sections + profile/start screens |
-| `<script>` block | 1,316–6,896 | All application logic (~250 functions) |
+| `<style>` block | 16–984 | All CSS, dark theme, accent color `#7f77dd` |
+| HTML markup | 986–1,393 | Page `<div>` sections + profile/start screens |
+| `<script>` block | 1,420–8,183 | All application logic (~290 functions) |
 
 External dependencies loaded from CDN:
 - **Chart.js v4.4.1** — `cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js`
@@ -99,10 +102,16 @@ The key strings are built in one place, `profileStorageKeys(id)`, and assigned t
 | (auth) | `flagit_auth` | Supabase auth session (cloud.js) |
 | (install prompt) | `flagit_install_dismissed_v1` | PWA install banner dismiss state |
 | (language) | `flagit_lang_v1` | UI language: `'en'` (default) or `'nl'` (global, no suffix) |
+| (calibration) | `flagit_calib_cache_v1` | 24h cache of the `grade_calibration` RPC (global, no suffix — gym data is not per-profile) |
 | (signup source) | `flagit_signup_source_v1` | `utm_source` captured on first load (global) |
 | (google migrate) | `flagit_google_migrate` | One-shot Google-signin migration flag (global) |
 
 **Mutation pattern:** Mutate the array directly → call the corresponding save function (`save()`, `saveGyms()`, `saveGoals()`, `saveHang()`, etc.). There is no reactive binding.
+
+**Route shape** (inside `session.routes`, a jsonb column in Supabase):
+`{grade, type, attempts, result, projectId}` plus three optional fields written only when filled — `color` (a `ROUTE_COLORS` name, in Dutch), `sector`, `note`. Because `_toRow()` spreads the whole session object and `routes` is jsonb, new fields inside a route sync to the cloud with **no schema migration**. Keep writing them conditionally: empty strings on every historic route would bloat both localStorage and the jsonb.
+
+**Deleting** goes through `deleteWithUndo(arr, id, saveFn, renderFn, msg, onUndo)`, which wraps `deleteItem()` and shows a 6-second toast with an undo. `deleteItem()` stashes the removed object and its index in `_lastDeleted`; `undoDelete()` splices it back and re-runs the same save/render pair (so the cloud dirty flag is set again). Pass `onUndo` when something outside the array has to come back too — `confirmDeleteProject` uses it to restore the Quest Lore cache entry.
 
 ### Boot sequence
 
@@ -148,11 +157,24 @@ Social features require a Supabase account and operate on the cloud tables.
 | User search | `renderUserSearch()` — ilike username filtering with follow buttons |
 | Session visibility | `setSessionPublic()` — toggle `is_public` flag |
 
-`social.js` has its own escape helper, `_s()` — it is a separate file with no access to `index.html`'s `esc()`.
+`social.js` has its own escape helper, `_s()` — it is a separate file with no access to `index.html`'s `esc()`. `beta.js` follows the same pattern with its own copy.
+
+### Gym Beta Board (beta.js)
+
+Shared route beta per gym, so climbers at the same wall see each other's tips. Gyms are free text per user, so rows are keyed on `betaGymKey(name)` = `lower(trim(name))` — the same key the grade calibrator uses.
+
+| Feature | Functions |
+|---|---|
+| Load / post | `betaLoad(gymKey)`, `betaPost(entry)` — rate limited to 10 posts per user per day |
+| Moderation | `betaDelete(id)` (own only), `betaHide(id)` (admin, via `cloudIsAdmin()`) |
+| UI | `openBetaBoard(gymName, prefill)`, `betaRefresh()`, `betaRenderForm()`, `betaSubmit()` |
+| Entry points | `openBetaForGym(id)` from the gym list, `openBetaForRoute(cardId)` from a route card while logging |
+
+**This is the one place in the app rendering text written by strangers.** Two rules hold here: `_s()` escapes `'` as well, and handlers receive an **array index** into `_betaRows`, never the text or the author name. Do not "simplify" that into interpolating the value.
 
 ### Supabase Schema (supabase_schema.sql)
 
-16 tables with Row Level Security (RLS):
+17 tables with Row Level Security (RLS):
 
 | Table | Purpose |
 |---|---|
@@ -172,8 +194,13 @@ Social features require a Supabase account and operate on the cloud tables.
 | `app_settings` | Global key/value config (e.g. `ads_enabled`) — anyone reads, admin-only writes |
 | `sponsored_card` | Single-row active sponsor config (logo/title/CTA) — anyone reads, admin-only writes |
 | `feedback` | Private feedback channel — anyone can insert (incl. logged out), admin-only select |
+| `gym_beta` | Shared route beta per gym — signed-in read of non-hidden rows, own-row write, admin hide |
 
-Postgres functions: `handle_updated_at()` (trigger — auto `updated_at` on sessions/goals/projects), `handle_new_user()` (trigger — auto account creation on signup), `check_is_admin()` (RPC).
+Postgres functions: `handle_updated_at()` (trigger — auto `updated_at` on sessions/goals/projects), `handle_new_user()` (trigger — auto account creation on signup), `check_is_admin()` (RPC), `grade_calibration(p_gym_key)` (RPC — see below).
+
+**Migrations are not automatic.** `supabase_schema.sql` is documentation; the two add-on blocks at the bottom of the file (the grade calibrator and the gym beta board) have to be pasted into the Supabase SQL Editor by hand. Both are written to be safe to re-run. Until they are run, the two features show an explanatory empty state and nothing else breaks.
+
+**`grade_calibration` and privacy.** The RPC is `security definer` and reads non-public sessions, because a sample limited to public ones would be too small to be meaningful. It therefore returns **only aggregates** — counts per `(gym_key, grade)` — and never rows or user ids, and a `having` clause withholds any cell with fewer than 5 distinct climbers or 30 routes. `accounts.stats_opt_out` excludes an account entirely; the switch for it lives in Meer → Gym-statistieken. If you extend this function, keep all three properties: aggregates only, the k-anonymity threshold, and the opt-out.
 
 **Admin check:** `is_admin` on `accounts` is not publicly readable directly — use the `check_is_admin` RPC (wrapped by `cloudIsAdmin()` in cloud.js) rather than querying the column. Note that table-level grants override a column-level `REVOKE`, so the protection lives in the RPC + grants, not in a column privilege.
 
@@ -246,9 +273,10 @@ Both write into the DOM, so the i18n observer covers them — but the `navigator
 
 - persists `?utm_source=…` to `flagit_signup_source_v1` (first write wins),
 - writes `?lang=en` / `?lang=nl` to `flagit_lang_v1` so marketing links deep-link into either language,
+- stashes `?p=…` in `window._bootPage` for the PWA shortcuts,
 - calls `history.replaceState` to strip the query string from the URL.
 
-Anything that reads `?lang=` must run after this IIFE — the ordering is load-bearing, not incidental.
+Anything that reads a query parameter must run after this IIFE — and cannot read `location.search` itself, because `replaceState` has already cleared it. That is why `?p=` goes into a global rather than being re-parsed: `_applyBootPage()` consumes it at the end of `initApp()`, once the profile is loaded, and resolves it against an allowlist (`PAGE_ORDER` plus the three retired ids plus `quicktop`). The ordering is load-bearing, not incidental.
 
 ### Internationalization (i18n)
 
@@ -265,12 +293,14 @@ The app supports **English (default) and Dutch**, chosen via a toggle in Meer �
 - A single `MutationObserver` on `document.body` (installed once via `initI18nObserver()`) calls `translateSubtree` on every added/changed node when `currentLang === 'en'`. Because every `render*()` function already works by reassigning `innerHTML`, this one observer transparently covers all current and future dynamic content — no per-function changes needed.
 - The observer only sees `document.body`. Text that never lands in the DOM — `navigator.share({title,text})` payloads, canvas `ctx.fillText()` labels, `alert()` — must be translated explicitly with `i18nTranslate()` or branched on `currentLang`. Prefer `toast()` over `alert()` for exactly this reason. When translating a string that embeds user content (a session note, a gym name), translate the surrounding parts separately so the user's own text is left alone — the DOM equivalent is the `data-no-i18n` attribute.
 - Since NL is the untouched source language, adding a new Dutch string needs **no code change** for Dutch. To make it appear in English — which is what nearly every user sees — add an `['Dutch phrase','English phrase']` entry to `I18N_PHRASES` (or a regex to `I18N_PATTERNS` if the string has interpolated values). Prefer the longest, most specific phrase that makes sense — the sort-by-length means longer entries are substituted before shorter/generic ones, avoiding accidental partial-word matches (e.g. `'Wisselen'` must have its own entry so the generic `'Wis'→'Clear'` rule doesn't mangle it into `'Clearselen'`).
+- **For a short standalone label, use an anchored `I18N_PATTERNS` regex instead of a phrase.** `translateSubtree` hands whole text nodes and whole attribute values to `i18nTranslate`, so `[/^Geel$/,'Yellow']` matches exactly the label and can never fire inside a longer sentence. This is what the hold colours and the feed filter chips use. A plain `['gehaald','done']` entry, by contrast, would also rewrite `binnengehaald` in the Klimverhaal templates into `binnendone` — that class of bug is why the bingo counter uses `[/(\d+)\/9 gehaald/,'$1/9 done']`.
+- **Check for a duplicate key before adding a phrase.** Two entries with the same Dutch string are not an error; the first one after sorting simply wins and the second is dead. `['Weg','Gone']` already exists, so a second `['Weg','Remove']` would silently never apply.
 
 ### Finding functions
 
 With ~250 functions in a single file, use grep/search to locate them by name. Functions are grouped loosely by feature area in the script block:
 
-i18n → profile management → data persistence → feed rendering → log form + draft autosave → goals → quick-top → hangboard + timers → stats/heatmap/pyramid/TLI → session stories (Klimverhaal) → projects + Quest Lore → backup/import → competitions → tab switching → diary → injuries/finger health → stroke radar → share card → coach + nudges → ads/admin → boot → rival mode → rest timer → route setter grid → extras (`fireShakedown`, `replaySession`, `applyVibe`, `renderStreakReaper`, `renderGradeOracle`)
+i18n → profile management → data persistence (incl. `deleteWithUndo`/`undoDelete`) → feed filters + feed rendering → log form + draft autosave → voice logging → goals → quick-top → hangboard + timers → stats/heatmap/pyramid/TLI → grade calibrator → session stories (Klimverhaal) → projects + Quest Lore → backup/import → competitions → weekly bingo → tab switching → diary → injuries/finger health → stroke radar → share card + Climbing DNA → coach + nudges → ads/admin → boot → rival mode → rest timer → route setter grid → extras (`fireShakedown`, `replaySession`, `applyVibe`, `renderStreakReaper`, `renderGradeOracle`)
 
 Feature areas that are easy to miss because they have no page of their own:
 
@@ -280,7 +310,13 @@ Feature areas that are easy to miss because they have no page of their own:
 | Rival mode | `importRival()`, `clearRival()`, `getRivalRoutes()`, `getRivalStats()`, `renderRivalSection()` |
 | Coach nudges & prompts | `renderPlateauBanner()`, `renderNudges()`, `renderQuietTime()`, `renderWeaknessDetector()`, `renderStreakReaper()`, `renderGradeOracle()`, `renderOnThisDay()` |
 | Timers | `toggleTimer()` (hangboard), `toggleSessHangTimer()` (in-session hang), `toggleSessionTimer()` (session clock), `toggleRestTimer()` (rest) |
-| Gestures / PWA shell | `initSwipeNav()`, `initPullToRefresh()`, `initInstallPrompt()`, `haptic()` |
+| Gestures / PWA shell | `initSwipeNav()`, `initPullToRefresh()`, `initInstallPrompt()`, `initOfflineBadge()`, `haptic()` |
+| Feed search & filters | `matchesFeedFilter()`, `_currentFeedFilter()`, `renderFeedChips()`, `setFeedFilter()`, `clearFilters()` |
+| Weekly bingo | `getBingoCard()`, `computeBingo()`, `renderBingoBar()`, `showBingoModal()`, `bingoStreak()`, `BINGO_TASKS` |
+| Climbing DNA | `computeDnaVector()`, `drawDna()`, `renderDnaCard()`, `dnaArchetype()`, `buildDnaShareCanvas()`, `shareDnaCard()` |
+| Voice logging | `parseVoiceRoute()`, `initVoiceLog()`, `toggleVoiceLog()`, `startVoiceLog()`, `_voiceAddRoute()` |
+| Grade calibrator | `computeGradeCalibration()`, `renderGradeCalibrator()`, `_globalCurve()`, `_invertCurve()`, `renderStatsOptOut()` |
+| Undo on delete | `deleteWithUndo()`, `undoDelete()`, `toast(msg, color, action)` |
 
 ## Conventions
 
