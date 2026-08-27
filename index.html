@@ -89,6 +89,59 @@ body.nav-transitioning{overflow:hidden}
 .activity-routes{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px 14px}
 .route-chip{display:flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px 4px 6px;font-size:13px;font-weight:500}
 .route-chip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.chip-hold{width:7px;height:7px;border-radius:2px;flex-shrink:0;border:.5px solid rgba(255,255,255,.3)}
+.rc-color-row{display:flex;flex-wrap:wrap;gap:8px}
+.rc-color-dot{width:28px;height:28px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.25);padding:0;cursor:pointer;transition:transform .12s,border-color .12s}
+.rc-color-dot.sel{border-color:var(--text);transform:scale(1.1)}
+.qrc-label{font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px}
+.qrc-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;-webkit-overflow-scrolling:touch}
+.qrc-chip{display:flex;align-items:center;gap:6px;flex-shrink:0;background:var(--surface2);border:.5px solid var(--border);border-radius:12px;padding:7px 12px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer;transition:border-color .15s}
+.qrc-chip:active{border-color:var(--accent)}
+.qrc-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;border:.5px solid rgba(255,255,255,.3)}
+.qrc-type{color:var(--muted);font-size:12px}
+/* ── VOICE-LOGGEN ────────────────────────────────────── */
+.btn-voice{padding:13px 16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:12px;color:var(--accent);font-family:'Barlow',sans-serif;font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.btn-voice.listening{background:rgba(229,57,53,.14);border-style:solid;border-color:var(--danger);color:var(--danger);animation:voicePulse 1.3s ease-in-out infinite}
+.btn-voice.continuous{border-color:var(--accent);background:rgba(127,119,221,.14);color:var(--accent);animation:voicePulse 1.3s ease-in-out infinite}
+@keyframes voicePulse{0%,100%{opacity:1}50%{opacity:.55}}
+.voice-hint{font-size:11px;color:var(--muted);margin:-6px 0 12px;line-height:1.4}
+/* ── GRAAD-KALIBRATOR ────────────────────────────────── */
+.calib-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px}
+.calib-verdict{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;line-height:1.05;text-transform:uppercase;letter-spacing:.3px}
+.calib-scale{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,#d93a3a,rgba(136,136,136,.35),#3ea15e);margin:12px 0 6px}
+.calib-scale-pin{position:absolute;top:-4px;width:3px;height:14px;border-radius:2px;background:var(--text);transform:translateX(-1.5px)}
+.calib-scale-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:14px}
+.calib-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.calib-grade{width:34px;flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;text-align:right}
+.calib-bars{flex:1;display:flex;flex-direction:column;gap:3px}
+.calib-bar{height:7px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden}
+.calib-bar span{display:block;height:100%;border-radius:4px}
+.calib-pct{width:74px;flex-shrink:0;text-align:right;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.calib-legend{display:flex;gap:14px;font-size:11px;color:var(--muted);margin:10px 0 4px}
+.calib-legend i{display:inline-block;width:10px;height:6px;border-radius:3px;margin-right:5px}
+.calib-rank-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:.5px solid var(--border);font-size:13px}
+.calib-rank-row:last-child{border-bottom:0}
+.calib-note{font-size:11px;color:var(--muted);line-height:1.45;margin-top:12px}
+.calib-select{width:100%;margin-bottom:12px}
+/* ── GYM BETA BOARD ──────────────────────────────────── */
+.beta-box{max-width:420px;width:100%}
+.beta-gym{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);margin:-10px 0 12px}
+.beta-list{overflow-y:auto;flex:1;min-height:60px;margin-bottom:8px}
+.beta-item{background:var(--surface2);border:.5px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:8px}
+.beta-item-top{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.beta-tag{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);background:rgba(255,255,255,.06);border-radius:20px;padding:2px 8px}
+.beta-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;border:.5px solid rgba(255,255,255,.3)}
+.beta-when{margin-left:auto;font-size:11px;color:var(--muted)}
+.beta-body{font-size:14px;line-height:1.45;color:var(--text);white-space:pre-wrap;word-break:break-word}
+.beta-foot{display:flex;align-items:center;gap:10px;margin-top:8px}
+.beta-who{font-size:12px;color:var(--muted)}
+.beta-act{margin-left:auto;background:none;border:none;color:var(--muted);font-family:'Barlow',sans-serif;font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
+.beta-act:hover{color:var(--danger)}
+.beta-form-row{display:flex;gap:8px;margin-bottom:8px}
+.beta-form-row .form-input{flex:1;min-width:0}
+.btn-gym-beta{background:none;border:.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Barlow',sans-serif;font-size:12px;padding:6px 10px;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s}
+.btn-gym-beta:active{color:var(--accent);border-color:var(--accent)}
+.btn-route-beta{background:none;border:none;color:var(--accent);font-family:'Barlow',sans-serif;font-size:12px;text-decoration:underline;cursor:pointer;padding:4px 0}
 .chip-top .dot{background:var(--success)}.chip-flash .dot{background:var(--flash)}.chip-poging .dot{background:var(--attempt)}
 
 .btn-delete{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s,border-color .2s;min-width:44px;min-height:44px}
@@ -366,6 +419,7 @@ select option{background:#1e1e1e}
 /* TOAST */
 .toast{position:fixed;bottom:calc(80px + var(--safe-bot));left:50%;transform:translateX(-50%) translateY(20px);background:var(--success);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:12px 24px;border-radius:40px;opacity:0;transition:all .3s;z-index:200;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-action{margin-left:14px;padding-left:14px;border-left:1px solid rgba(255,255,255,.35);text-decoration:underline;text-underline-offset:2px}
 
 /* PULL-TO-REFRESH */
 @keyframes ptrSpin{to{transform:translateX(-50%) rotate(360deg)}}
@@ -427,6 +481,37 @@ select option{background:#1e1e1e}
 .filter-bar select{flex:1;min-width:100px;font-size:13px;padding:8px 10px}
 .btn-filter-clear{background:var(--surface2);border:.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;padding:8px 14px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:color .2s,border-color .2s;text-transform:uppercase;letter-spacing:.5px}
 .btn-filter-clear.active{color:var(--danger);border-color:var(--danger)}
+.feed-search{width:100%;box-sizing:border-box;background:var(--surface);border:.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:11px 14px;margin-bottom:8px;outline:none;transition:border-color .15s}
+.feed-search:focus{border-color:var(--accent)}
+.feed-chip-row{display:flex;align-items:center;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;-webkit-overflow-scrolling:touch}
+.feed-chip{flex-shrink:0;background:var(--surface2);border:.5px solid var(--border);border-radius:12px;color:var(--muted);font-family:'Barlow',sans-serif;font-size:13px;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s,background .15s}
+.feed-chip.sel{color:var(--text);border-color:var(--accent);background:rgba(127,119,221,.14)}
+.feed-chip-sep{flex-shrink:0;width:1px;height:18px;background:var(--border);margin:0 2px}
+.feed-result-count{font-size:12px;color:var(--muted);margin-bottom:8px}
+/* ── WEEKBINGO ───────────────────────────────────────── */
+.bingo-bar-btn{display:flex;align-items:center;gap:10px;width:100%;background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer;transition:border-color .15s}
+.bingo-bar-btn:active{border-color:var(--accent)}
+.bingo-bar-icon{font-size:18px;line-height:1}
+.bingo-bar-text{flex:1;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.bingo-bar-count{color:var(--muted);font-variant-numeric:tabular-nums}
+.bingo-bar-badge{background:var(--accent);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.5px;border-radius:20px;padding:2px 8px}
+.bingo-box{max-width:400px;width:100%}
+.bingo-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.bingo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
+.bingo-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 6px;border-radius:12px;background:var(--surface2);border:.5px solid var(--border);font-size:11.5px;line-height:1.25;color:var(--muted);overflow:hidden}
+.bingo-cell.done{background:rgba(76,175,80,.14);border-color:rgba(76,175,80,.45);color:var(--text)}
+.bingo-cell.inline{background:rgba(127,119,221,.18);border-color:var(--accent);color:var(--text)}
+.bingo-foot{font-size:13px;color:var(--muted);margin-bottom:14px;text-align:center}
+/* ── KLIM-DNA ────────────────────────────────────────── */
+.dna-wrap{display:flex;justify-content:center;margin:4px 0 10px}
+.dna-wrap canvas{max-width:100%;height:auto;border-radius:12px}
+.dna-arch{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;text-align:center;color:var(--text);line-height:1.1}
+.dna-trait{font-size:13px;color:var(--muted);text-align:center;margin-top:4px;margin-bottom:16px}
+.dna-evo-label{font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
+.dna-evo{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.dna-evo-item{flex-shrink:0;text-align:center}
+.dna-evo-item canvas{border-radius:10px;background:rgba(255,255,255,.02);display:block}
+.dna-evo-lbl{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
 .btn-edit-session{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;margin-top:2px;min-width:44px;min-height:44px}
 .btn-edit-session:active{color:var(--accent);background:rgba(127,119,221,.12)}
 .goal-card.overdue{border-color:rgba(229,57,53,.4)}
@@ -939,6 +1024,7 @@ select option{background:#1e1e1e}
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
       <div class="hero-greeting">Jouw stats</div>
       <div style="display:flex;align-items:center;gap:6px">
+        <div id="offline-badge" class="cloud-badge cloud-badge-off" style="display:none">Offline</div>
         <div id="cloud-auth-badge"></div>
         <div id="cloud-sync-dot" class="cloud-sync-dot" title="Sync status"></div>
       </div>
@@ -968,6 +1054,9 @@ select option{background:#1e1e1e}
     <button class="feed-toggle-btn" id="tab-feed-sociaal" onclick="switchFeedTab('sociaal')">Sociaal</button>
   </div>
   <div id="feed-tab-feed">
+    <div id="bingo-bar"></div>
+    <input type="search" id="feed-search" class="feed-search" placeholder="Zoek in gym, notitie, graad, kleur…" aria-label="Zoek in je sessies" oninput="_feedSearchDebounced()">
+    <div class="feed-chip-row" id="feed-chip-row"></div>
     <div id="filter-bar" class="filter-bar">
       <select id="filter-gym" onchange="renderFeed()" aria-label="Filter op gym"><option value="">Alle gyms</option></select>
       <select id="filter-grade" onchange="renderFeed()" aria-label="Filter op minimale graad"><option value="">Min. graad</option></select>
@@ -975,6 +1064,7 @@ select option{background:#1e1e1e}
     </div>
     <div id="nudge-section"></div>
     <div class="section-title">Recente sessies</div>
+    <div id="feed-result-count" class="feed-result-count"></div>
     <div id="feed"></div>
   </div>
   <div id="feed-tab-dagboek" style="display:none">
@@ -1012,7 +1102,7 @@ select option{background:#1e1e1e}
       <div class="input-row">
         <div class="field"><label>Gym</label>
           <div class="gym-selector">
-            <select id="inp-gym-select" onchange="saveDraft()"><option value="">— Kies een gym —</option></select>
+            <select id="inp-gym-select" onchange="saveDraft();refreshSectorDatalist()"><option value="">— Kies een gym —</option></select>
             <button class="btn-manage-gyms" onclick="openGymPickerModal()">⚙ Gyms</button>
           </div>
         </div>
@@ -1036,10 +1126,14 @@ select option{background:#1e1e1e}
       </div>
       <div id="route-cards"></div>
       <div class="sess-stats-bar" id="sess-stats-bar"></div>
+      <datalist id="sector-options"></datalist>
+      <div id="quick-route-chips"></div>
       <div style="display:flex;gap:8px;margin-bottom:12px">
         <button class="btn-add-route" style="flex:1;margin-bottom:0" onclick="addRouteCard(getSmartDefaultGrade());saveDraft()">+ Route toevoegen</button>
         <button onclick="openSetterModal()" style="padding:13px 16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:12px;color:var(--accent);font-family:'Barlow',sans-serif;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0" onmousedown="this.style.background='rgba(127,119,221,.08)'" onmouseup="this.style.background='none'">🏗️ Setter</button>
+        <button id="btn-voice-log" class="btn-voice" style="display:none" onclick="toggleVoiceLog()" aria-label="Route inspreken">🎤 Inspreken</button>
       </div>
+      <div id="voice-hint" class="voice-hint" style="display:none"></div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 16px">
       <div>
@@ -1065,6 +1159,7 @@ select option{background:#1e1e1e}
   <div id="analyse-tab-stats">
   <div class="stats-content">
     <div id="insights-section"></div>
+    <div id="charts-offline-note"></div>
     <div class="pr-row">
       <div class="pr-card"><div class="pr-label">Hoogste top</div><div class="pr-grade" id="pr-top">—</div><div class="pr-date" id="pr-top-date"></div></div>
       <div class="pr-card"><div class="pr-label">Hoogste flash</div><div class="pr-grade flash" id="pr-flash">—</div><div class="pr-date" id="pr-flash-date"></div></div>
@@ -1085,7 +1180,10 @@ select option{background:#1e1e1e}
     <div id="pyramid-section"></div>
     <div id="pyramid-audit-section"></div>
     <div id="stoke-radar-section"></div>
+    <div id="dna-section"></div>
     <div class="chart-card"><div class="chart-card-title">Per gym</div><div id="stats-gyms"><div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sessies</div></div></div>
+    <div id="color-stat-section"></div>
+    <div id="calibrator-section"></div>
     <div id="grade-norm-section"></div>
     <div id="weakness-section"></div>
     <div id="oracle-section"></div>
@@ -1205,6 +1303,9 @@ select option{background:#1e1e1e}
       <div class="spotify-arrow">→</div>
     </a>
 
+    <div class="form-section-title" style="padding:20px 0 10px">Gym-statistieken</div>
+    <div id="stats-optout-section"></div>
+
     <div class="form-section-title" style="padding:20px 0 10px">Profiel</div>
     <div id="profile-mgmt-section"></div>
     <div class="form-section-title" style="padding:20px 0 10px">Feedback</div>
@@ -1226,6 +1327,8 @@ select option{background:#1e1e1e}
     <div class="hang-pr-scroll" id="hang-pr-row">
       <div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sets gelogd</div>
     </div>
+
+    <div id="charts-offline-note-hang"></div>
 
     <div class="chart-card" style="margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -1313,6 +1416,7 @@ select option{background:#1e1e1e}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="cloud.js"></script>
 <script src="social.js"></script>
+<script src="beta.js"></script>
 <script>
 /* ══════════════════════════════════════════
    CONSTANTS
@@ -1323,6 +1427,15 @@ const GRADE_COLORS=['#9FE1CB','#5DCAA5','#1D9E75','#0F6E56','#7EC8A0','#50B090',
 const CHART_TICK_COLOR='#888'; // matches --muted; old #666/#555 tick labels fell below WCAG contrast vs the dark chart surface
 const TYPES=['Slab','Verticaal','Overhang','Cave','Dyno','Mantle','Pinch','Crimp','Sloper'];
 const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch','Open hand','Jug'];
+// Greepkleuren zoals gyms ze aan de muur hangen. Los van GRADE_COLORS: dat is
+// de graadschaal, dit is de fysieke kleur van de grepen. Opgeslagen wordt de
+// Nederlandse naam (brontaal); de weergave vertaalt via I18N_PATTERNS.
+const ROUTE_COLORS=[
+  {n:'Geel',c:'#f2c31d'},{n:'Groen',c:'#3ea15e'},{n:'Blauw',c:'#3082d8'},
+  {n:'Rood',c:'#d93a3a'},{n:'Zwart',c:'#2f2f37'},{n:'Wit',c:'#e9e9ef'},
+  {n:'Paars',c:'#8b5cd6'},{n:'Oranje',c:'#e8802a'},{n:'Roze',c:'#e35d9c'}
+];
+const routeColorHex=n=>{const f=ROUTE_COLORS.find(c=>c.n===n);return f?f.c:''};
 
 /* ══════════════════════════════════════════
    MARKETING ATTRIBUTION (utm_source, lang)
@@ -1340,7 +1453,12 @@ const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch',
   if(lang==='en'||lang==='nl'){
     localStorage.setItem('flagit_lang_v1',lang);
   }
-  if(utmSource || qp.has('lang') || qp.has('utm_medium')){
+  // Deep link vanaf een app-shortcut (?p=log). Allowlist, geen vrije input.
+  // De waarde moet hier in een globale: replaceState() hieronder wist de
+  // querystring, dus later opnieuw uit location.search lezen kan niet meer.
+  const page=qp.get('p');
+  if(page&&/^[a-z]{1,12}$/.test(page))window._bootPage=page;
+  if(utmSource || qp.has('lang') || qp.has('p') || qp.has('utm_medium')){
     history.replaceState(null,'',location.pathname);
   }
 })();
@@ -1365,6 +1483,18 @@ const I18N_PATTERNS=[
   [/^Je trainingsbelasting deze week \((\d+)\) is (-?\d+)% hoger dan je 4-weeksgemiddelde \((\d+)\)\. Plan een rustdag of lichte sessie\.$/,
     'Your training load this week ($1) is $2% higher than your 4-week average ($3). Plan a rest day or a light session.'],
   [/^of$/,'or'],
+  [/^Geel$/,'Yellow'],[/^Groen$/,'Green'],[/^Blauw$/,'Blue'],[/^Rood$/,'Red'],
+  [/^Zwart$/,'Black'],[/^Wit$/,'White'],[/^Paars$/,'Purple'],[/^Oranje$/,'Orange'],
+  [/^Roze$/,'Pink'],
+  [/^Alles$/,'All'],[/^30 dagen$/,'30 days'],[/^90 dagen$/,'90 days'],[/^Dit jaar$/,'This year'],
+  [/^Alle routes$/,'All routes'],[/^Alleen flash$/,'Flash only'],[/^Alleen top$/,'Sends only'],
+  [/^Met poging$/,'With attempt'],
+  [/^(\d+) van (\d+) sessies$/,'$1 of $2 sessions'],
+  [/(\d+)× bingo/g,'$1x bingo'],
+  [/(\d+)\/9 gehaald/,'$1/9 done'],
+  [/^([\d.,]+) graad zachter$/,'$1 grade softer'],
+  [/^([\d.,]+) graad harder$/,'$1 grade harder'],
+
   [/^Week (\d+) van (\d+) · /,'Week $1 of $2 · '],
 ];
 const I18N_PHRASES=[
@@ -1859,6 +1989,107 @@ const I18N_PHRASES=[
   ['Gekopieerd naar klembord','Copied to clipboard'],
   [' weken resterend',' weeks left'],['Laatste week!','Last week!'],
   ['% boven gemiddeld','% above average'],
+  ['Ongedaan maken','Undo'],
+  ['Greepkleur','Hold colour'],['Route-notitie','Route note'],
+  ['hiel rechts, dan crossen','right heel, then cross'],['bijv. Kolom','e.g. Pillar'],
+  ['Vaak gelogd','Logged often'],['Per kleur','By colour'],
+  ['Zoek in gym, notitie, graad, kleur…','Search gym, note, grade, colour…'],
+  ['Zoek in je sessies','Search your sessions'],
+  ['Vinkt zichzelf af uit wat je logt. Elke maandag een nieuwe kaart.','Ticks itself off from what you log. A fresh card every Monday.'],
+  ['Flash een overhang','Flash an overhang'],
+  ['Drie routes op slab','Three routes on slab'],
+  ['Probeer een graad boven je PR','Try a grade above your PR'],
+  ['Twee sessies deze week','Two sessions this week'],
+  ['Stuur iets in maximaal twee pogingen','Send something in two attempts or fewer'],
+  ['Log een dyno','Log a dyno'],
+  ['Tien routes in één sessie','Ten routes in one session'],
+  ['Log een route met een notitie','Log a route with a note'],
+  ['Drie verschillende routetypes','Three different route types'],
+  ['Top een crimp-route','Send a crimp route'],
+  ['Sluit een sessie af met gevoel 🔥','Finish a session feeling 🔥'],
+  ['Vijf tops in één sessie','Five sends in one session'],
+  ['Geef een project een poging','Give a project an attempt'],
+  ['Twee routes op mantle of pinch','Two routes on mantle or pinch'],
+  ['Drie flashes deze week','Three flashes this week'],
+  ['Een sessie zonder mislukte poging','A session without a failed attempt'],
+  ['Klim in twee verschillende gyms','Climb at two different gyms'],
+  ['Top een verticale route','Send a vertical route'],
+  ['Log een sloper-route','Log a sloper route'],
+  ['Waag je aan een cave-route','Take on a cave route'],
+  ['Vijftien routes deze week','Fifteen routes this week'],
+  ['Schrijf een sessienotitie','Write a session note'],
+  ['Vier routes van dezelfde graad','Four routes of the same grade'],
+  ['Klim op drie verschillende dagen','Climb on three different days'],
+  ['Log een hangsessie','Log a hangboard session'],
+  ['Drie routes van dezelfde kleur','Three routes of the same colour'],
+  ['Top een gele boulder','Send a yellow boulder'],
+  ['Routes in twee verschillende kleuren','Routes in two different colours'],
+  ['Log een route met een sector','Log a route with a sector'],
+  ['weken op rij bingo','weeks of bingo in a row'],
+  ['Weekbingo','Weekly bingo'],['Rij compleet','Line complete'],
+  ['Klim-DNA','Climbing DNA'],['Mijn Klim-DNA','My Climbing DNA'],
+  ['Graad-kalibrator','Grade calibrator'],['Gym-statistieken','Gym statistics'],
+  ['Beta board','Beta board'],['Beta delen','Share beta'],['Plaatsen','Post'],
+  ['📋 Deel deze beta met je gym','📋 Share this beta with your gym'],
+  ['Nog geen beta voor deze gym — wees de eerste.','No beta for this gym yet — be the first.'],
+  ['Log in om beta te lezen en te delen.','Sign in to read and share beta.'],
+  ['Beta board is nu niet beschikbaar.','Beta board is unavailable right now.'],
+  ['Beta board niet beschikbaar','Beta board unavailable'],
+  ['Beta laden mislukt.','Could not load beta.'],
+  ['Beta geplaatst!','Beta posted!'],['Beta verwijderd','Beta removed'],
+  ['Beta verborgen','Beta hidden'],['Beta verbergen?','Hide beta?'],
+  ['Beta verwijderen?','Remove beta?'],['Beta plaatsen mislukt','Could not post beta'],
+  ['Beta is te lang','Beta is too long'],['Verbergen mislukt','Could not hide'],
+  ['Dagelijkse limiet bereikt — morgen weer','Daily limit reached — try again tomorrow'],
+  ['Log in om beta te delen','Sign in to share beta'],
+  ['Schrijf eerst je beta','Write your beta first'],
+  ['Kies eerst een gym','Pick a gym first'],
+  ['Hiel rechts op de volgreep, dan crossen naar de sloper...','Right heel on the jug, then cross to the sloper...'],
+  ['Sector (optioneel)','Sector (optional)'],
+  ['Verbergen','Hide'],['Laden…','Loading…'],
+  ['Gyms van zacht naar hard','Gyms from soft to hard'],
+  ['In lijn met het gemiddelde','In line with the average'],
+  ['Deze gym','This gym'],['Gemiddeld','Average'],['Jij hier','You here'],
+  ['Harder','Harder'],['Zachter','Softer'],
+  ['Nog te weinig gedeelde data om gyms te vergelijken.','Not enough shared data yet to compare gyms.'],
+  ['Kalibratie is nu niet beschikbaar.','Calibration is unavailable right now.'],
+  ['Kalibratie heeft even internet nodig.','Calibration needs a connection.'],
+  ['Gegevens ophalen…','Fetching data…'],['Ververs','Refresh'],
+  ['Indicatie op basis van zelf-gerapporteerde data, geen norm. Alleen geanonimiseerde totalen, en pas vanaf 5 klimmers per graad.','Indication based on self-reported data, not a standard. Anonymised totals only, and only from 5 climbers per grade.'],
+  ['Bijgewerkt ','Updated '],
+  ['Mijn data meetellen','Include my data'],
+  ['Anoniem, alleen als totaal per gym en graad. Voedt de graad-kalibrator.','Anonymous, only as a total per gym and grade. Feeds the grade calibrator.'],
+  ['Log in om dit te kunnen instellen.','Sign in to change this.'],
+  ['Je data telt weer mee','Your data counts again'],
+  ['Je data telt niet meer mee','Your data no longer counts'],
+  ['Instelling opslaan mislukt','Could not save the setting'],
+  ['🎤 Inspreken','🎤 Speak'],['🎤 Luistert…','🎤 Listening…'],['🎤 Blijft luisteren','🎤 Staying on'],
+  ['Route inspreken','Speak a route'],
+  ['Zeg bijvoorbeeld "zes b plus top overhang". Spraakherkenning loopt via je browser.','Say for example "six b plus top overhang". Speech recognition runs through your browser.'],
+  ['Niet verstaan — probeer "zes b plus top"','Did not catch that — try "six b plus top"'],
+  ['Spraakherkenning werkt niet in deze browser','Speech recognition does not work in this browser'],
+  ['Spraakherkenning werkt even niet','Speech recognition is not working right now'],
+  ['Geen toegang tot de microfoon','No access to the microphone'],
+  ['Geen microfoon gevonden','No microphone found'],
+  ['Microfoon uit na een minuut stilte','Microphone off after a minute of silence'],
+  ['Je DNA is nog aan het vormen — log 10 sessies.','Your DNA is still forming — log 10 sessions.'],
+  ['Zo groeide het','How it grew'],['Deel je DNA','Share your DNA'],
+  ['Nog te weinig historie voor een tijdlijn.','Not enough history for a timeline yet.'],
+  ['Klim-DNA gedownload!','Climbing DNA downloaded!'],
+  ['Nog geen DNA om te delen','No DNA to share yet'],
+  ['Slab-fluisteraar','Slab whisperer'],['Muurmetronoom','Wall metronome'],
+  ['Overhangbeul','Overhang brute'],['Grotduiker','Cave diver'],
+  ['Dyno-durfal','Dyno daredevil'],['Mantelmonteur','Mantle mechanic'],
+  ['Knijpkracht','Pinch power'],['Crimpmonnik','Crimp monk'],
+  ['Slopersluiper','Sloper sneak'],
+  ['Je flasht meer dan je probeert.','You flash more than you try.'],
+  ['Je bijt je vast tot het klaar is.','You lock on until it goes.'],
+  ['Volume is jouw wapen.','Volume is your weapon.'],
+  ['Je gaat bijna altijd met een goed gevoel naar huis.','You almost always go home feeling good.'],
+  ['Consistentie is je handtekening.','Consistency is your signature.'],
+  ['Je vingers doen het stille werk.','Your fingers do the quiet work.'],
+  ['Je bouwt gestaag aan een breed profiel.','You are steadily building a broad profile.'],
+  ['Grafieken zijn offline niet beschikbaar. Ze komen terug zodra je weer verbinding hebt.','Charts are unavailable offline. They come back as soon as you are online again.'],
   ['sessie','session'],
 ];
 I18N_PHRASES.sort((a,b)=>b[0].length-a[0].length);
@@ -2311,12 +2542,34 @@ function saveProjectLore(){
   try{localStorage.setItem(PLRK,JSON.stringify(projectLoreCache))}catch(e){toast('Opslaan mislukt','#e53935')}
 }
 // Generiek verwijder-patroon: muteer array in place, bewaar, her-render.
-function deleteItem(arr,id,saveFn,renderFn){
+// Het verwijderde item blijft in _lastDeleted staan zodat undoDelete() het
+// op zijn oude plek kan terugzetten — één toast houdt alle deleteflows af.
+let _lastDeleted=null;
+function deleteItem(arr,id,saveFn,renderFn,onUndo){
   const idx=arr.findIndex(x=>x.id===id);
-  if(idx===-1)return;
+  if(idx===-1)return false;
+  _lastDeleted={arr,item:arr[idx],idx,saveFn,renderFn,onUndo};
   arr.splice(idx,1);
   saveFn();
   renderFn();
+  return true;
+}
+function undoDelete(){
+  const d=_lastDeleted;
+  if(!d)return;
+  _lastDeleted=null;
+  d.arr.splice(Math.min(d.idx,d.arr.length),0,d.item);
+  // sessies staan op datum gesorteerd; na herstel opnieuw sorteren zodat de feed klopt
+  if(d.arr===sessions)sessions.sort((a,b)=>a.date.localeCompare(b.date));
+  if(typeof d.onUndo==='function')d.onUndo(d.item);
+  d.saveFn();
+  d.renderFn();
+  toast('Hersteld');
+}
+// Verwijderen mét vangnet: toont een toast waarmee je het meteen terugdraait.
+function deleteWithUndo(arr,id,saveFn,renderFn,msg,onUndo){
+  if(!deleteItem(arr,id,saveFn,renderFn,onUndo))return;
+  toast(msg,'#e53935',{label:'Ongedaan maken',fn:undoDelete});
 }
 function loadArr(k,fb){
   try{
@@ -2338,6 +2591,27 @@ function getPR(type){const r=allRoutes().filter(x=>type==='flash'?x.result==='fl
 function maxGrade(routes){const t=routes.filter(r=>r.result!=='poging');if(!t.length)return null;return t.reduce((b,r)=>gi(r.grade)>gi(b.grade)?r:b,t[0])}
 function getResultColor(res){return res==='top'?'var(--success)':res==='flash'?'var(--flash)':'var(--attempt)'}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+/* Chart.js komt van een CDN. Bij een koude start zonder internet bestaat hij
+   niet; de grafieken slaan zichzelf dan over in plaats van te crashen, en we
+   leggen één keer per pagina uit waarom ze leeg zijn. */
+function _chartsAvailable(){return typeof Chart!=='undefined'}
+function _renderChartsOfflineNote(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.innerHTML=_chartsAvailable()?'':'<div class="chart-card" style="text-align:center;color:var(--muted);font-size:13px">Grafieken zijn offline niet beschikbaar. Ze komen terug zodra je weer verbinding hebt.</div>';
+}
+function initOfflineBadge(){
+  const el=document.getElementById('offline-badge');
+  if(!el)return;
+  const upd=()=>{el.style.display=navigator.onLine?'none':''};
+  window.addEventListener('offline',upd);
+  window.addEventListener('online',()=>{
+    upd();
+    _renderChartsOfflineNote('charts-offline-note');
+    _renderChartsOfflineNote('charts-offline-note-hang');
+  });
+  upd();
+}
 const haptic=(ms=10)=>{if(navigator.vibrate)navigator.vibrate(ms)};
 function dateBucket(dateStr){
   const today=new Date().toISOString().split('T')[0];
@@ -2373,8 +2647,8 @@ function _doPageRender(id){
   if(id==='home'){renderFeed();if(feedTab==='sociaal')renderSociaalPage();}
   if(id==='stats'){if(analyseTab==='stats')renderStats();else renderCoach();}
   if(id==='goals'){renderGoals();if(doelenTab==='projects')renderProjects();}
-  if(id==='gyms'){if(meerTab==='gyms'){renderGymsPage();renderProfileMgmt();renderOwnerControls();renderFeedbackAdmin();}else renderHangPage();}
-  if(id==='log'){refreshGymSelect();refreshNotePlaceholder();_ensureLogFormSeeded();}
+  if(id==='gyms'){if(meerTab==='gyms'){renderGymsPage();renderProfileMgmt();renderOwnerControls();renderFeedbackAdmin();renderStatsOptOut();}else renderHangPage();}
+  if(id==='log'){refreshGymSelect();refreshNotePlaceholder();_ensureLogFormSeeded();renderQuickRouteChips();refreshSectorDatalist();}
   // Legacy: werking bij directe showPage calls naar verwijderde tabs
   if(id==='sociaal')renderSociaalPage();
   if(id==='hang')renderHangPage();
@@ -2396,9 +2670,14 @@ function showPage(id,direction){
   if(id==='coach'){analyseTab='coach';id='stats';}
   if(id==='hang'){meerTab='hang';id='gyms';}
   if(_navTransitioning)return;
-  // Guard: intercept navigation away from log page when routes have been entered
+  // Guard: intercept navigation away from log page when routes have been entered.
+  // Tellen op het aantal routekaarten kan niet: een verse logpagina heeft er
+  // altijd precies één (leeg), dus dan waarschuwde hij ook als je niets had
+  // ingevuld — en direct na het opslaan, want _resetLogForm() zet die lege
+  // kaart meteen terug. _isLogFormBlank() is de bestaande definitie van
+  // "er staat niets in".
   const onLogPage=document.querySelector('.page.active')?.id==='page-log';
-  if(id!=='log'&&onLogPage&&!editMode&&document.querySelectorAll('#route-cards .route-card').length>0){
+  if(id!=='log'&&onLogPage&&!editMode&&_logFormHasUserInput()){
     pendingNavTarget=id;showNavLeaveConfirm();return;
   }
   haptic();
@@ -2471,11 +2750,23 @@ function confirmNavLeave(){
   showPage(target);
 }
 
-function toast(msg,color){
+let _toastTimer=null;
+// action = {label, fn} maakt de toast klikbaar en verlengt hem naar 6s (undo-patroon).
+function toast(msg,color,action){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.style.background=color||'var(--success)';
-  t.style.pointerEvents='none';t.style.cursor='';t.onclick=null;
-  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)
+  clearTimeout(_toastTimer);
+  t.onclick=null;
+  if(action&&typeof action.fn==='function'){
+    t.innerHTML=`<span>${esc(msg)}</span><span class="toast-action">${esc(action.label)}</span>`;
+    t.style.pointerEvents='auto';t.style.cursor='pointer';
+    t.onclick=()=>{clearTimeout(_toastTimer);t.onclick=null;t.style.pointerEvents='none';t.style.cursor='';t.classList.remove('show');action.fn();};
+  }else{
+    t.textContent=msg;
+    t.style.pointerEvents='none';t.style.cursor='';
+  }
+  t.style.background=color||'var(--success)';
+  t.classList.add('show');
+  _toastTimer=setTimeout(()=>t.classList.remove('show'),action?6000:2200);
 }
 
 /* ══════════════════════════════════════════
@@ -2722,6 +3013,71 @@ function getMilestones(){
 /* ══════════════════════════════════════════
    FEED
 ══════════════════════════════════════════ */
+/* ── FEED FILTERS ──────────────────────────────────────
+   Gym en min. graad staan al in twee selects; zoekterm, periode en
+   resultaat komen daarbovenop. Bewust niet in localStorage: een filter
+   hoort niet te overleven tot je volgende bezoek. */
+const FEED_PERIODS=[['all','Alles'],['30','30 dagen'],['90','90 dagen'],['year','Dit jaar']];
+const FEED_RESULTS=[['all','Alle routes'],['flash','Alleen flash'],['top','Alleen top'],['poging','Met poging']];
+let feedFilter={q:'',period:'all',result:'all'};
+let _feedSearchTimer=null;
+function _feedSearchDebounced(){
+  clearTimeout(_feedSearchTimer);
+  _feedSearchTimer=setTimeout(()=>{
+    feedFilter.q=document.getElementById('feed-search')?.value||'';
+    renderFeed();
+  },400);
+}
+function setFeedFilter(key,val){
+  feedFilter[key]=val;
+  haptic();
+  renderFeed();
+}
+function renderFeedChips(){
+  const el=document.getElementById('feed-chip-row');
+  if(!el)return;
+  const chip=(k,v,l)=>`<button type="button" class="feed-chip${feedFilter[k]===v?' sel':''}" onclick="setFeedFilter('${k}','${v}')">${l}</button>`;
+  el.innerHTML=FEED_PERIODS.map(([v,l])=>chip('period',v,l)).join('')
+    +'<span class="feed-chip-sep"></span>'
+    +FEED_RESULTS.map(([v,l])=>chip('result',v,l)).join('');
+}
+function _currentFeedFilter(){
+  return{
+    q:(feedFilter.q||'').trim().toLowerCase(),
+    period:feedFilter.period,
+    result:feedFilter.result,
+    gym:document.getElementById('filter-gym')?.value||'',
+    grade:document.getElementById('filter-grade')?.value||''
+  };
+}
+function _feedFilterActive(f){
+  return!!(f.q||f.gym||f.grade||f.period!=='all'||f.result!=='all');
+}
+function matchesFeedFilter(s,f){
+  if(f.gym&&s.gym!==f.gym)return false;
+  if(f.grade){const mg=maxGrade(s.routes);if(!mg||gi(mg.grade)<gi(f.grade))return false;}
+  if(f.period==='year'){
+    if(s.date.slice(0,4)!==String(new Date().getFullYear()))return false;
+  }else if(f.period!=='all'){
+    const cut=new Date(Date.now()-parseInt(f.period,10)*86400000).toISOString().slice(0,10);
+    if(s.date<cut)return false;
+  }
+  if(f.result==='flash'&&!s.routes.some(r=>r.result==='flash'))return false;
+  if(f.result==='top'&&!s.routes.some(r=>r.result==='top'||r.result==='flash'))return false;
+  if(f.result==='poging'&&!s.routes.some(r=>r.result==='poging'))return false;
+  if(f.q){
+    // Type- en kleurnamen staan in het Nederlands opgeslagen; in de Engelse
+    // modus zoeken we ook op de vertaling, zodat "blue" net zo goed werkt.
+    const parts=[s.gym||'',s.note||''];
+    s.routes.forEach(r=>{
+      parts.push(r.grade||'',r.type||'',r.color||'',r.sector||'',r.note||'');
+      if(currentLang==='en')parts.push(i18nTranslate(r.type||''),i18nTranslate(r.color||''));
+    });
+    if(!parts.join(' ').toLowerCase().includes(f.q))return false;
+  }
+  return true;
+}
+
 function renderFeed(){
   const pt=getPR('top'),streak=calcStreak();
   document.getElementById('hs-sessions').textContent=sessions.length;
@@ -2734,6 +3090,7 @@ function renderFeed(){
   renderOnThisDay();
   renderStreakReaper();
   renderNudges();
+  renderBingoBar();
 
   // Sync gym filter options with sessions
   const fgEl=document.getElementById('filter-gym');
@@ -2745,15 +3102,15 @@ function renderFeed(){
   }
 
   // Apply filters
-  const fg=document.getElementById('filter-gym')?.value||'';
-  const fgr=document.getElementById('filter-grade')?.value||'';
-  const hasFilter=!!(fg||fgr);
+  renderFeedChips();
+  const filt=_currentFeedFilter();
+  const hasFilter=_feedFilterActive(filt);
   const clearBtn=document.getElementById('filter-clear-btn');
   if(clearBtn)clearBtn.className='btn-filter-clear'+(hasFilter?' active':'');
 
-  let visible=[...sessions].reverse();
-  if(fg)visible=visible.filter(s=>s.gym===fg);
-  if(fgr)visible=visible.filter(s=>{const mg=maxGrade(s.routes);return mg&&gi(mg.grade)>=gi(fgr)});
+  const visible=[...sessions].reverse().filter(s=>matchesFeedFilter(s,filt));
+  const countEl=document.getElementById('feed-result-count');
+  if(countEl)countEl.textContent=hasFilter?`${visible.length} van ${sessions.length} sessies`:'';
 
   const feed=document.getElementById('feed');
   if(!sessions.length){
@@ -2786,7 +3143,7 @@ function renderFeed(){
     const s=item.s;
     const idx=cardIdx++;
     const mg=maxGrade(s.routes);
-    const chips=s.routes.map(r=>{const gc=GRADE_COLORS[GRADES.indexOf(r.grade)]||'#555';return`<div class="route-chip chip-${r.result}" style="background:${gc}22;border:.5px solid ${gc}55"><div class="dot"></div>${esc(r.grade)}${r.type?' · '+esc(r.type):''}</div>`;}).join('');
+    const chips=s.routes.map(r=>{const gc=GRADE_COLORS[GRADES.indexOf(r.grade)]||'#555';const hc=routeColorHex(r.color);return`<div class="route-chip chip-${r.result}" style="background:${gc}22;border:.5px solid ${gc}55"><div class="dot"></div>${hc?`<span class="chip-hold" style="background:${hc}"></span>`:''}${esc(r.grade)}${r.type?' · '+esc(r.type):''}</div>`;}).join('');
     const heat=s.routes.map(r=>{const gc=GRADE_COLORS[GRADES.indexOf(r.grade)]||'#555';return`<div class="heat-block" style="background:${gc}"></div>`;}).join('');
     const feelEmojis=['😓','😐','💪','🔥'];
     const feelStr=s.feel!=null?` · <span class="feed-feel">${feelEmojis[s.feel]}</span>`:'';
@@ -2865,6 +3222,9 @@ function showSessionSummary(routes,wasEdit,durSecs=null){
 function clearFilters(){
   const fg=document.getElementById('filter-gym');const fgr=document.getElementById('filter-grade');
   if(fg)fg.value='';if(fgr)fgr.value='';
+  const q=document.getElementById('feed-search');if(q)q.value='';
+  clearTimeout(_feedSearchTimer);
+  feedFilter={q:'',period:'all',result:'all'};
   renderFeed();
 }
 
@@ -2889,7 +3249,7 @@ function deleteSession(id){
   const s=sessions.find(x=>x.id===id);if(!s)return;
   showDeleteConfirm('Sessie verwijderen?',`${esc(s.gym||'Gym')} — ${fmtDate(s.date)}`,()=>confirmDelete(id));
 }
-function confirmDelete(id){haptic(8);deleteItem(sessions,id,save,renderFeed);toast('Sessie verwijderd','#e53935')}
+function confirmDelete(id){haptic(8);deleteWithUndo(sessions,id,save,renderFeed,'Sessie verwijderd')}
 
 function editSession(id){
   const s=sessions.find(x=>x.id===id);if(!s)return;
@@ -2899,7 +3259,7 @@ function editSession(id){
   currentFeel=s.feel!=null?s.feel:null;
   document.querySelectorAll('.feel-btn').forEach((b,i)=>b.classList.toggle('selected',i===currentFeel));
   document.getElementById('route-cards').innerHTML='';routeCount=0;
-  s.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type,r.projectId));
+  s.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type,r.projectId,r));
   document.querySelector('#page-log .page-title').textContent='Sessie bewerken';
   document.querySelector('#page-log .btn-save').textContent='Wijzigingen opslaan';
   const pubEl=document.getElementById('inp-public');if(pubEl)pubEl.checked=!!(s.is_public);
@@ -2934,19 +3294,36 @@ function addGym(){
   if(gyms.find(g=>g.name.toLowerCase()===name.toLowerCase())){toast('Gym bestaat al','#e53935');return}
   gyms.push({id:Date.now(),name,fav:gyms.length===0});saveGyms();inp.value='';renderGymsPage();refreshGymSelect();toast('Gym toegevoegd!')
 }
+// Beta board openen vanaf de gymlijst: alleen het id gaat de handler in.
+function openBetaForGym(id){
+  const g=gyms.find(x=>x.id===id);
+  if(!g)return;
+  if(typeof openBetaBoard!=='function'){toast('Beta board niet beschikbaar','#e53935');return;}
+  openBetaBoard(g.name);
+}
+// ...of vanaf een routekaart tijdens het loggen, met graad/kleur/sector vooringevuld.
+function openBetaForRoute(cardId){
+  if(typeof openBetaBoard!=='function'){toast('Beta board niet beschikbaar','#e53935');return;}
+  const gym=document.getElementById('inp-gym-select')?.value||'';
+  if(!gym){toast('Kies eerst een gym','#e53935');return;}
+  openBetaBoard(gym,{
+    grade:document.getElementById('rg-'+cardId)?.value||'',
+    color:document.getElementById('rcl-'+cardId)?.value||'',
+    sector:document.getElementById('rsec-'+cardId)?.value||''
+  });
+}
 function setFav(id){gyms.forEach(g=>g.fav=(g.id===id));saveGyms();renderGymsPage();refreshGymSelect()}
 function deleteGym(id){
   const g=gyms.find(x=>x.id===id);if(!g)return;
   showDeleteConfirm('Gym verwijderen?',esc(g.name),()=>confirmDeleteGym(id));
 }
 function confirmDeleteGym(id){
-  deleteItem(gyms,id,()=>{if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms()},()=>{renderGymsPage();refreshGymSelect()});
-  toast('Gym verwijderd','#e53935');
+  deleteWithUndo(gyms,id,()=>{if(!gyms.find(g=>g.fav)&&gyms.length)gyms[0].fav=true;saveGyms()},()=>{renderGymsPage();refreshGymSelect()},'Gym verwijderd');
 }
 function renderGymsPage(){
   const list=document.getElementById('gym-list');
   if(!gyms.length){list.innerHTML='<div class="empty-state" style="padding:30px 0"><div>Nog geen gyms — voeg er een toe hieronder.</div></div>';}
-  else{list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${esc(g.name)}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-fav ${g.fav?'active':''}" onclick="setFav(${g.id})">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-delete" onclick="deleteGym(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')}
+  else{list.innerHTML=gyms.map(g=>`<div class="gym-item ${g.fav?'is-fav':''}"><div><div class="gym-item-name">${esc(g.name)}</div>${g.fav?'<div class="gym-item-fav-badge">★ Favoriet</div>':''}</div><div class="gym-actions"><button class="btn-gym-beta" onclick="openBetaForGym(${g.id})">📋 Beta</button><button class="btn-fav ${g.fav?'active':''}" onclick="setFav(${g.id})">${g.fav?'★ Favoriet':'Favoriet'}</button><button class="btn-delete" onclick="deleteGym(${g.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`).join('')}
   renderResetSection();
   renderQuietTime();
 }
@@ -2994,13 +3371,51 @@ function selectRouteGrade(id,grade,btn){
   haptic();
   saveDraft();
 }
+// De vijf vaakst gelogde graad+type+kleur-combinaties van de laatste 90 dagen.
+// Eén tik voegt zo'n route toe — de grootste tijdwinst tijdens een sessie.
+function _recentRouteCombos(){
+  const cut=new Date(Date.now()-90*86400000).toISOString().slice(0,10);
+  const counts={};
+  sessions.forEach(s=>{
+    if(s.date<cut)return;
+    s.routes.forEach(r=>{
+      const key=[r.grade,r.type||'',r.color||''].join('|');
+      counts[key]=(counts[key]||0)+1;
+    });
+  });
+  return Object.keys(counts)
+    .sort((a,b)=>counts[b]-counts[a])
+    .slice(0,5)
+    .map(k=>{const p=k.split('|');return{grade:p[0],type:p[1],color:p[2],n:counts[k]}});
+}
+function renderQuickRouteChips(){
+  const el=document.getElementById('quick-route-chips');
+  if(!el)return;
+  const combos=_recentRouteCombos();
+  if(combos.length<2){el.innerHTML='';el._combos=null;return;}
+  el.innerHTML=`<div class="qrc-label">Vaak gelogd</div><div class="qrc-row">${combos.map((c,i)=>{
+    const hex=routeColorHex(c.color);
+    return`<button type="button" class="qrc-chip" onclick="addFromCombo(${i})">${hex?`<span class="qrc-dot" style="background:${hex}"></span>`:''}<span>${esc(c.grade)}</span>${c.type?`<span class="qrc-type">${esc(c.type)}</span>`:''}</button>`;
+  }).join('')}</div>`;
+  el._combos=combos;
+}
+// Index in plaats van de waarden zelf doorgeven: niets van de gebruiker
+// belandt zo in een inline handler.
+function addFromCombo(i){
+  const el=document.getElementById('quick-route-chips');
+  const c=el&&el._combos&&el._combos[i];
+  if(!c)return;
+  addRouteCard(c.grade,1,'poging',c.type,null,{color:c.color});
+  saveDraft();
+}
 function getSmartDefaultGrade(){
   const cards=document.querySelectorAll('#route-cards .route-card');
   if(cards.length){const lastId=cards[cards.length-1].id.replace('rc-','');const sel=document.getElementById('rg-'+lastId);if(sel)return sel.value;}
   if(sessions.length){const freq={};[...sessions].slice(-5).forEach(s=>s.routes.forEach(r=>{freq[r.grade]=(freq[r.grade]||0)+1}));const best=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];if(best)return best[0];}
   return'6a';
 }
-function addRouteCard(grade='6a',attempts=1,result='poging',type='',projectId=null){
+function addRouteCard(grade='6a',attempts=1,result='poging',type='',projectId=null,extra={}){
+  const color=extra&&extra.color||'',sector=extra&&extra.sector||'',rnote=extra&&extra.note||'';
   if(!editMode&&routeCount===0)startSessionTimer();
   document.querySelectorAll('#route-cards .route-card.expanded').forEach(c=>c.classList.remove('expanded'));
   routeCount++;const id=routeCount;
@@ -3039,7 +3454,15 @@ function addRouteCard(grade='6a',attempts=1,result='poging',type='',projectId=nu
       </div>
       <div class="field"><label>Type</label><select id="rt-${id}" onchange="saveDraft()"><option value="">— type —</option>${TYPES.map(t=>`<option ${t===type?'selected':''}>${t}</option>`).join('')}</select></div>
       <div class="field"><label>Pogingen</label><div class="attempts-stepper"><button class="stepper-btn" onclick="event.stopPropagation();stepAttempts(${id},-1)">−</button><span class="stepper-val" id="ra-${id}">${attempts}</span><button class="stepper-btn" onclick="event.stopPropagation();stepAttempts(${id},1)">+</button><button class="stepper-btn stepper-btn-bulk" onclick="event.stopPropagation();stepAttempts(${id},5)">+5</button></div></div>
+      <div class="field full">
+        <label>Greepkleur</label>
+        <div class="rc-color-row" id="rcc-${id}">${ROUTE_COLORS.map(c=>`<button type="button" class="rc-color-dot${c.n===color?' sel':''}" style="background:${c.c}" title="${c.n}" aria-label="${c.n}" onclick="event.stopPropagation();selectRouteColor(${id},'${c.n}',this)"></button>`).join('')}</div>
+        <input type="hidden" id="rcl-${id}" value="${esc(color)}">
+      </div>
+      <div class="field"><label>Sector</label><input type="text" id="rsec-${id}" list="sector-options" value="${esc(sector)}" placeholder="bijv. Kolom" onclick="event.stopPropagation()" oninput="_saveDraftDebounced()"></div>
+      <div class="field"><label>Route-notitie</label><input type="text" id="rnote-${id}" value="${esc(rnote)}" placeholder="hiel rechts, dan crossen" onclick="event.stopPropagation()" oninput="_saveDraftDebounced()"></div>
       ${projectRow}
+      <div class="field full"><button type="button" class="btn-route-beta" onclick="event.stopPropagation();openBetaForRoute(${id})">📋 Deel deze beta met je gym</button></div>
     </div>
   </div>
   <input type="hidden" id="rr-${id}" value="${result}">`;
@@ -3087,6 +3510,27 @@ function _initCardSwipe(card,wrap,delBg){
   },{passive:false});
 }
 function toggleRC(id){document.getElementById('rc-'+id).classList.toggle('expanded')}
+function selectRouteColor(id,name,btn){
+  const inp=document.getElementById('rcl-'+id);
+  if(!inp)return;
+  const on=inp.value!==name;
+  inp.value=on?name:'';
+  btn.closest('.rc-color-row').querySelectorAll('.rc-color-dot').forEach(b=>b.classList.remove('sel'));
+  if(on)btn.classList.add('sel');
+  haptic();saveDraft();
+}
+// Sectorsuggesties komen uit wat je bij deze gym eerder hebt getypt.
+function refreshSectorDatalist(){
+  const dl=document.getElementById('sector-options');
+  if(!dl)return;
+  const gym=document.getElementById('inp-gym-select')?.value||'';
+  const seen=new Set();
+  sessions.forEach(s=>{
+    if(gym&&s.gym!==gym)return;
+    s.routes.forEach(r=>{if(r.sector)seen.add(r.sector)});
+  });
+  dl.innerHTML=[...seen].sort().map(v=>`<option value="${esc(v)}"></option>`).join('');
+}
 function stepAttempts(id,delta){const el=document.getElementById('ra-'+id);if(!el)return;const v=Math.min(99,Math.max(1,(parseInt(el.textContent)||1)+delta));el.textContent=v;const rsa=document.getElementById('rsa-'+id);if(rsa)rsa.textContent=v>1?`· ${v}×`:'';haptic();saveDraft();}
 function updRS(id){const g=document.getElementById('rg-'+id).value,res=document.getElementById('rr-'+id).value,s=document.getElementById('rs-'+id);s.querySelector('.rs-grade').textContent=g;s.querySelector('.rs-dot').style.background=getResultColor(res);updateSessStatsBar();}
 function _isNewGradeRecord(grade,result){
@@ -3117,7 +3561,11 @@ function duplicateRouteCard(id){
   const a=parseInt(document.getElementById('ra-'+id)?.textContent)||1;
   const r=document.getElementById('rr-'+id)?.value||'top';
   const p=document.getElementById('rp-'+id)?.value||null;
-  addRouteCard(g,a,r,t,p);
+  addRouteCard(g,a,r,t,p,{
+    color:document.getElementById('rcl-'+id)?.value||'',
+    sector:document.getElementById('rsec-'+id)?.value||'',
+    note:document.getElementById('rnote-'+id)?.value||''
+  });
   saveDraft();
 }
 function updateSessStatsBar(){
@@ -3135,29 +3583,50 @@ function _collectRoutes(){
   const routes=[];
   cards.forEach(c=>{
     const id=c.id.replace('rc-','');
-    routes.push({
+    const route={
       grade:document.getElementById('rg-'+id).value,
       type:document.getElementById('rt-'+id).value,
       attempts:parseInt(document.getElementById('ra-'+id).textContent)||1,
       result:document.getElementById('rr-'+id).value,
       projectId:document.getElementById('rp-'+id)?.value||null
-    });
+    };
+    // Alleen wegschrijven wat ingevuld is — lege strings zouden elke oude
+    // sessie onnodig laten groeien in localStorage en in de cloud-jsonb.
+    const col=document.getElementById('rcl-'+id)?.value||'';
+    const sec=(document.getElementById('rsec-'+id)?.value||'').trim();
+    const rn=(document.getElementById('rnote-'+id)?.value||'').trim();
+    if(col)route.color=col;
+    if(sec)route.sector=sec;
+    if(rn)route.note=rn;
+    routes.push(route);
   });
   return routes;
 }
 /* ══════════════════════════════════════════
    LOG DRAFT — autosave in-progress (unsaved) session
 ══════════════════════════════════════════ */
-function _isLogFormBlank(){
+// Heeft de gebruiker zelf iets ingevuld? De gym telt hier bewust NIET mee:
+// refreshGymSelect() vult je favoriete of laatst gebruikte gym alvast in,
+// en dat is geen invoer om een navigatiewaarschuwing voor te geven.
+function _logFormHasUserInput(){
   const cards=document.querySelectorAll('#route-cards .route-card');
-  if(cards.length>1)return false;
-  if(document.getElementById('inp-note')?.value.trim())return false;
-  if(document.getElementById('inp-gym-select')?.value)return false;
-  if(currentFeel!=null)return false;
-  if(!cards.length)return true;
+  if(cards.length>1)return true;
+  if(document.getElementById('inp-note')?.value.trim())return true;
+  if(currentFeel!=null)return true;
+  if(!cards.length)return false;
   const id=cards[0].id.replace('rc-','');
-  const g=document.getElementById('rg-'+id)?.value,t=document.getElementById('rt-'+id)?.value,a=parseInt(document.getElementById('ra-'+id)?.textContent)||1,r=document.getElementById('rr-'+id)?.value;
-  return g==='6a'&&t===''&&a===1&&r==='poging';
+  if(document.getElementById('rcl-'+id)?.value)return true;
+  if((document.getElementById('rsec-'+id)?.value||'').trim())return true;
+  if((document.getElementById('rnote-'+id)?.value||'').trim())return true;
+  const g=document.getElementById('rg-'+id)?.value,t=document.getElementById('rt-'+id)?.value,
+        a=parseInt(document.getElementById('ra-'+id)?.textContent)||1,r=document.getElementById('rr-'+id)?.value;
+  return!(g==='6a'&&t===''&&a===1&&r==='poging');
+}
+// Voor het concept telt de gym wél mee: een gekozen gym alleen is niets
+// om op te slaan, maar samen met invoer hoort hij in het concept.
+function _isLogFormBlank(){
+  if(_logFormHasUserInput())return false;
+  return!document.getElementById('inp-gym-select')?.value;
 }
 let _draftSaveTimer=null;
 function _saveDraftDebounced(){clearTimeout(_draftSaveTimer);_draftSaveTimer=setTimeout(saveDraft,400);}
@@ -3189,7 +3658,7 @@ function restoreDraftIfAny(){
   applyVibe(currentFeel);
   const pubEl=document.getElementById('inp-public');if(pubEl)pubEl.checked=!!draft.is_public;
   document.getElementById('route-cards').innerHTML='';routeCount=0;
-  draft.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type,r.projectId));
+  draft.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type,r.projectId,r));
   sessionTimerStart=draft.sessionTimerStart||null;
   sessionTimerElapsed=draft.sessionTimerElapsed||0;
   sessionTimerPaused=!!draft.sessionTimerPaused;
@@ -3298,7 +3767,7 @@ function addCountGoal(){
   goals.push({id:Date.now(),type:'count',grade,result,count,deadline,createdAt:new Date().toISOString().split('T')[0]});
   saveGoals();renderGoals();toast('Doel toegevoegd!');
 }
-function deleteGoal(id){deleteItem(goals,id,saveGoals,renderGoals);toast('Doel verwijderd','#e53935')}
+function deleteGoal(id){deleteWithUndo(goals,id,saveGoals,renderGoals,'Doel verwijderd')}
 
 function renderGoals(){
   const trashSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4h6v2"/></svg>`;
@@ -3397,6 +3866,183 @@ function quickLogRoute(grade,result='top',attempts=1){
   const n=document.querySelectorAll('#route-cards .route-card').length;
   const label=result==='top'?'Top':result==='flash'?'Flash':'Poging';
   toast(`${label} genoteerd — ${n} route${n!==1?'s':''} vandaag`,getResultColor(result));
+}
+
+/* ══════════════════════════════════════════
+   VOICE-LOGGEN
+   Zeg "zes b plus top" en de routekaart staat er. Web Speech API, dus
+   geen dependency — en de knop verschijnt alleen op browsers die hem
+   hebben. De kaart die eruit rolt staat open, dus corrigeren kan direct;
+   de toast eronder geeft bovendien een 'Weg' om hem meteen te wissen.
+══════════════════════════════════════════ */
+const VOICE_NUMBERS={vier:'4',vijf:'5',zes:'6',zeven:'7',acht:'8',four:'4',five:'5',six:'6',seven:'7',eight:'8',
+  een:'1',één:'1',twee:'2',drie:'3',one:'1',two:'2',three:'3'};
+const VOICE_LETTERS={bee:'b',cee:'c',see:'c',aa:'a',ay:'a',be:'b',ce:'c'};
+const VOICE_TYPES={slab:'Slab',verticaal:'Verticaal',vertical:'Verticaal',overhang:'Overhang',cave:'Cave',grot:'Cave',
+  dyno:'Dyno',mantle:'Mantle',mantel:'Mantle',pinch:'Pinch',knijp:'Pinch',crimp:'Crimp',krim:'Crimp',sloper:'Sloper'};
+const VOICE_COLORS={geel:'Geel',yellow:'Geel',groen:'Groen',green:'Groen',blauw:'Blauw',blue:'Blauw',rood:'Rood',red:'Rood',
+  zwart:'Zwart',black:'Zwart',wit:'Wit',white:'Wit',paars:'Paars',purple:'Paars',oranje:'Oranje',orange:'Oranje',roze:'Roze',pink:'Roze'};
+function _lev(a,b){
+  if(a===b)return 0;
+  if(!a.length||!b.length)return Math.max(a.length,b.length);
+  let prev=Array.from({length:b.length+1},(_,i)=>i);
+  for(let i=1;i<=a.length;i++){
+    const cur=[i];
+    for(let j=1;j<=b.length;j++){
+      cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    }
+    prev=cur;
+  }
+  return prev[b.length];
+}
+// Fuzzy: spraakherkenning hoort "krimp" waar "crimp" staat. Korte woorden
+// krijgen minder speling, anders matcht alles op alles.
+function _voiceLookup(word,table){
+  if(table[word])return table[word];
+  let best=null,bestD=99;
+  for(const k in table){
+    const d=_lev(word,k);
+    const max=k.length<=4?1:2;
+    if(d<=max&&d<bestD){best=table[k];bestD=d;}
+  }
+  return best;
+}
+function parseVoiceRoute(transcript){
+  const raw=String(transcript||'').toLowerCase().replace(/[.,!?;:]/g,' ');
+  const words=raw.split(/\s+/).filter(Boolean);
+  if(!words.length)return null;
+
+  // 1) Graad. Getal- en letterwoorden eerst naar tekens, dan aan elkaar
+  //    plakken zodat "zes b plus" en "6b+" hetzelfde opleveren.
+  const norm=words.map(w=>VOICE_NUMBERS[w]||VOICE_LETTERS[w]||(w==='plus'?'+':w)).join(' ');
+  const compact=norm.replace(/\s+/g,'');
+  const m=compact.match(/([45678])\s*([abc])?\s*(\+)?/);
+  if(!m)return null;
+  const[,d,letter,plus]=m;
+  const candidates=[d+(letter||'')+(plus||''),d+(letter||''),d+(plus||''),d,d+'a'];
+  const grade=candidates.find(c=>GRADES.includes(c));
+  if(!grade)return null;
+
+  // 2) Resultaat — flash vóór top, want "flash" impliceert ook een top.
+  let result='poging';
+  if(/flash|geflash/.test(raw))result='flash';
+  else if(/\btop\b|gestuurd|stuur|\bsend\b|\bsent\b|gedaan/.test(raw))result='top';
+
+  // 3) Type, kleur en pogingen
+  let type='',color='';
+  words.forEach(w=>{
+    if(!type){const t=_voiceLookup(w,VOICE_TYPES);if(t)type=t;}
+    if(!color){const c=_voiceLookup(w,VOICE_COLORS);if(c)color=c;}
+  });
+  let attempts=1;
+  const am=norm.match(/(\d+)\s+(pogingen|poging|attempts|attempt|tries|try|keer)/);
+  if(am)attempts=Math.min(99,Math.max(1,parseInt(am[1],10)));
+  else if(result==='poging')attempts=1;
+
+  return{grade,result,type,color,attempts};
+}
+let _voiceRec=null,_voiceContinuous=false,_voiceStopping=false,_voiceIdleTimer=null,_voiceHoldTimer=null;
+// Op de waarde testen, niet op het bestaan van de key: een browser kan
+// de naam wel kennen en toch niets leveren.
+function _voiceSupported(){
+  return typeof window!=='undefined'&&!!(window.SpeechRecognition||window.webkitSpeechRecognition);
+}
+function initVoiceLog(){
+  const btn=document.getElementById('btn-voice-log');
+  if(!btn||!_voiceSupported())return;
+  btn.style.display='';
+  // Lang indrukken = doorluisteren tijdens de hele sessie.
+  const hold=()=>{_voiceHoldTimer=setTimeout(()=>{_voiceHoldTimer=null;startVoiceLog(true);},600);};
+  const release=()=>{if(_voiceHoldTimer){clearTimeout(_voiceHoldTimer);_voiceHoldTimer=null;}};
+  btn.addEventListener('pointerdown',hold);
+  ['pointerup','pointerleave','pointercancel'].forEach(e=>btn.addEventListener(e,release));
+}
+function _voiceSetState(state){
+  const btn=document.getElementById('btn-voice-log');
+  const hint=document.getElementById('voice-hint');
+  if(btn){
+    btn.classList.toggle('listening',state==='listening');
+    btn.classList.toggle('continuous',state==='continuous');
+    btn.textContent=state==='listening'?'🎤 Luistert…':state==='continuous'?'🎤 Blijft luisteren':'🎤 Inspreken';
+  }
+  if(hint){
+    if(state==='off'){hint.style.display='none';hint.textContent='';}
+    else{
+      hint.style.display='';
+      hint.textContent='Zeg bijvoorbeeld "zes b plus top overhang". Spraakherkenning loopt via je browser.';
+    }
+  }
+}
+function toggleVoiceLog(){
+  if(_voiceRec){stopVoiceLog();return;}
+  startVoiceLog(false);
+}
+function startVoiceLog(continuous){
+  if(!_voiceSupported()){toast('Spraakherkenning werkt niet in deze browser','#e53935');return;}
+  if(_voiceRec)stopVoiceLog();
+  const Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const rec=new Rec();
+  _voiceRec=rec;_voiceContinuous=!!continuous;_voiceStopping=false;
+  rec.lang=LOCALE();
+  rec.continuous=!!continuous;
+  rec.interimResults=false;
+  rec.maxAlternatives=3;
+  rec.onresult=e=>{
+    _voiceResetIdle();
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const res=e.results[i];
+      if(!res.isFinal)continue;
+      let parsed=null;
+      for(let a=0;a<res.length&&!parsed;a++)parsed=parseVoiceRoute(res[a].transcript);
+      if(parsed)_voiceAddRoute(parsed);
+      else toast('Niet verstaan — probeer "zes b plus top"','#e53935');
+    }
+  };
+  rec.onerror=ev=>{
+    const err=ev&&ev.error;
+    if(err==='no-speech')return;                        // stilte is geen fout
+    if(err==='not-allowed'||err==='service-not-allowed')toast('Geen toegang tot de microfoon','#e53935');
+    else if(err==='audio-capture')toast('Geen microfoon gevonden','#e53935');
+    else if(err!=='aborted')toast('Spraakherkenning werkt even niet','#e53935');
+    stopVoiceLog();
+  };
+  rec.onend=()=>{
+    // Chrome kapt de sessie vanzelf af; in doorluister-modus opnieuw starten.
+    if(_voiceContinuous&&!_voiceStopping&&_voiceRec===rec){
+      try{rec.start();return;}catch(e){}
+    }
+    if(_voiceRec===rec)stopVoiceLog();
+  };
+  try{rec.start();}
+  catch(e){_voiceRec=null;toast('Spraakherkenning werkt even niet','#e53935');return;}
+  _voiceSetState(continuous?'continuous':'listening');
+  if(continuous)_voiceResetIdle();
+  haptic();
+}
+function _voiceResetIdle(){
+  clearTimeout(_voiceIdleTimer);
+  if(!_voiceContinuous)return;
+  _voiceIdleTimer=setTimeout(()=>{stopVoiceLog();toast('Microfoon uit na een minuut stilte');},60000);
+}
+function stopVoiceLog(){
+  clearTimeout(_voiceIdleTimer);_voiceIdleTimer=null;
+  const rec=_voiceRec;
+  _voiceRec=null;_voiceContinuous=false;_voiceStopping=true;
+  if(rec){try{rec.stop()}catch(e){}}
+  _voiceSetState('off');
+}
+function _voiceAddRoute(p){
+  addRouteCard(p.grade,p.attempts,p.result,p.type,null,{color:p.color});
+  saveDraft();
+  haptic();
+  const wrapId=document.querySelector('#route-cards .route-card-wrap:last-child')?.id;
+  const label=p.result==='flash'?'Flash':p.result==='top'?'Top':'Poging';
+  const bits=[p.grade,label];
+  if(p.type)bits.push(p.type);
+  if(p.color)bits.push(p.color);
+  toast(bits.join(' · '),getResultColor(p.result),{label:'Ongedaan maken',fn:()=>{
+    if(wrapId)removeRouteCard(wrapId);
+  }});
 }
 
 /* -- Inline sessie hangsets -- */
@@ -3604,11 +4250,11 @@ function deleteHangSession(id){
   showDeleteConfirm('Hangsessie verwijderen?',`${esc(fmtDate(s.date))} · ${s.sets.length} set${s.sets.length!==1?'s':''}`,()=>confirmDeleteHangSession(id));
 }
 function confirmDeleteHangSession(id){
-  deleteItem(hangSessions,id,saveHang,renderHangPage);
-  toast('Verwijderd','#e53935');
+  deleteWithUndo(hangSessions,id,saveHang,renderHangPage,'Verwijderd');
 }
 
 function renderHangPage(){
+  _renderChartsOfflineNote('charts-offline-note-hang');
   renderFingerHealth();
   // PR per grip: langste hangtijd
   const prRow=document.getElementById('hang-pr-row');
@@ -3659,6 +4305,7 @@ function renderHangChart(){
   if(!canvas)return;
   if(chartH){chartH.destroy();chartH=null;}
   if(!pts.length)return;
+  if(!_chartsAvailable())return;
   chartH=new Chart(canvas,{type:'line',data:{labels:pts.map(p=>p.date.slice(5)),datasets:[{data:pts.map(p=>p.time),borderColor:'#e91e8c',backgroundColor:'rgba(233,30,140,0.1)',borderWidth:2,pointBackgroundColor:'#e91e8c',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{beginAtZero:true,ticks:{color:CHART_TICK_COLOR,font:{size:11},callback:v=>fmtSecs(v)},grid:{color:'rgba(255,255,255,0.05)'}}}}});
 }
 
@@ -3896,6 +4543,7 @@ function renderTLI(){
   const canvas=document.getElementById('chart-tli');
   if(!canvas)return;
   if(tliChart){tliChart.destroy();tliChart=null}
+  if(!_chartsAvailable())return;
   tliChart=new Chart(canvas,{type:'bar',data:{labels:data.map(d=>d.label),datasets:[{data:data.map(d=>d.tli),backgroundColor:data.map((_,i)=>i===data.length-1?'rgba(127,119,221,.85)':'rgba(127,119,221,.3)'),borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:10}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:CHART_TICK_COLOR,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}}}}});
 }
 
@@ -3929,15 +4577,16 @@ function renderStats(){
     }else feelEl.innerHTML='';
   }
 
+  _renderChartsOfflineNote('charts-offline-note');
   const maxPS=[],chartSessions=[];
   sessions.forEach(s=>{const mg=maxGrade(s.routes);if(mg){maxPS.push({date:s.date,idx:gi(mg.grade)});chartSessions.push(s);}});
-  if(chartP)chartP.destroy();
-  chartP=new Chart(document.getElementById('chart-progress'),{type:'line',data:{labels:maxPS.map(s=>s.date.slice(5)),datasets:[{data:maxPS.map(s=>s.idx),borderColor:'#7f77dd',backgroundColor:'rgba(127,119,221,0.12)',borderWidth:2,pointBackgroundColor:'#7f77dd',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,items)=>{if(items.length>0)showSessionDetailModal(chartSessions[items[0].index]);},plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{min:0,max:GRADES.length-1,ticks:{color:CHART_TICK_COLOR,font:{size:11},callback:v=>GRADES[v]||'',stepSize:2},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+  if(chartP){chartP.destroy();chartP=null}
+  if(_chartsAvailable())chartP=new Chart(document.getElementById('chart-progress'),{type:'line',data:{labels:maxPS.map(s=>s.date.slice(5)),datasets:[{data:maxPS.map(s=>s.idx),borderColor:'#7f77dd',backgroundColor:'rgba(127,119,221,0.12)',borderWidth:2,pointBackgroundColor:'#7f77dd',pointRadius:5,pointHoverRadius:7,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,items)=>{if(items.length>0)showSessionDetailModal(chartSessions[items[0].index]);},plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{color:'rgba(255,255,255,0.05)'}},y:{min:0,max:GRADES.length-1,ticks:{color:CHART_TICK_COLOR,font:{size:11},callback:v=>GRADES[v]||'',stepSize:2},grid:{color:'rgba(255,255,255,0.05)'}}}}});
   renderTLI();
 
   const counts={};GRADES.forEach(g=>counts[g]=0);allR.filter(r=>r.result!=='poging').forEach(r=>counts[r.grade]++);const used=GRADES.filter(g=>counts[g]>0);
-  if(chartG)chartG.destroy();
-  chartG=new Chart(document.getElementById('chart-grades'),{type:'bar',data:{labels:used.length?used:['—'],datasets:[{data:used.length?used.map(g=>counts[g]):[0],backgroundColor:used.map(g=>GRADE_COLORS[GRADES.indexOf(g)]||'#444'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:CHART_TICK_COLOR,font:{size:11},stepSize:1},grid:{color:'rgba(255,255,255,0.05)'}}}}});
+  if(chartG){chartG.destroy();chartG=null}
+  if(_chartsAvailable())chartG=new Chart(document.getElementById('chart-grades'),{type:'bar',data:{labels:used.length?used:['—'],datasets:[{data:used.length?used.map(g=>counts[g]):[0],backgroundColor:used.map(g=>GRADE_COLORS[GRADES.indexOf(g)]||'#444'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:CHART_TICK_COLOR,font:{size:11}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:CHART_TICK_COLOR,font:{size:11},stepSize:1},grid:{color:'rgba(255,255,255,0.05)'}}}}});
 
   renderPyramid();
   renderPyramidAudit();
@@ -3960,9 +4609,33 @@ function renderStats(){
       return`<div class="stats-gym-row"><div><div class="stats-gym-name">${esc(gym)}</div><div class="stats-gym-sub">${st.count} sessie${st.count!==1?'s':''} · ${pct}% geslaagd</div></div><div class="stats-gym-grade">${st.best||'—'}</div></div>`;
     }).join('')
     :'<div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sessies</div>';
+  renderColorStats();
+  renderGradeCalibrator();
+  renderDnaCard();
   renderGradeNorm();
   renderWeaknessDetector();
   renderRivalSection();
+}
+
+function renderColorStats(){
+  const el=document.getElementById('color-stat-section');
+  if(!el)return;
+  const stats={};
+  allRoutes().forEach(r=>{
+    if(!r.color)return;
+    const st=stats[r.color]||(stats[r.color]={total:0,sent:0,best:null});
+    st.total++;
+    if(r.result!=='poging'){
+      st.sent++;
+      if(!st.best||gi(r.grade)>gi(st.best))st.best=r.grade;
+    }
+  });
+  const keys=Object.keys(stats).sort((a,b)=>stats[b].total-stats[a].total);
+  if(!keys.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="chart-card"><div class="chart-card-title">Per kleur</div>${keys.map(k=>{
+    const st=stats[k],pct=Math.round(st.sent/st.total*100),hex=routeColorHex(k)||'#888';
+    return`<div class="stats-gym-row"><div style="display:flex;align-items:center;gap:10px"><span style="width:18px;height:18px;border-radius:50%;flex-shrink:0;background:${hex};box-shadow:inset 0 0 0 .5px rgba(255,255,255,.25)"></span><div><div class="stats-gym-name">${esc(k)}</div><div class="stats-gym-sub">${st.total} route${st.total!==1?'s':''} · ${pct}% geslaagd</div></div></div><div class="stats-gym-grade">${st.best||'—'}</div></div>`;
+  }).join('')}</div>`;
 }
 
 function showSessionDetailModal(s){
@@ -4024,6 +4697,223 @@ function renderGradeNorm(){
 /* ══════════════════════════════════════════
    SOCIALE LAAG — SESSIE DELEN (Feature 8)
 ══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   GRAAD-KALIBRATOR
+   Is jouw gym zacht of hard? De RPC levert geanonimiseerde totalen per
+   (gym, graad); hier vertalen we het verschil in slagingspercentage naar
+   graadstappen. Methode: bouw de globale curve p(g) over alle gyms, zoek
+   voor het percentage van jouw gym bij graad g de globale graad g' met
+   hetzelfde percentage, en neem g - g'. Positief = zachter.
+══════════════════════════════════════════ */
+const CALIB_CACHE_KEY='flagit_calib_cache_v1';   // globaal: gym-data is niet profielgebonden
+const CALIB_MAX_AGE=24*60*60*1000;
+const gymKeyOf=n=>String(n||'').trim().toLowerCase();
+let _calibLoading=false,_calibFocusGym=null;
+
+function _loadCalibCache(){
+  try{
+    const raw=localStorage.getItem(CALIB_CACHE_KEY);
+    if(!raw)return null;
+    const c=JSON.parse(raw);
+    if(c&&Array.isArray(c.rows))return c;
+  }catch(e){}
+  return null;
+}
+function _saveCalibCache(rows){
+  try{localStorage.setItem(CALIB_CACHE_KEY,JSON.stringify({ts:Date.now(),rows}))}catch(e){}
+}
+// Globale curve: slagingspercentage per graad over alle gyms, daarna
+// niet-stijgend gemaakt. Echte data hobbelt; zonder die correctie is de
+// curve niet omkeerbaar.
+function _globalCurve(rows){
+  const agg={};
+  rows.forEach(r=>{
+    const i=gi(r.grade);
+    if(i<0)return;
+    const a=agg[i]||(agg[i]={s:0,t:0});
+    a.s+=Number(r.sends)||0;a.t+=Number(r.routes_total)||0;
+  });
+  const curve=Object.keys(agg).map(Number).sort((a,b)=>a-b)
+    .filter(i=>agg[i].t>0).map(i=>({idx:i,p:agg[i].s/agg[i].t}));
+  for(let i=1;i<curve.length;i++)curve[i].p=Math.min(curve[i].p,curve[i-1].p);
+  return curve;
+}
+function _invertCurve(curve,p){
+  if(curve.length<2)return null;
+  if(p>=curve[0].p)return curve[0].idx;
+  const last=curve[curve.length-1];
+  if(p<=last.p)return last.idx;
+  for(let i=1;i<curve.length;i++){
+    const a=curve[i-1],b=curve[i];
+    if(p<=a.p&&p>=b.p){
+      const span=a.p-b.p;
+      return a.idx+(b.idx-a.idx)*(span>0?(a.p-p)/span:0);
+    }
+  }
+  return null;
+}
+function computeGradeCalibration(rows){
+  if(!rows||!rows.length)return null;
+  const curve=_globalCurve(rows);
+  if(curve.length<3)return null;
+  const byGym={};
+  rows.forEach(r=>{
+    const i=gi(r.grade);
+    if(i<0)return;
+    const g=byGym[r.gym_key]||(byGym[r.gym_key]={key:r.gym_key,grades:{}});
+    g.grades[i]={sends:Number(r.sends)||0,total:Number(r.routes_total)||0,climbers:Number(r.climbers)||0};
+  });
+  const gyms=Object.values(byGym).map(g=>{
+    const offs=[];
+    Object.keys(g.grades).map(Number).forEach(i=>{
+      const d=g.grades[i];
+      if(!d.total)return;
+      const gPrime=_invertCurve(curve,d.sends/d.total);
+      if(gPrime===null)return;
+      offs.push(i-gPrime);            // positief = zachter dan gemiddeld
+    });
+    return{...g,offsets:offs,softness:offs.length>=3?offs.reduce((a,b)=>a+b,0)/offs.length:null};
+  }).filter(g=>g.softness!==null);
+  if(!gyms.length)return null;
+  return{curve,gyms:gyms.sort((a,b)=>b.softness-a.softness),globalAt:i=>{
+    const p=curve.find(c=>c.idx===i);return p?p.p:null;
+  }};
+}
+// Jouw eigen cijfers in die gym, uit je lokale sessies.
+function _ownRates(gymKey){
+  const out={};
+  sessions.forEach(s=>{
+    if(gymKeyOf(s.gym)!==gymKey)return;
+    (s.routes||[]).forEach(r=>{
+      const i=gi(r.grade);
+      if(i<0)return;
+      const a=out[i]||(out[i]={s:0,t:0});
+      a.t++;if(r.result!=='poging')a.s++;
+    });
+  });
+  return out;
+}
+function _calibVerdict(soft){
+  const abs=Math.abs(soft).toFixed(1);
+  if(soft>=.15)return`${abs} graad zachter`;
+  if(soft<=-.15)return`${abs} graad harder`;
+  return'In lijn met het gemiddelde';
+}
+function setCalibGym(key){_calibFocusGym=key;renderGradeCalibrator();}
+function refreshCalibration(){
+  try{localStorage.removeItem(CALIB_CACHE_KEY)}catch(e){}
+  renderGradeCalibrator();
+}
+function renderGradeCalibrator(){
+  const el=document.getElementById('calibrator-section');
+  if(!el)return;
+  const cache=_loadCalibCache();
+  const stale=!cache||Date.now()-cache.ts>CALIB_MAX_AGE;
+  if(stale&&!_calibLoading&&typeof cloudGradeCalibration==='function'&&navigator.onLine){
+    _calibLoading=true;
+    cloudGradeCalibration(null).then(rows=>{
+      _calibLoading=false;
+      if(rows){_saveCalibCache(rows);renderGradeCalibrator();}
+      else if(!cache)el.innerHTML=_calibCard('<div style="color:var(--muted);font-size:13px">Kalibratie is nu niet beschikbaar.</div>');
+    }).catch(()=>{_calibLoading=false;});
+  }
+  if(!cache){
+    if(_calibLoading)el.innerHTML=_calibCard('<div style="color:var(--muted);font-size:13px">Gegevens ophalen…</div>');
+    else if(!navigator.onLine)el.innerHTML=_calibCard('<div style="color:var(--muted);font-size:13px">Kalibratie heeft even internet nodig.</div>');
+    else el.innerHTML='';
+    return;
+  }
+  const calib=computeGradeCalibration(cache.rows);
+  if(!calib){
+    el.innerHTML=_calibCard('<div style="color:var(--muted);font-size:13px">Nog te weinig gedeelde data om gyms te vergelijken.</div>');
+    return;
+  }
+  // Focusgym: je keuze, anders je favoriet, anders je meest bezochte.
+  const mine=[...new Set(sessions.map(s=>gymKeyOf(s.gym)).filter(Boolean))];
+  const withData=calib.gyms.filter(g=>mine.includes(g.key));
+  const fav=gymKeyOf((gyms.find(g=>g.fav)||{}).name);
+  const focusKey=_calibFocusGym&&calib.gyms.some(g=>g.key===_calibFocusGym)
+    ?_calibFocusGym
+    :(withData.find(g=>g.key===fav)||withData[0]||calib.gyms[0]).key;
+  const focus=calib.gyms.find(g=>g.key===focusKey);
+  const label=(sessions.find(s=>gymKeyOf(s.gym)===focusKey)||{}).gym||focusKey;
+  const own=_ownRates(focusKey);
+  const pin=Math.max(0,Math.min(100,50+focus.softness*50));   // -1..+1 graad over de balk
+  const grades=Object.keys(focus.grades).map(Number).sort((a,b)=>a-b);
+  const rows=grades.map(i=>{
+    const d=focus.grades[i];
+    const gymPct=d.total?d.sends/d.total:0;
+    const gp=calib.globalAt(i);
+    const o=own[i];
+    return`<div class="calib-row">
+      <div class="calib-grade" style="color:${GRADE_COLORS[i]||'var(--muted)'}">${esc(GRADES[i]||'?')}</div>
+      <div class="calib-bars">
+        <div class="calib-bar"><span style="width:${Math.round(gymPct*100)}%;background:${GRADE_COLORS[i]||'var(--accent)'}"></span></div>
+        <div class="calib-bar"><span style="width:${Math.round((gp||0)*100)}%;background:rgba(255,255,255,.28)"></span></div>
+        ${o&&o.t>=3?`<div class="calib-bar"><span style="width:${Math.round(o.s/o.t*100)}%;background:var(--accent)"></span></div>`:''}
+      </div>
+      <div class="calib-pct">${Math.round(gymPct*100)}% / ${gp!==null?Math.round(gp*100):'—'}%</div>
+    </div>`;
+  }).join('');
+  const picker=withData.length>1
+    ?`<select class="calib-select form-input" onchange="setCalibGym(this.value)">${withData.map(g=>{
+        const nm=(sessions.find(s=>gymKeyOf(s.gym)===g.key)||{}).gym||g.key;
+        return`<option value="${esc(g.key)}"${g.key===focusKey?' selected':''}>${esc(nm)}</option>`;
+      }).join('')}</select>`
+    :'';
+  const rank=calib.gyms.slice(0,8).map(g=>{
+    const nm=(sessions.find(s=>gymKeyOf(s.gym)===g.key)||{}).gym||g.key;
+    return`<div class="calib-rank-row"><span${g.key===focusKey?' style="color:var(--accent);font-weight:600"':''} data-no-i18n>${esc(nm)}</span><span style="color:var(--muted)">${_calibVerdict(g.softness)}</span></div>`;
+  }).join('');
+  const updated=new Date(cache.ts).toLocaleDateString(LOCALE(),{day:'numeric',month:'short'});
+  el.innerHTML=_calibCard(`
+    ${picker}
+    <div class="calib-head">
+      <div class="calib-verdict" style="color:${focus.softness>=.15?'var(--success)':focus.softness<=-.15?'var(--danger)':'var(--text)'}" data-no-i18n>${esc(label)}</div>
+    </div>
+    <div class="calib-verdict" style="font-size:20px;color:var(--muted)">${_calibVerdict(focus.softness)}</div>
+    <div class="calib-scale"><div class="calib-scale-pin" style="left:${pin}%"></div></div>
+    <div class="calib-scale-lbl"><span>Harder</span><span>Zachter</span></div>
+    ${rows}
+    <div class="calib-legend">
+      <span><i style="background:var(--success)"></i>Deze gym</span>
+      <span><i style="background:rgba(255,255,255,.28)"></i>Gemiddeld</span>
+      <span><i style="background:var(--accent)"></i>Jij hier</span>
+    </div>
+    <div class="form-section-title" style="padding:14px 0 6px">Gyms van zacht naar hard</div>
+    ${rank}
+    <div class="calib-note">Indicatie op basis van zelf-gerapporteerde data, geen norm. Alleen geanonimiseerde totalen, en pas vanaf 5 klimmers per graad. Bijgewerkt ${updated}. <a href="#" onclick="event.preventDefault();refreshCalibration()" style="color:var(--accent)">Ververs</a></div>
+  `);
+}
+function _calibCard(inner){
+  return`<div class="chart-card"><div class="chart-card-title">Graad-kalibrator</div>${inner}</div>`;
+}
+
+/* Opt-out: wie niet mee wil tellen in de gym-statistieken. */
+async function renderStatsOptOut(){
+  const el=document.getElementById('stats-optout-section');
+  if(!el)return;
+  if(typeof cloudGetStatsOptOut!=='function'){el.innerHTML='';return;}
+  const user=typeof cloudCurrentUser==='function'?await cloudCurrentUser().catch(()=>null):null;
+  if(!user){
+    el.innerHTML='<div style="font-size:13px;color:var(--muted)">Log in om dit te kunnen instellen.</div>';
+    return;
+  }
+  const optOut=await cloudGetStatsOptOut();
+  el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <div>
+      <div style="font-size:14px;font-weight:600">Mijn data meetellen</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Anoniem, alleen als totaal per gym en graad. Voedt de graad-kalibrator.</div>
+    </div>
+    <input type="checkbox" id="inp-stats-optin" ${optOut?'':'checked'} style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--accent)" onchange="toggleStatsOptOut(this)">
+  </div>`;
+}
+async function toggleStatsOptOut(el){
+  const ok=await cloudSetStatsOptOut(!el.checked);
+  if(!ok){el.checked=!el.checked;toast('Instelling opslaan mislukt','#e53935');return;}
+  toast(el.checked?'Je data telt weer mee':'Je data telt niet meer mee');
+}
+
 function shareSession(id){
   const s=sessions.find(x=>x.id===id);if(!s)return;
   const mg=maxGrade(s.routes);
@@ -4441,9 +5331,12 @@ function deleteProject(id){
   showDeleteConfirm('Project verwijderen?',esc(p.grade+(p.name?' · '+p.name:'')+(p.gym?' @ '+p.gym:'')),()=>confirmDeleteProject(id));
 }
 function confirmDeleteProject(id){
-  deleteItem(projects,id,saveProjects,renderProjects);
-  if(projectLoreCache[id]){delete projectLoreCache[id];saveProjectLore();}
-  toast('Project verwijderd','#e53935');
+  // Quest Lore hoort bij het project: bewaren zodat undo ook de lore terugzet.
+  const lore=projectLoreCache[id];
+  if(lore){delete projectLoreCache[id];saveProjectLore();}
+  deleteWithUndo(projects,id,saveProjects,renderProjects,'Project verwijderd',()=>{
+    if(lore){projectLoreCache[id]=lore;saveProjectLore();}
+  });
 }
 
 function openProjectModal(id){
@@ -4836,8 +5729,7 @@ function deleteComp(id){
   showDeleteConfirm('Competitie verwijderen?',esc(c.name),()=>confirmDeleteComp(id));
 }
 function confirmDeleteComp(id){
-  deleteItem(competitions,id,saveCompetitions,()=>{renderCompSection();renderCompCountdown()});
-  toast('Competitie verwijderd','#e53935');
+  deleteWithUndo(competitions,id,saveCompetitions,()=>{renderCompSection();renderCompCountdown()},'Competitie verwijderd');
 }
 
 /* ══════════════════════════════════════════
@@ -5017,6 +5909,137 @@ function renderOnThisDay(){
 }
 
 // Generiek subtab-mechanisme: knoppen heten tab-{prefix}-{naam}, panelen {prefix}-tab-{naam}.
+/* ══════════════════════════════════════════
+   WEEKBINGO
+   Elke maandag een nieuwe 3x3-kaart, deterministisch uit de seeded
+   generator: zelfde profiel + zelfde week geeft altijd dezelfde kaart.
+   Er wordt niets opgeslagen — de kaart volgt uit de seed en de voortgang
+   volgt uit wat je die week gelogd hebt. Dus niets te syncen, niets dat
+   kan verlopen, en op elk apparaat identiek.
+══════════════════════════════════════════ */
+const _ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function _weekStartStr(from){
+  const x=from?new Date(from):new Date();
+  x.setDate(x.getDate()-((x.getDay()+6)%7)); // maandag als eerste dag
+  return _ymd(x);
+}
+function _addDaysStr(dateStr,n){
+  const d=new Date(dateStr+'T00:00:00');
+  d.setDate(d.getDate()+n);
+  return _ymd(d);
+}
+const BINGO_TASKS=[
+  {id:'flash_oh',t:'Flash een overhang',f:c=>c.routes.some(r=>r.type==='Overhang'&&r.result==='flash')},
+  {id:'slab3',t:'Drie routes op slab',f:c=>c.routes.filter(r=>r.type==='Slab').length>=3},
+  {id:'above_pr',t:'Probeer een graad boven je PR',f:c=>c.prIdx>=0&&c.routes.some(r=>gi(r.grade)>c.prIdx)},
+  {id:'two_sess',t:'Twee sessies deze week',f:c=>c.sessions.length>=2},
+  {id:'quick_send',t:'Stuur iets in maximaal twee pogingen',f:c=>c.routes.some(r=>r.result!=='poging'&&(r.attempts||1)<=2)},
+  {id:'dyno',t:'Log een dyno',f:c=>c.routes.some(r=>r.type==='Dyno')},
+  {id:'ten_routes',t:'Tien routes in één sessie',f:c=>c.sessions.some(s=>(s.routes||[]).length>=10)},
+  {id:'with_note',t:'Log een route met een notitie',f:c=>c.routes.some(r=>r.note)},
+  {id:'three_types',t:'Drie verschillende routetypes',f:c=>new Set(c.routes.map(r=>r.type).filter(Boolean)).size>=3},
+  {id:'crimp',t:'Top een crimp-route',f:c=>c.routes.some(r=>r.type==='Crimp'&&r.result!=='poging')},
+  {id:'feel_fire',t:'Sluit een sessie af met gevoel 🔥',f:c=>c.sessions.some(s=>s.feel===3)},
+  {id:'five_tops',t:'Vijf tops in één sessie',f:c=>c.sessions.some(s=>(s.routes||[]).filter(r=>r.result!=='poging').length>=5)},
+  {id:'project_try',t:'Geef een project een poging',f:c=>c.routes.some(r=>r.projectId)},
+  {id:'mantle_pinch',t:'Twee routes op mantle of pinch',f:c=>c.routes.filter(r=>r.type==='Mantle'||r.type==='Pinch').length>=2},
+  {id:'flash3',t:'Drie flashes deze week',f:c=>c.routes.filter(r=>r.result==='flash').length>=3},
+  {id:'perfect',t:'Een sessie zonder mislukte poging',f:c=>c.sessions.some(s=>(s.routes||[]).length>=3&&s.routes.every(r=>r.result!=='poging'))},
+  {id:'two_gyms',t:'Klim in twee verschillende gyms',f:c=>new Set(c.sessions.map(s=>s.gym).filter(Boolean)).size>=2},
+  {id:'vert',t:'Top een verticale route',f:c=>c.routes.some(r=>r.type==='Verticaal'&&r.result!=='poging')},
+  {id:'sloper',t:'Log een sloper-route',f:c=>c.routes.some(r=>r.type==='Sloper')},
+  {id:'cave',t:'Waag je aan een cave-route',f:c=>c.routes.some(r=>r.type==='Cave')},
+  {id:'fifteen',t:'Vijftien routes deze week',f:c=>c.routes.length>=15},
+  {id:'session_note',t:'Schrijf een sessienotitie',f:c=>c.sessions.some(s=>(s.note||'').trim())},
+  {id:'same_grade4',t:'Vier routes van dezelfde graad',f:c=>{const m={};c.routes.forEach(r=>{m[r.grade]=(m[r.grade]||0)+1});return Object.values(m).some(v=>v>=4)}},
+  {id:'three_days',t:'Klim op drie verschillende dagen',f:c=>new Set(c.sessions.map(s=>s.date)).size>=3},
+  {id:'hang',t:'Log een hangsessie',need:'hang',f:c=>c.hang.length>=1},
+  {id:'color3',t:'Drie routes van dezelfde kleur',need:'color',f:c=>{const m={};c.routes.forEach(r=>{if(r.color)m[r.color]=(m[r.color]||0)+1});return Object.values(m).some(v=>v>=3)}},
+  {id:'color_yellow',t:'Top een gele boulder',need:'color',f:c=>c.routes.some(r=>r.color==='Geel'&&r.result!=='poging')},
+  {id:'color_two',t:'Routes in twee verschillende kleuren',need:'color',f:c=>new Set(c.routes.map(r=>r.color).filter(Boolean)).size>=2},
+  {id:'sector',t:'Log een route met een sector',need:'color',f:c=>c.routes.some(r=>r.sector)},
+];
+function _bingoContext(from,to){
+  const inRange=d=>d>=from&&(!to||d<to);
+  const ws=sessions.filter(s=>inRange(s.date));
+  const pr=getPR('top');
+  return{
+    sessions:ws,
+    routes:ws.flatMap(s=>s.routes||[]),
+    hang:hangSessions.filter(h=>inRange(h.date)),
+    prIdx:pr?gi(pr.grade):-1
+  };
+}
+function getBingoCard(weekStart){
+  const start=weekStart||_weekStartStr();
+  // Kleur- en hangboardopdrachten alleen als je die dingen ook logt,
+  // anders staat er een vakje op de kaart dat je nooit kunt halen.
+  const hasColor=allRoutes().some(r=>r.color);
+  const pool=BINGO_TASKS.filter(t=>t.need==='color'?hasColor:t.need==='hang'?hangSessions.length>0:true);
+  const rand=_seededRand(`${activeProfileId||'p'}|bingo|${isoWeekKey(start).key}`);
+  return{start,cells:_shuffle(pool,rand).slice(0,9)};
+}
+const BINGO_LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+function computeBingo(weekStart){
+  const card=getBingoCard(weekStart);
+  const ctx=_bingoContext(card.start,_addDaysStr(card.start,7));
+  const done=card.cells.map(t=>{try{return!!t.f(ctx)}catch(e){return false}});
+  const full=BINGO_LINES.filter(l=>l.every(i=>done[i]));
+  return{card,done,doneCount:done.filter(Boolean).length,lines:full,lineCells:new Set(full.flat())};
+}
+// Hoeveel aaneengesloten weken vóór deze had je minstens één bingo?
+function bingoStreak(){
+  let n=0;
+  for(let w=1;w<=52;w++){
+    const d=new Date();
+    d.setDate(d.getDate()-7*w);
+    if(!computeBingo(_weekStartStr(d)).lines.length)break;
+    n++;
+  }
+  return n;
+}
+let _lastBingoLines=null;
+function renderBingoBar(){
+  const el=document.getElementById('bingo-bar');
+  if(!el)return;
+  if(!sessions.length){el.innerHTML='';return;}
+  const b=computeBingo();
+  if(_lastBingoLines!==null&&b.lines.length>_lastBingoLines)celebrateBingo();
+  _lastBingoLines=b.lines.length;
+  el.innerHTML=`<button type="button" class="bingo-bar-btn" onclick="showBingoModal()">
+    <span class="bingo-bar-icon">🎲</span>
+    <span class="bingo-bar-text">Weekbingo</span>
+    <span class="bingo-bar-count">${b.doneCount}/9</span>
+    ${b.lines.length?'<span class="bingo-bar-badge">Bingo!</span>':''}
+  </button>`;
+}
+function showBingoModal(){
+  document.getElementById('bingo-ov')?.remove();
+  const b=computeBingo();
+  const streak=bingoStreak();
+  const ov=document.createElement('div');
+  ov.className='modal-overlay';ov.id='bingo-ov';
+  ov.innerHTML=`<div class="modal-box bingo-box">
+    <div class="modal-title">Weekbingo</div>
+    <div class="bingo-sub">Vinkt zichzelf af uit wat je logt. Elke maandag een nieuwe kaart.</div>
+    <div class="bingo-grid">${b.card.cells.map((t,i)=>`<div class="bingo-cell${b.done[i]?' done':''}${b.lineCells.has(i)?' inline':''}"><span>${esc(t.t)}</span></div>`).join('')}</div>
+    <div class="bingo-foot">${b.doneCount}/9 gehaald${b.lines.length?` · ${b.lines.length}× bingo`:''}${streak?` · ${streak} weken op rij bingo`:''}</div>
+    <button class="btn-export modal-close" onclick="document.getElementById('bingo-ov')?.remove()">Sluiten</button>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+function celebrateBingo(){
+  document.getElementById('bingo-burst')?.remove();
+  const el=document.createElement('div');
+  el.id='bingo-burst';el.className='shake-burst';
+  el.innerHTML='<div class="shake-burst-text">BINGO!</div><div class="shake-burst-sub">Rij compleet 🎲</div>';
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('visible'));
+  if(navigator.vibrate)navigator.vibrate([60,40,60,40,120]);
+  setTimeout(()=>{el.classList.remove('visible');setTimeout(()=>el.remove(),250)},2300);
+}
+
 function switchTab(prefix,tabs,active){
   tabs.forEach(t=>{
     document.getElementById(`tab-${prefix}-${t}`)?.classList.toggle('active',t===active);
@@ -5253,7 +6276,7 @@ function toggleInjuryStatus(id){
   if(inj){inj.status=inj.status==='active'?'recovered':'active';saveInjuries();renderFingerHealth();}
 }
 
-function deleteInjury(id){deleteItem(injuries,id,saveInjuries,renderFingerHealth);toast('Verwijderd','#e53935')}
+function deleteInjury(id){deleteWithUndo(injuries,id,saveInjuries,renderFingerHealth,'Verwijderd')}
 
 /* ══════════════════════════════════════════
    GRADE PYRAMID AUDITOR
@@ -5312,6 +6335,7 @@ function renderStokeRadar(){
   const el=document.getElementById('stoke-radar-section');
   if(!el)return;
   if(stokeRadarChart){stokeRadarChart.destroy();stokeRadarChart=null;}
+  if(!_chartsAvailable()){el.innerHTML='';return;}
   const feelSessions=sessions.filter(s=>s.feel!=null);
   if(feelSessions.length<5){el.innerHTML='';return;}
   const typeTotal={};const typeCnt={};
@@ -5469,6 +6493,249 @@ function generateShareCard(){
   document.body.appendChild(ov);
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
 }
+/* ══════════════════════════════════════════
+   KLIM-DNA
+   Een generatieve signature die rechtstreeks uit je stijlcijfers wordt
+   getekend. De seed is een hash van die cijfers, dus het beeld is stabiel
+   zolang jij hetzelfde klimt en verschuift zodra je verandert — geen
+   willekeur per render, wel evolutie over tijd.
+
+   Let op: alles hieronder tekent met fillText op canvas en is daarmee
+   onzichtbaar voor de i18n-observer. Elk label gaat expliciet door
+   i18nTranslate() of vertakt op currentLang.
+══════════════════════════════════════════ */
+const DNA_NAMES={
+  'Slab':'Slab-fluisteraar','Verticaal':'Muurmetronoom','Overhang':'Overhangbeul',
+  'Cave':'Grotduiker','Dyno':'Dyno-durfal','Mantle':'Mantelmonteur',
+  'Pinch':'Knijpkracht','Crimp':'Crimpmonnik','Sloper':'Slopersluiper'
+};
+function _hexA(hex,a){
+  const h=String(hex).replace('#','');
+  const n=parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16);
+  return`rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+function _mixHex(a,b,t){
+  const p=h=>{const s=String(h).replace('#','');const n=parseInt(s,16);return[(n>>16)&255,(n>>8)&255,n&255]};
+  const A=p(a),B=p(b);
+  return`rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')})`;
+}
+function computeDnaVector(upto){
+  const rs=upto?sessions.filter(s=>s.date<=upto):sessions;
+  const routes=rs.flatMap(s=>s.routes||[]);
+  if(!routes.length)return null;
+  const typeCount={};TYPES.forEach(t=>{typeCount[t]=0});
+  routes.forEach(r=>{if(r.type&&typeCount[r.type]!==undefined)typeCount[r.type]++});
+  const typed=TYPES.reduce((a,t)=>a+typeCount[t],0);
+  const strands=TYPES.map(t=>typed?typeCount[t]/typed:1/TYPES.length);
+  const sends=routes.filter(r=>r.result!=='poging');
+  const idxs=sends.map(r=>gi(r.grade)).filter(i=>i>=0).sort((a,b)=>a-b);
+  const weeks=new Set(rs.map(s=>isoWeekKey(s.date).key)).size||1;
+  const feels=rs.filter(s=>s.feel!=null).map(s=>s.feel);
+  const hangSets=hangSessions.filter(h=>!upto||h.date<=upto).reduce((a,h)=>a+((h.sets||[]).length),0);
+  return{
+    strands,typed,
+    dominant:typed?TYPES.reduce((b,t)=>typeCount[t]>typeCount[b]?t:b,TYPES[0]):null,
+    flashRatio:routes.filter(r=>r.result==='flash').length/routes.length,
+    median:idxs.length?idxs[Math.floor(idxs.length/2)]:gi('6a'),
+    max:idxs.length?idxs[idxs.length-1]:gi('6a'),
+    perWeek:routes.length/weeks,
+    feel:feels.length?feels.reduce((a,b)=>a+b,0)/feels.length/3:.5,
+    hangSets,
+    attemptsPerSend:sends.length?routes.reduce((a,r)=>a+(r.attempts||1),0)/sends.length:1,
+    routes:routes.length,
+    sessions:rs.length,
+    streak:calcStreak()
+  };
+}
+// Seed uit de cijfers zelf: gelijk blijven = gelijk beeld, veranderen = nieuw beeld.
+function _dnaSeed(vec){
+  return[activeProfileId||'p','dna',
+    vec.strands.map(s=>Math.round(s*100)).join(','),
+    Math.round(vec.flashRatio*100),vec.median,vec.max,
+    Math.round(vec.perWeek*10),Math.round(vec.feel*100),vec.routes
+  ].join('|');
+}
+function dnaArchetype(vec){
+  const rand=_seededRand(_dnaSeed(vec)+'|arch');
+  const name=(vec.dominant&&DNA_NAMES[vec.dominant])||'Allrounder';
+  const traits=[];
+  if(vec.flashRatio>=.3)traits.push('Je flasht meer dan je probeert.');
+  if(vec.attemptsPerSend>=3.5)traits.push('Je bijt je vast tot het klaar is.');
+  if(vec.perWeek>=12)traits.push('Volume is jouw wapen.');
+  if(vec.feel>=.7)traits.push('Je gaat bijna altijd met een goed gevoel naar huis.');
+  if(vec.streak>=3)traits.push('Consistentie is je handtekening.');
+  if(vec.hangSets>=20)traits.push('Je vingers doen het stille werk.');
+  if(!traits.length)traits.push('Je bouwt gestaag aan een breed profiel.');
+  return{name,trait:_pick(traits,rand)};
+}
+function drawDna(ctx,vec,size,cx,cy){
+  const rand=_seededRand(_dnaSeed(vec));
+  const clamp=i=>Math.max(0,Math.min(GRADES.length-1,i));
+  const cMed=GRADE_COLORS[clamp(vec.median)]||'#7f77dd';
+  const cMax=GRADE_COLORS[clamp(vec.max)]||'#7f77dd';
+  // Achtergrondgloed: warmte uit het gemiddelde sessiegevoel.
+  const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,size*.62);
+  glow.addColorStop(0,_hexA(cMax,.10+vec.feel*.22));
+  glow.addColorStop(1,_hexA(cMax,0));
+  ctx.fillStyle=glow;
+  ctx.fillRect(cx-size*.7,cy-size*.7,size*1.4,size*1.4);
+  const R=size*.42,rIn=size*.09;
+  const jitter=(1-vec.flashRatio)*size*.022;      // veel flash = strakke lijn
+  const nodes=Math.max(7,Math.min(28,Math.round(7+vec.perWeek*1.1)));
+  ctx.lineCap='round';ctx.lineJoin='round';
+  vec.strands.forEach((share,i)=>{
+    const base=(i/vec.strands.length)*Math.PI*2;
+    ctx.lineWidth=Math.max(size*.004,share*size*.10);
+    ctx.strokeStyle=_mixHex(cMed,cMax,vec.strands.length>1?i/(vec.strands.length-1):0);
+    ctx.globalAlpha=Math.min(1,.3+share*2.4);
+    // Onderbroken lijn als de reeks weg is: consistentie is zichtbaar.
+    ctx.setLineDash(vec.streak>=2?[]:[size*.03,size*.025]);
+    ctx.beginPath();
+    for(let n=0;n<=nodes;n++){
+      const t=n/nodes;
+      const ang=base+t*Math.PI*1.35;
+      const rad=rIn+(R-rIn)*t;
+      const x=cx+Math.cos(ang)*rad+(rand()-.5)*jitter;
+      const y=cy+Math.sin(ang)*rad+(rand()-.5)*jitter;
+      if(n===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // knoop aan het uiteinde van elke streng
+    const endAng=base+Math.PI*1.35;
+    ctx.globalAlpha=Math.min(1,.45+share*2);
+    ctx.beginPath();
+    ctx.arc(cx+Math.cos(endAng)*R,cy+Math.sin(endAng)*R,Math.max(size*.005,share*size*.05),0,Math.PI*2);
+    ctx.fillStyle=ctx.strokeStyle;ctx.fill();
+  });
+  ctx.setLineDash([]);
+  // Korrel: hangboardvolume als textuur over het geheel.
+  const specks=Math.min(220,Math.round(vec.hangSets*3));
+  ctx.globalAlpha=.5;ctx.fillStyle=_hexA(cMax,.5);
+  for(let i=0;i<specks;i++){
+    const a=rand()*Math.PI*2,d=rIn+rand()*(R*1.05-rIn);
+    ctx.fillRect(cx+Math.cos(a)*d,cy+Math.sin(a)*d,size*.006,size*.006);
+  }
+  // Kern in de kleur van je hoogste graad.
+  ctx.globalAlpha=1;
+  const core=ctx.createRadialGradient(cx,cy,0,cx,cy,rIn*1.5);
+  core.addColorStop(0,cMax);core.addColorStop(1,_hexA(cMax,0));
+  ctx.fillStyle=core;
+  ctx.beginPath();ctx.arc(cx,cy,rIn*1.5,0,Math.PI*2);ctx.fill();
+}
+function _paintDna(canvas,vec,cssSize){
+  if(!canvas||!vec)return;
+  const dpr=Math.min(3,window.devicePixelRatio||1);
+  canvas.width=cssSize*dpr;canvas.height=cssSize*dpr;
+  canvas.style.width=cssSize+'px';canvas.style.height=cssSize+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  drawDna(ctx,vec,cssSize,cssSize/2,cssSize/2);
+}
+// Vier momentopnames: einde van de maand, 9/6/3/0 maanden terug.
+function _dnaCheckpoints(){
+  const out=[],now=new Date();
+  [9,6,3,0].forEach(back=>{
+    const d=new Date(now.getFullYear(),now.getMonth()-back+1,0);
+    if(d>now)d.setTime(now.getTime());
+    const vec=computeDnaVector(_ymd(d));
+    if(!vec||vec.routes<5)return;
+    out.push({label:d.toLocaleDateString(LOCALE(),{month:'short',year:'2-digit'}),vec});
+  });
+  return out;
+}
+function renderDnaCard(){
+  const el=document.getElementById('dna-section');
+  if(!el)return;
+  if(sessions.length<10){
+    el.innerHTML='<div class="chart-card"><div class="chart-card-title">Klim-DNA</div><div style="color:var(--muted);font-size:13px;padding:8px 0">Je DNA is nog aan het vormen — log 10 sessies.</div></div>';
+    return;
+  }
+  const vec=computeDnaVector();
+  if(!vec){el.innerHTML='';return;}
+  const arch=dnaArchetype(vec);
+  el.innerHTML=`<div class="chart-card">
+    <div class="chart-card-title">Klim-DNA</div>
+    <div class="dna-wrap"><canvas id="dna-canvas"></canvas></div>
+    <div class="dna-arch">${esc(arch.name)}</div>
+    <div class="dna-trait">${esc(arch.trait)}</div>
+    <div class="dna-evo-label">Zo groeide het</div>
+    <div class="dna-evo" id="dna-evo"></div>
+    <button class="btn-export" style="width:100%;margin-top:14px" onclick="shareDnaCard()">Deel je DNA</button>
+  </div>`;
+  const cv=document.getElementById('dna-canvas');
+  const avail=(el.clientWidth||330)-32;
+  _paintDna(cv,vec,Math.max(180,Math.min(300,avail)));
+  const evo=document.getElementById('dna-evo');
+  const points=_dnaCheckpoints();
+  if(points.length<2){
+    evo.innerHTML='<div style="color:var(--muted);font-size:12px">Nog te weinig historie voor een tijdlijn.</div>';
+    return;
+  }
+  points.forEach(p=>{
+    const item=document.createElement('div');item.className='dna-evo-item';
+    const c=document.createElement('canvas');
+    item.appendChild(c);
+    const lbl=document.createElement('div');lbl.className='dna-evo-lbl';lbl.textContent=p.label;
+    item.appendChild(lbl);
+    evo.appendChild(item);
+    _paintDna(c,p.vec,64);
+  });
+}
+function buildDnaShareCanvas(){
+  const vec=computeDnaVector();
+  if(!vec)return null;
+  const arch=dnaArchetype(vec);
+  const en=currentLang==='en';
+  const profile=loadProfiles().find(p=>p.id===activeProfileId);
+  const S=1080;
+  const c=document.createElement('canvas');c.width=S;c.height=S;
+  const ctx=c.getContext('2d');
+  const bg=ctx.createLinearGradient(0,0,S,S);
+  bg.addColorStop(0,'#10102e');bg.addColorStop(.6,'#0d0b20');bg.addColorStop(1,'#0a0a0a');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,S,S);
+  drawDna(ctx,vec,S*.66,S/2,S*.47);
+  ctx.textAlign='center';
+  ctx.globalAlpha=1;
+  ctx.fillStyle='rgba(255,255,255,.55)';
+  ctx.font='700 30px "Barlow Condensed", sans-serif';
+  ctx.fillText(en?'CLIMBING DNA':'KLIM-DNA',S/2,92);
+  ctx.fillStyle='#fff';
+  ctx.font='800 74px "Barlow Condensed", sans-serif';
+  ctx.fillText(i18nTranslate(arch.name).toUpperCase(),S/2,S-190);
+  ctx.fillStyle='rgba(255,255,255,.62)';
+  ctx.font='400 30px "Barlow", sans-serif';
+  ctx.fillText(i18nTranslate(arch.trait),S/2,S-142);
+  ctx.fillStyle='rgba(255,255,255,.45)';
+  ctx.font='700 27px "Barlow Condensed", sans-serif';
+  const stats=en
+    ?`${vec.sessions} SESSIONS · ${vec.routes} ROUTES · ${GRADES[Math.max(0,Math.min(GRADES.length-1,vec.max))]} MAX`
+    :`${vec.sessions} SESSIES · ${vec.routes} ROUTES · ${GRADES[Math.max(0,Math.min(GRADES.length-1,vec.max))]} MAX`;
+  ctx.fillText(stats,S/2,S-96);
+  ctx.fillStyle='rgba(127,119,221,.85)';
+  ctx.font='800 26px "Barlow Condensed", sans-serif';
+  ctx.fillText((profile?profile.name.toUpperCase()+' · ':'')+'FLAG IT',S/2,S-46);
+  return c.toDataURL('image/png');
+}
+async function shareDnaCard(){
+  const dataUrl=buildDnaShareCanvas();
+  if(!dataUrl){toast('Nog geen DNA om te delen','#e53935');return;}
+  const name='flagit-klim-dna-'+new Date().toISOString().split('T')[0]+'.png';
+  try{
+    const blob=await(await fetch(dataUrl)).blob();
+    const file=new File([blob],name,{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      // navigator.share bereikt de DOM niet, dus hier expliciet vertalen
+      await navigator.share({files:[file],title:i18nTranslate('Mijn Klim-DNA')});
+      return;
+    }
+  }catch(e){
+    if(e&&e.name==='AbortError')return;
+  }
+  const a=document.createElement('a');a.href=dataUrl;a.download=name;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('Klim-DNA gedownload!');
+}
+
 function downloadShareCard(dataUrl){
   const a=document.createElement('a');a.href=dataUrl;a.download='flagit-klimkaart-'+new Date().toISOString().split('T')[0]+'.png';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
@@ -6227,6 +7494,7 @@ function initApp(profileId){
     navigator.serviceWorker.addEventListener('message',e=>{
       if(e.data?.type==='SW_UPDATED'){
         const t=document.getElementById('toast');
+        clearTimeout(_toastTimer);
         t.textContent='Nieuwe versie — tik om te herladen';
         t.style.background='var(--accent)';
         t.style.cursor='pointer';
@@ -6241,6 +7509,8 @@ function initApp(profileId){
     initSwipeNav();
     initPullToRefresh();
     initInstallPrompt();
+    initOfflineBadge();
+    initVoiceLog();
     if(typeof cloudInitAuthListener==='function')cloudInitAuthListener();
   }
 
@@ -6277,6 +7547,23 @@ function initApp(profileId){
     const el=document.getElementById('start-screen');
     if(el)el.remove();
   }
+
+  _applyBootPage();
+}
+
+/* Deep link uit een PWA-shortcut afhandelen. showPage() vangt de drie
+   ingetrokken id's (sociaal/coach/hang) zelf al af, dus die mogen mee. */
+const BOOT_PAGES=[...PAGE_ORDER,'sociaal','coach','hang'];
+function _applyBootPage(){
+  const p=window._bootPage;
+  if(!p)return;
+  window._bootPage=null;
+  if(p==='quicktop'){
+    showPage('log');
+    setTimeout(()=>openQuickTop('top'),350);
+    return;
+  }
+  if(BOOT_PAGES.includes(p))showPage(p);
 }
 
 /* ══════════════════════════════════════════

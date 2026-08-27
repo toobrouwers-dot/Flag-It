@@ -562,3 +562,130 @@ create policy "feedback_select_admin_only" on public.feedback for select
 create index if not exists kudos_from_user_id_idx on public.kudos(from_user_id);
 create index if not exists comments_user_id_idx on public.comments(user_id);
 create index if not exists feedback_user_id_idx on public.feedback(user_id);
+
+-- ════════════════════════════════════════════════════════════
+-- GRAAD-KALIBRATOR (F6)
+-- Voer dit uit in de Supabase SQL Editor als add-on migratie.
+--
+-- Geeft ALLEEN geanonimiseerde totalen per (gym, graad) terug: counts,
+-- nooit rijen en nooit user_ids. De HAVING-clausule is de
+-- k-anonimiteitsdrempel — een combinatie verschijnt pas vanaf 5
+-- verschillende klimmers en 30 gelogde routes. Wie niet mee wil tellen
+-- zet stats_opt_out aan (schakelaar in Meer) en valt er dan uit.
+--
+-- Veilig om opnieuw te draaien.
+-- ════════════════════════════════════════════════════════════
+
+alter table public.accounts
+  add column if not exists stats_opt_out boolean not null default false;
+
+create or replace function public.grade_calibration(p_gym_key text default null)
+returns table (
+  gym_key      text,
+  grade        text,
+  sends        bigint,
+  routes_total bigint,
+  climbers     bigint
+)
+language sql
+security definer
+set search_path = ''
+stable
+as $$
+  with exploded as (
+    select
+      lower(btrim(s.gym))                as gym_key,
+      s.user_id                          as user_id,
+      rt->>'grade'                       as grade,
+      (rt->>'result') in ('top','flash') as sent
+    from public.sessions s
+    join public.accounts a on a.id = s.user_id
+    cross join lateral jsonb_array_elements(s.routes) as rt
+    where a.stats_opt_out = false
+      and s.gym is not null
+      and btrim(s.gym) <> ''
+  )
+  select
+    e.gym_key,
+    e.grade,
+    count(*) filter (where e.sent) as sends,
+    count(*)                       as routes_total,
+    count(distinct e.user_id)      as climbers
+  from exploded e
+  where e.grade is not null
+    and e.grade <> ''
+    and (p_gym_key is null or e.gym_key = p_gym_key)
+  group by e.gym_key, e.grade
+  having count(distinct e.user_id) >= 5
+     and count(*) >= 30;
+$$;
+
+grant execute on function public.grade_calibration(text) to authenticated;
+
+-- ════════════════════════════════════════════════════════════
+-- GYM BETA BOARD (F10)
+-- Voer dit uit in de Supabase SQL Editor als add-on migratie.
+--
+-- Gedeelde route-beta per gym. gym_key = lower(btrim(gymnaam)) en
+-- koppelt klimmers van dezelfde gym aan elkaar; gyms zijn vrije tekst
+-- per gebruiker, dus zonder die normalisatie zijn "Monk" en "monk "
+-- twee verschillende gyms.
+--
+-- Veilig om opnieuw te draaien.
+-- ════════════════════════════════════════════════════════════
+
+create table if not exists public.gym_beta (
+  id         uuid default gen_random_uuid() primary key,
+  user_id    uuid references public.accounts(id) on delete cascade not null,
+  gym_key    text not null,                  -- lower(btrim(gymnaam))
+  gym_label  text not null default '',       -- naam zoals de plaatser hem schreef
+  grade      text not null default '',
+  color      text not null default '',       -- greepkleur
+  sector     text not null default '',
+  body       text not null,                  -- de beta zelf, max 500 tekens
+  hidden     boolean not null default false, -- admin-moderatie
+  created_at timestamptz default now()
+);
+
+-- Lengtebegrenzing server-side, niet alleen in de UI
+alter table public.gym_beta drop constraint if exists gym_beta_body_len;
+alter table public.gym_beta
+  add constraint gym_beta_body_len check (char_length(body) between 1 and 500);
+
+-- Hoofdquery: beta van één gym, nieuwste eerst
+create index if not exists gym_beta_gym_key_idx
+  on public.gym_beta (gym_key, created_at desc);
+
+-- Index op de foreign key, net als bij kudos/comments/feedback
+create index if not exists gym_beta_user_id_idx
+  on public.gym_beta (user_id);
+
+alter table public.gym_beta enable row level security;
+
+-- auth.uid() staat gewrapt in (select ...) zodat Postgres hem één keer
+-- evalueert in plaats van per rij — zelfde patroon als de policies hierboven.
+drop policy if exists "gym_beta_read"       on public.gym_beta;
+drop policy if exists "gym_beta_insert_own" on public.gym_beta;
+drop policy if exists "gym_beta_update_own" on public.gym_beta;
+drop policy if exists "gym_beta_delete_own" on public.gym_beta;
+drop policy if exists "gym_beta_admin_all"  on public.gym_beta;
+
+-- Ingelogde gebruikers lezen niet-verborgen beta
+create policy "gym_beta_read" on public.gym_beta for select
+  using (hidden = false and (select auth.uid()) is not null);
+
+-- Je plaatst alleen onder je eigen naam
+create policy "gym_beta_insert_own" on public.gym_beta for insert
+  with check (user_id = (select auth.uid()));
+
+-- Je bewerkt en verwijdert alleen je eigen beta
+create policy "gym_beta_update_own" on public.gym_beta for update
+  using (user_id = (select auth.uid()))
+  with check (user_id = (select auth.uid()));
+
+create policy "gym_beta_delete_own" on public.gym_beta for delete
+  using (user_id = (select auth.uid()));
+
+-- Admin mag alles: verbergen en verwijderen
+create policy "gym_beta_admin_all" on public.gym_beta for all
+  using (public.check_is_admin()) with check (public.check_is_admin());
