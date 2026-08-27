@@ -445,6 +445,30 @@ select option{background:#1e1e1e}
 .feed-chip.sel{color:var(--text);border-color:var(--accent);background:rgba(127,119,221,.14)}
 .feed-chip-sep{flex-shrink:0;width:1px;height:18px;background:var(--border);margin:0 2px}
 .feed-result-count{font-size:12px;color:var(--muted);margin-bottom:8px}
+/* ── WEEKBINGO ───────────────────────────────────────── */
+.bingo-bar-btn{display:flex;align-items:center;gap:10px;width:100%;background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer;transition:border-color .15s}
+.bingo-bar-btn:active{border-color:var(--accent)}
+.bingo-bar-icon{font-size:18px;line-height:1}
+.bingo-bar-text{flex:1;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.bingo-bar-count{color:var(--muted);font-variant-numeric:tabular-nums}
+.bingo-bar-badge{background:var(--accent);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.5px;border-radius:20px;padding:2px 8px}
+.bingo-box{max-width:400px;width:100%}
+.bingo-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.bingo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
+.bingo-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 6px;border-radius:12px;background:var(--surface2);border:.5px solid var(--border);font-size:11.5px;line-height:1.25;color:var(--muted);overflow:hidden}
+.bingo-cell.done{background:rgba(76,175,80,.14);border-color:rgba(76,175,80,.45);color:var(--text)}
+.bingo-cell.inline{background:rgba(127,119,221,.18);border-color:var(--accent);color:var(--text)}
+.bingo-foot{font-size:13px;color:var(--muted);margin-bottom:14px;text-align:center}
+/* ── KLIM-DNA ────────────────────────────────────────── */
+.dna-wrap{display:flex;justify-content:center;margin:4px 0 10px}
+.dna-wrap canvas{max-width:100%;height:auto;border-radius:12px}
+.dna-arch{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;text-align:center;color:var(--text);line-height:1.1}
+.dna-trait{font-size:13px;color:var(--muted);text-align:center;margin-top:4px;margin-bottom:16px}
+.dna-evo-label{font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
+.dna-evo{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.dna-evo-item{flex-shrink:0;text-align:center}
+.dna-evo-item canvas{border-radius:10px;background:rgba(255,255,255,.02);display:block}
+.dna-evo-lbl{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
 .btn-edit-session{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;margin-top:2px;min-width:44px;min-height:44px}
 .btn-edit-session:active{color:var(--accent);background:rgba(127,119,221,.12)}
 .goal-card.overdue{border-color:rgba(229,57,53,.4)}
@@ -987,6 +1011,7 @@ select option{background:#1e1e1e}
     <button class="feed-toggle-btn" id="tab-feed-sociaal" onclick="switchFeedTab('sociaal')">Sociaal</button>
   </div>
   <div id="feed-tab-feed">
+    <div id="bingo-bar"></div>
     <input type="search" id="feed-search" class="feed-search" placeholder="Zoek in gym, notitie, graad, kleur…" aria-label="Zoek in je sessies" oninput="_feedSearchDebounced()">
     <div class="feed-chip-row" id="feed-chip-row"></div>
     <div id="filter-bar" class="filter-bar">
@@ -1110,6 +1135,7 @@ select option{background:#1e1e1e}
     <div id="pyramid-section"></div>
     <div id="pyramid-audit-section"></div>
     <div id="stoke-radar-section"></div>
+    <div id="dna-section"></div>
     <div class="chart-card"><div class="chart-card-title">Per gym</div><div id="stats-gyms"><div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sessies</div></div></div>
     <div id="color-stat-section"></div>
     <div id="grade-norm-section"></div>
@@ -1414,6 +1440,8 @@ const I18N_PATTERNS=[
   [/^Alle routes$/,'All routes'],[/^Alleen flash$/,'Flash only'],[/^Alleen top$/,'Sends only'],
   [/^Met poging$/,'With attempt'],
   [/^(\d+) van (\d+) sessies$/,'$1 of $2 sessions'],
+  [/(\d+)× bingo/g,'$1x bingo'],
+  [/(\d+)\/9 gehaald/,'$1/9 done'],
   [/^Week (\d+) van (\d+) · /,'Week $1 of $2 · '],
 ];
 const I18N_PHRASES=[
@@ -1914,6 +1942,56 @@ const I18N_PHRASES=[
   ['Vaak gelogd','Logged often'],['Per kleur','By colour'],
   ['Zoek in gym, notitie, graad, kleur…','Search gym, note, grade, colour…'],
   ['Zoek in je sessies','Search your sessions'],
+  ['Vinkt zichzelf af uit wat je logt. Elke maandag een nieuwe kaart.','Ticks itself off from what you log. A fresh card every Monday.'],
+  ['Flash een overhang','Flash an overhang'],
+  ['Drie routes op slab','Three routes on slab'],
+  ['Probeer een graad boven je PR','Try a grade above your PR'],
+  ['Twee sessies deze week','Two sessions this week'],
+  ['Stuur iets in maximaal twee pogingen','Send something in two attempts or fewer'],
+  ['Log een dyno','Log a dyno'],
+  ['Tien routes in één sessie','Ten routes in one session'],
+  ['Log een route met een notitie','Log a route with a note'],
+  ['Drie verschillende routetypes','Three different route types'],
+  ['Top een crimp-route','Send a crimp route'],
+  ['Sluit een sessie af met gevoel 🔥','Finish a session feeling 🔥'],
+  ['Vijf tops in één sessie','Five sends in one session'],
+  ['Geef een project een poging','Give a project an attempt'],
+  ['Twee routes op mantle of pinch','Two routes on mantle or pinch'],
+  ['Drie flashes deze week','Three flashes this week'],
+  ['Een sessie zonder mislukte poging','A session without a failed attempt'],
+  ['Klim in twee verschillende gyms','Climb at two different gyms'],
+  ['Top een verticale route','Send a vertical route'],
+  ['Log een sloper-route','Log a sloper route'],
+  ['Waag je aan een cave-route','Take on a cave route'],
+  ['Vijftien routes deze week','Fifteen routes this week'],
+  ['Schrijf een sessienotitie','Write a session note'],
+  ['Vier routes van dezelfde graad','Four routes of the same grade'],
+  ['Klim op drie verschillende dagen','Climb on three different days'],
+  ['Log een hangsessie','Log a hangboard session'],
+  ['Drie routes van dezelfde kleur','Three routes of the same colour'],
+  ['Top een gele boulder','Send a yellow boulder'],
+  ['Routes in twee verschillende kleuren','Routes in two different colours'],
+  ['Log een route met een sector','Log a route with a sector'],
+  ['weken op rij bingo','weeks of bingo in a row'],
+  ['Weekbingo','Weekly bingo'],['Rij compleet','Line complete'],
+  ['Klim-DNA','Climbing DNA'],['Mijn Klim-DNA','My Climbing DNA'],
+  ['Je DNA is nog aan het vormen — log 10 sessies.','Your DNA is still forming — log 10 sessions.'],
+  ['Zo groeide het','How it grew'],['Deel je DNA','Share your DNA'],
+  ['Nog te weinig historie voor een tijdlijn.','Not enough history for a timeline yet.'],
+  ['Klim-DNA gedownload!','Climbing DNA downloaded!'],
+  ['Nog geen DNA om te delen','No DNA to share yet'],
+  ['Slab-fluisteraar','Slab whisperer'],['Muurmetronoom','Wall metronome'],
+  ['Overhangbeul','Overhang brute'],['Grotduiker','Cave diver'],
+  ['Dyno-durfal','Dyno daredevil'],['Mantelmonteur','Mantle mechanic'],
+  ['Knijpkracht','Pinch power'],['Crimpmonnik','Crimp monk'],
+  ['Slopersluiper','Sloper sneak'],
+  ['Je flasht meer dan je probeert.','You flash more than you try.'],
+  ['Je bijt je vast tot het klaar is.','You lock on until it goes.'],
+  ['Volume is jouw wapen.','Volume is your weapon.'],
+  ['Je gaat bijna altijd met een goed gevoel naar huis.','You almost always go home feeling good.'],
+  ['Consistentie is je handtekening.','Consistency is your signature.'],
+  ['Je vingers doen het stille werk.','Your fingers do the quiet work.'],
+  ['Je bouwt gestaag aan een breed profiel.','You are steadily building a broad profile.'],
   ['Grafieken zijn offline niet beschikbaar. Ze komen terug zodra je weer verbinding hebt.','Charts are unavailable offline. They come back as soon as you are online again.'],
   ['sessie','session'],
 ];
@@ -2915,6 +2993,7 @@ function renderFeed(){
   renderOnThisDay();
   renderStreakReaper();
   renderNudges();
+  renderBingoBar();
 
   // Sync gym filter options with sessions
   const fgEl=document.getElementById('filter-gym');
@@ -4229,6 +4308,7 @@ function renderStats(){
     }).join('')
     :'<div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sessies</div>';
   renderColorStats();
+  renderDnaCard();
   renderGradeNorm();
   renderWeaknessDetector();
   renderRivalSection();
@@ -5309,6 +5389,137 @@ function renderOnThisDay(){
 }
 
 // Generiek subtab-mechanisme: knoppen heten tab-{prefix}-{naam}, panelen {prefix}-tab-{naam}.
+/* ══════════════════════════════════════════
+   WEEKBINGO
+   Elke maandag een nieuwe 3x3-kaart, deterministisch uit de seeded
+   generator: zelfde profiel + zelfde week geeft altijd dezelfde kaart.
+   Er wordt niets opgeslagen — de kaart volgt uit de seed en de voortgang
+   volgt uit wat je die week gelogd hebt. Dus niets te syncen, niets dat
+   kan verlopen, en op elk apparaat identiek.
+══════════════════════════════════════════ */
+const _ymd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function _weekStartStr(from){
+  const x=from?new Date(from):new Date();
+  x.setDate(x.getDate()-((x.getDay()+6)%7)); // maandag als eerste dag
+  return _ymd(x);
+}
+function _addDaysStr(dateStr,n){
+  const d=new Date(dateStr+'T00:00:00');
+  d.setDate(d.getDate()+n);
+  return _ymd(d);
+}
+const BINGO_TASKS=[
+  {id:'flash_oh',t:'Flash een overhang',f:c=>c.routes.some(r=>r.type==='Overhang'&&r.result==='flash')},
+  {id:'slab3',t:'Drie routes op slab',f:c=>c.routes.filter(r=>r.type==='Slab').length>=3},
+  {id:'above_pr',t:'Probeer een graad boven je PR',f:c=>c.prIdx>=0&&c.routes.some(r=>gi(r.grade)>c.prIdx)},
+  {id:'two_sess',t:'Twee sessies deze week',f:c=>c.sessions.length>=2},
+  {id:'quick_send',t:'Stuur iets in maximaal twee pogingen',f:c=>c.routes.some(r=>r.result!=='poging'&&(r.attempts||1)<=2)},
+  {id:'dyno',t:'Log een dyno',f:c=>c.routes.some(r=>r.type==='Dyno')},
+  {id:'ten_routes',t:'Tien routes in één sessie',f:c=>c.sessions.some(s=>(s.routes||[]).length>=10)},
+  {id:'with_note',t:'Log een route met een notitie',f:c=>c.routes.some(r=>r.note)},
+  {id:'three_types',t:'Drie verschillende routetypes',f:c=>new Set(c.routes.map(r=>r.type).filter(Boolean)).size>=3},
+  {id:'crimp',t:'Top een crimp-route',f:c=>c.routes.some(r=>r.type==='Crimp'&&r.result!=='poging')},
+  {id:'feel_fire',t:'Sluit een sessie af met gevoel 🔥',f:c=>c.sessions.some(s=>s.feel===3)},
+  {id:'five_tops',t:'Vijf tops in één sessie',f:c=>c.sessions.some(s=>(s.routes||[]).filter(r=>r.result!=='poging').length>=5)},
+  {id:'project_try',t:'Geef een project een poging',f:c=>c.routes.some(r=>r.projectId)},
+  {id:'mantle_pinch',t:'Twee routes op mantle of pinch',f:c=>c.routes.filter(r=>r.type==='Mantle'||r.type==='Pinch').length>=2},
+  {id:'flash3',t:'Drie flashes deze week',f:c=>c.routes.filter(r=>r.result==='flash').length>=3},
+  {id:'perfect',t:'Een sessie zonder mislukte poging',f:c=>c.sessions.some(s=>(s.routes||[]).length>=3&&s.routes.every(r=>r.result!=='poging'))},
+  {id:'two_gyms',t:'Klim in twee verschillende gyms',f:c=>new Set(c.sessions.map(s=>s.gym).filter(Boolean)).size>=2},
+  {id:'vert',t:'Top een verticale route',f:c=>c.routes.some(r=>r.type==='Verticaal'&&r.result!=='poging')},
+  {id:'sloper',t:'Log een sloper-route',f:c=>c.routes.some(r=>r.type==='Sloper')},
+  {id:'cave',t:'Waag je aan een cave-route',f:c=>c.routes.some(r=>r.type==='Cave')},
+  {id:'fifteen',t:'Vijftien routes deze week',f:c=>c.routes.length>=15},
+  {id:'session_note',t:'Schrijf een sessienotitie',f:c=>c.sessions.some(s=>(s.note||'').trim())},
+  {id:'same_grade4',t:'Vier routes van dezelfde graad',f:c=>{const m={};c.routes.forEach(r=>{m[r.grade]=(m[r.grade]||0)+1});return Object.values(m).some(v=>v>=4)}},
+  {id:'three_days',t:'Klim op drie verschillende dagen',f:c=>new Set(c.sessions.map(s=>s.date)).size>=3},
+  {id:'hang',t:'Log een hangsessie',need:'hang',f:c=>c.hang.length>=1},
+  {id:'color3',t:'Drie routes van dezelfde kleur',need:'color',f:c=>{const m={};c.routes.forEach(r=>{if(r.color)m[r.color]=(m[r.color]||0)+1});return Object.values(m).some(v=>v>=3)}},
+  {id:'color_yellow',t:'Top een gele boulder',need:'color',f:c=>c.routes.some(r=>r.color==='Geel'&&r.result!=='poging')},
+  {id:'color_two',t:'Routes in twee verschillende kleuren',need:'color',f:c=>new Set(c.routes.map(r=>r.color).filter(Boolean)).size>=2},
+  {id:'sector',t:'Log een route met een sector',need:'color',f:c=>c.routes.some(r=>r.sector)},
+];
+function _bingoContext(from,to){
+  const inRange=d=>d>=from&&(!to||d<to);
+  const ws=sessions.filter(s=>inRange(s.date));
+  const pr=getPR('top');
+  return{
+    sessions:ws,
+    routes:ws.flatMap(s=>s.routes||[]),
+    hang:hangSessions.filter(h=>inRange(h.date)),
+    prIdx:pr?gi(pr.grade):-1
+  };
+}
+function getBingoCard(weekStart){
+  const start=weekStart||_weekStartStr();
+  // Kleur- en hangboardopdrachten alleen als je die dingen ook logt,
+  // anders staat er een vakje op de kaart dat je nooit kunt halen.
+  const hasColor=allRoutes().some(r=>r.color);
+  const pool=BINGO_TASKS.filter(t=>t.need==='color'?hasColor:t.need==='hang'?hangSessions.length>0:true);
+  const rand=_seededRand(`${activeProfileId||'p'}|bingo|${isoWeekKey(start).key}`);
+  return{start,cells:_shuffle(pool,rand).slice(0,9)};
+}
+const BINGO_LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+function computeBingo(weekStart){
+  const card=getBingoCard(weekStart);
+  const ctx=_bingoContext(card.start,_addDaysStr(card.start,7));
+  const done=card.cells.map(t=>{try{return!!t.f(ctx)}catch(e){return false}});
+  const full=BINGO_LINES.filter(l=>l.every(i=>done[i]));
+  return{card,done,doneCount:done.filter(Boolean).length,lines:full,lineCells:new Set(full.flat())};
+}
+// Hoeveel aaneengesloten weken vóór deze had je minstens één bingo?
+function bingoStreak(){
+  let n=0;
+  for(let w=1;w<=52;w++){
+    const d=new Date();
+    d.setDate(d.getDate()-7*w);
+    if(!computeBingo(_weekStartStr(d)).lines.length)break;
+    n++;
+  }
+  return n;
+}
+let _lastBingoLines=null;
+function renderBingoBar(){
+  const el=document.getElementById('bingo-bar');
+  if(!el)return;
+  if(!sessions.length){el.innerHTML='';return;}
+  const b=computeBingo();
+  if(_lastBingoLines!==null&&b.lines.length>_lastBingoLines)celebrateBingo();
+  _lastBingoLines=b.lines.length;
+  el.innerHTML=`<button type="button" class="bingo-bar-btn" onclick="showBingoModal()">
+    <span class="bingo-bar-icon">🎲</span>
+    <span class="bingo-bar-text">Weekbingo</span>
+    <span class="bingo-bar-count">${b.doneCount}/9</span>
+    ${b.lines.length?'<span class="bingo-bar-badge">Bingo!</span>':''}
+  </button>`;
+}
+function showBingoModal(){
+  document.getElementById('bingo-ov')?.remove();
+  const b=computeBingo();
+  const streak=bingoStreak();
+  const ov=document.createElement('div');
+  ov.className='modal-overlay';ov.id='bingo-ov';
+  ov.innerHTML=`<div class="modal-box bingo-box">
+    <div class="modal-title">Weekbingo</div>
+    <div class="bingo-sub">Vinkt zichzelf af uit wat je logt. Elke maandag een nieuwe kaart.</div>
+    <div class="bingo-grid">${b.card.cells.map((t,i)=>`<div class="bingo-cell${b.done[i]?' done':''}${b.lineCells.has(i)?' inline':''}"><span>${esc(t.t)}</span></div>`).join('')}</div>
+    <div class="bingo-foot">${b.doneCount}/9 gehaald${b.lines.length?` · ${b.lines.length}× bingo`:''}${streak?` · ${streak} weken op rij bingo`:''}</div>
+    <button class="btn-export modal-close" onclick="document.getElementById('bingo-ov')?.remove()">Sluiten</button>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
+}
+function celebrateBingo(){
+  document.getElementById('bingo-burst')?.remove();
+  const el=document.createElement('div');
+  el.id='bingo-burst';el.className='shake-burst';
+  el.innerHTML='<div class="shake-burst-text">BINGO!</div><div class="shake-burst-sub">Rij compleet 🎲</div>';
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('visible'));
+  if(navigator.vibrate)navigator.vibrate([60,40,60,40,120]);
+  setTimeout(()=>{el.classList.remove('visible');setTimeout(()=>el.remove(),250)},2300);
+}
+
 function switchTab(prefix,tabs,active){
   tabs.forEach(t=>{
     document.getElementById(`tab-${prefix}-${t}`)?.classList.toggle('active',t===active);
@@ -5762,6 +5973,249 @@ function generateShareCard(){
   document.body.appendChild(ov);
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove()});
 }
+/* ══════════════════════════════════════════
+   KLIM-DNA
+   Een generatieve signature die rechtstreeks uit je stijlcijfers wordt
+   getekend. De seed is een hash van die cijfers, dus het beeld is stabiel
+   zolang jij hetzelfde klimt en verschuift zodra je verandert — geen
+   willekeur per render, wel evolutie over tijd.
+
+   Let op: alles hieronder tekent met fillText op canvas en is daarmee
+   onzichtbaar voor de i18n-observer. Elk label gaat expliciet door
+   i18nTranslate() of vertakt op currentLang.
+══════════════════════════════════════════ */
+const DNA_NAMES={
+  'Slab':'Slab-fluisteraar','Verticaal':'Muurmetronoom','Overhang':'Overhangbeul',
+  'Cave':'Grotduiker','Dyno':'Dyno-durfal','Mantle':'Mantelmonteur',
+  'Pinch':'Knijpkracht','Crimp':'Crimpmonnik','Sloper':'Slopersluiper'
+};
+function _hexA(hex,a){
+  const h=String(hex).replace('#','');
+  const n=parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16);
+  return`rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+function _mixHex(a,b,t){
+  const p=h=>{const s=String(h).replace('#','');const n=parseInt(s,16);return[(n>>16)&255,(n>>8)&255,n&255]};
+  const A=p(a),B=p(b);
+  return`rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')})`;
+}
+function computeDnaVector(upto){
+  const rs=upto?sessions.filter(s=>s.date<=upto):sessions;
+  const routes=rs.flatMap(s=>s.routes||[]);
+  if(!routes.length)return null;
+  const typeCount={};TYPES.forEach(t=>{typeCount[t]=0});
+  routes.forEach(r=>{if(r.type&&typeCount[r.type]!==undefined)typeCount[r.type]++});
+  const typed=TYPES.reduce((a,t)=>a+typeCount[t],0);
+  const strands=TYPES.map(t=>typed?typeCount[t]/typed:1/TYPES.length);
+  const sends=routes.filter(r=>r.result!=='poging');
+  const idxs=sends.map(r=>gi(r.grade)).filter(i=>i>=0).sort((a,b)=>a-b);
+  const weeks=new Set(rs.map(s=>isoWeekKey(s.date).key)).size||1;
+  const feels=rs.filter(s=>s.feel!=null).map(s=>s.feel);
+  const hangSets=hangSessions.filter(h=>!upto||h.date<=upto).reduce((a,h)=>a+((h.sets||[]).length),0);
+  return{
+    strands,typed,
+    dominant:typed?TYPES.reduce((b,t)=>typeCount[t]>typeCount[b]?t:b,TYPES[0]):null,
+    flashRatio:routes.filter(r=>r.result==='flash').length/routes.length,
+    median:idxs.length?idxs[Math.floor(idxs.length/2)]:gi('6a'),
+    max:idxs.length?idxs[idxs.length-1]:gi('6a'),
+    perWeek:routes.length/weeks,
+    feel:feels.length?feels.reduce((a,b)=>a+b,0)/feels.length/3:.5,
+    hangSets,
+    attemptsPerSend:sends.length?routes.reduce((a,r)=>a+(r.attempts||1),0)/sends.length:1,
+    routes:routes.length,
+    sessions:rs.length,
+    streak:calcStreak()
+  };
+}
+// Seed uit de cijfers zelf: gelijk blijven = gelijk beeld, veranderen = nieuw beeld.
+function _dnaSeed(vec){
+  return[activeProfileId||'p','dna',
+    vec.strands.map(s=>Math.round(s*100)).join(','),
+    Math.round(vec.flashRatio*100),vec.median,vec.max,
+    Math.round(vec.perWeek*10),Math.round(vec.feel*100),vec.routes
+  ].join('|');
+}
+function dnaArchetype(vec){
+  const rand=_seededRand(_dnaSeed(vec)+'|arch');
+  const name=(vec.dominant&&DNA_NAMES[vec.dominant])||'Allrounder';
+  const traits=[];
+  if(vec.flashRatio>=.3)traits.push('Je flasht meer dan je probeert.');
+  if(vec.attemptsPerSend>=3.5)traits.push('Je bijt je vast tot het klaar is.');
+  if(vec.perWeek>=12)traits.push('Volume is jouw wapen.');
+  if(vec.feel>=.7)traits.push('Je gaat bijna altijd met een goed gevoel naar huis.');
+  if(vec.streak>=3)traits.push('Consistentie is je handtekening.');
+  if(vec.hangSets>=20)traits.push('Je vingers doen het stille werk.');
+  if(!traits.length)traits.push('Je bouwt gestaag aan een breed profiel.');
+  return{name,trait:_pick(traits,rand)};
+}
+function drawDna(ctx,vec,size,cx,cy){
+  const rand=_seededRand(_dnaSeed(vec));
+  const clamp=i=>Math.max(0,Math.min(GRADES.length-1,i));
+  const cMed=GRADE_COLORS[clamp(vec.median)]||'#7f77dd';
+  const cMax=GRADE_COLORS[clamp(vec.max)]||'#7f77dd';
+  // Achtergrondgloed: warmte uit het gemiddelde sessiegevoel.
+  const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,size*.62);
+  glow.addColorStop(0,_hexA(cMax,.10+vec.feel*.22));
+  glow.addColorStop(1,_hexA(cMax,0));
+  ctx.fillStyle=glow;
+  ctx.fillRect(cx-size*.7,cy-size*.7,size*1.4,size*1.4);
+  const R=size*.42,rIn=size*.09;
+  const jitter=(1-vec.flashRatio)*size*.022;      // veel flash = strakke lijn
+  const nodes=Math.max(7,Math.min(28,Math.round(7+vec.perWeek*1.1)));
+  ctx.lineCap='round';ctx.lineJoin='round';
+  vec.strands.forEach((share,i)=>{
+    const base=(i/vec.strands.length)*Math.PI*2;
+    ctx.lineWidth=Math.max(size*.004,share*size*.10);
+    ctx.strokeStyle=_mixHex(cMed,cMax,vec.strands.length>1?i/(vec.strands.length-1):0);
+    ctx.globalAlpha=Math.min(1,.3+share*2.4);
+    // Onderbroken lijn als de reeks weg is: consistentie is zichtbaar.
+    ctx.setLineDash(vec.streak>=2?[]:[size*.03,size*.025]);
+    ctx.beginPath();
+    for(let n=0;n<=nodes;n++){
+      const t=n/nodes;
+      const ang=base+t*Math.PI*1.35;
+      const rad=rIn+(R-rIn)*t;
+      const x=cx+Math.cos(ang)*rad+(rand()-.5)*jitter;
+      const y=cy+Math.sin(ang)*rad+(rand()-.5)*jitter;
+      if(n===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // knoop aan het uiteinde van elke streng
+    const endAng=base+Math.PI*1.35;
+    ctx.globalAlpha=Math.min(1,.45+share*2);
+    ctx.beginPath();
+    ctx.arc(cx+Math.cos(endAng)*R,cy+Math.sin(endAng)*R,Math.max(size*.005,share*size*.05),0,Math.PI*2);
+    ctx.fillStyle=ctx.strokeStyle;ctx.fill();
+  });
+  ctx.setLineDash([]);
+  // Korrel: hangboardvolume als textuur over het geheel.
+  const specks=Math.min(220,Math.round(vec.hangSets*3));
+  ctx.globalAlpha=.5;ctx.fillStyle=_hexA(cMax,.5);
+  for(let i=0;i<specks;i++){
+    const a=rand()*Math.PI*2,d=rIn+rand()*(R*1.05-rIn);
+    ctx.fillRect(cx+Math.cos(a)*d,cy+Math.sin(a)*d,size*.006,size*.006);
+  }
+  // Kern in de kleur van je hoogste graad.
+  ctx.globalAlpha=1;
+  const core=ctx.createRadialGradient(cx,cy,0,cx,cy,rIn*1.5);
+  core.addColorStop(0,cMax);core.addColorStop(1,_hexA(cMax,0));
+  ctx.fillStyle=core;
+  ctx.beginPath();ctx.arc(cx,cy,rIn*1.5,0,Math.PI*2);ctx.fill();
+}
+function _paintDna(canvas,vec,cssSize){
+  if(!canvas||!vec)return;
+  const dpr=Math.min(3,window.devicePixelRatio||1);
+  canvas.width=cssSize*dpr;canvas.height=cssSize*dpr;
+  canvas.style.width=cssSize+'px';canvas.style.height=cssSize+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  drawDna(ctx,vec,cssSize,cssSize/2,cssSize/2);
+}
+// Vier momentopnames: einde van de maand, 9/6/3/0 maanden terug.
+function _dnaCheckpoints(){
+  const out=[],now=new Date();
+  [9,6,3,0].forEach(back=>{
+    const d=new Date(now.getFullYear(),now.getMonth()-back+1,0);
+    if(d>now)d.setTime(now.getTime());
+    const vec=computeDnaVector(_ymd(d));
+    if(!vec||vec.routes<5)return;
+    out.push({label:d.toLocaleDateString(LOCALE(),{month:'short',year:'2-digit'}),vec});
+  });
+  return out;
+}
+function renderDnaCard(){
+  const el=document.getElementById('dna-section');
+  if(!el)return;
+  if(sessions.length<10){
+    el.innerHTML='<div class="chart-card"><div class="chart-card-title">Klim-DNA</div><div style="color:var(--muted);font-size:13px;padding:8px 0">Je DNA is nog aan het vormen — log 10 sessies.</div></div>';
+    return;
+  }
+  const vec=computeDnaVector();
+  if(!vec){el.innerHTML='';return;}
+  const arch=dnaArchetype(vec);
+  el.innerHTML=`<div class="chart-card">
+    <div class="chart-card-title">Klim-DNA</div>
+    <div class="dna-wrap"><canvas id="dna-canvas"></canvas></div>
+    <div class="dna-arch">${esc(arch.name)}</div>
+    <div class="dna-trait">${esc(arch.trait)}</div>
+    <div class="dna-evo-label">Zo groeide het</div>
+    <div class="dna-evo" id="dna-evo"></div>
+    <button class="btn-export" style="width:100%;margin-top:14px" onclick="shareDnaCard()">Deel je DNA</button>
+  </div>`;
+  const cv=document.getElementById('dna-canvas');
+  const avail=(el.clientWidth||330)-32;
+  _paintDna(cv,vec,Math.max(180,Math.min(300,avail)));
+  const evo=document.getElementById('dna-evo');
+  const points=_dnaCheckpoints();
+  if(points.length<2){
+    evo.innerHTML='<div style="color:var(--muted);font-size:12px">Nog te weinig historie voor een tijdlijn.</div>';
+    return;
+  }
+  points.forEach(p=>{
+    const item=document.createElement('div');item.className='dna-evo-item';
+    const c=document.createElement('canvas');
+    item.appendChild(c);
+    const lbl=document.createElement('div');lbl.className='dna-evo-lbl';lbl.textContent=p.label;
+    item.appendChild(lbl);
+    evo.appendChild(item);
+    _paintDna(c,p.vec,64);
+  });
+}
+function buildDnaShareCanvas(){
+  const vec=computeDnaVector();
+  if(!vec)return null;
+  const arch=dnaArchetype(vec);
+  const en=currentLang==='en';
+  const profile=loadProfiles().find(p=>p.id===activeProfileId);
+  const S=1080;
+  const c=document.createElement('canvas');c.width=S;c.height=S;
+  const ctx=c.getContext('2d');
+  const bg=ctx.createLinearGradient(0,0,S,S);
+  bg.addColorStop(0,'#10102e');bg.addColorStop(.6,'#0d0b20');bg.addColorStop(1,'#0a0a0a');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,S,S);
+  drawDna(ctx,vec,S*.66,S/2,S*.47);
+  ctx.textAlign='center';
+  ctx.globalAlpha=1;
+  ctx.fillStyle='rgba(255,255,255,.55)';
+  ctx.font='700 30px "Barlow Condensed", sans-serif';
+  ctx.fillText(en?'CLIMBING DNA':'KLIM-DNA',S/2,92);
+  ctx.fillStyle='#fff';
+  ctx.font='800 74px "Barlow Condensed", sans-serif';
+  ctx.fillText(i18nTranslate(arch.name).toUpperCase(),S/2,S-190);
+  ctx.fillStyle='rgba(255,255,255,.62)';
+  ctx.font='400 30px "Barlow", sans-serif';
+  ctx.fillText(i18nTranslate(arch.trait),S/2,S-142);
+  ctx.fillStyle='rgba(255,255,255,.45)';
+  ctx.font='700 27px "Barlow Condensed", sans-serif';
+  const stats=en
+    ?`${vec.sessions} SESSIONS · ${vec.routes} ROUTES · ${GRADES[Math.max(0,Math.min(GRADES.length-1,vec.max))]} MAX`
+    :`${vec.sessions} SESSIES · ${vec.routes} ROUTES · ${GRADES[Math.max(0,Math.min(GRADES.length-1,vec.max))]} MAX`;
+  ctx.fillText(stats,S/2,S-96);
+  ctx.fillStyle='rgba(127,119,221,.85)';
+  ctx.font='800 26px "Barlow Condensed", sans-serif';
+  ctx.fillText((profile?profile.name.toUpperCase()+' · ':'')+'FLAG IT',S/2,S-46);
+  return c.toDataURL('image/png');
+}
+async function shareDnaCard(){
+  const dataUrl=buildDnaShareCanvas();
+  if(!dataUrl){toast('Nog geen DNA om te delen','#e53935');return;}
+  const name='flagit-klim-dna-'+new Date().toISOString().split('T')[0]+'.png';
+  try{
+    const blob=await(await fetch(dataUrl)).blob();
+    const file=new File([blob],name,{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      // navigator.share bereikt de DOM niet, dus hier expliciet vertalen
+      await navigator.share({files:[file],title:i18nTranslate('Mijn Klim-DNA')});
+      return;
+    }
+  }catch(e){
+    if(e&&e.name==='AbortError')return;
+  }
+  const a=document.createElement('a');a.href=dataUrl;a.download=name;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('Klim-DNA gedownload!');
+}
+
 function downloadShareCard(dataUrl){
   const a=document.createElement('a');a.href=dataUrl;a.download='flagit-klimkaart-'+new Date().toISOString().split('T')[0]+'.png';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
