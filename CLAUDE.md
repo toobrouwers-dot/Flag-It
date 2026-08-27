@@ -65,17 +65,19 @@ Nav is consolidated to **5 tabs**. Several former top-level pages now live as su
 
 | Nav label | Element ID | Purpose | Subtabs |
 |---|---|---|---|
-| Feed | `#page-home` | Recent sessions, filtering, streaks, milestones | `switchFeedTab()`: Feed · **Sociaal** (social feed/search/leaderboard, itself split via `switchSociaalTab()`) |
-| Loggen | `#page-log` | Record bouldering sessions | — |
-| Analyse | `#page-stats` | Analytics, PRs, charts, heatmap, TLI | `switchAnalyseTab()`: Stats · **Coach** (AI insights, training plans, stroke radar) |
+| Feed | `#page-home` | Weekly bingo bar, search + filter chips, recent sessions, streaks, milestones | `switchFeedTab()`: Sessies · **Dagboek** · **Sociaal** (social feed/search/leaderboard, itself split via `switchSociaalTab()`) |
+| Loggen | `#page-log` | Record bouldering sessions, voice logging, quick chips | — |
+| Analyse | `#page-stats` | Analytics, PRs, charts, heatmap, TLI, grade calibrator, Climbing DNA | `switchAnalyseTab()`: Stats · **Coach** (AI insights, training plans, stroke radar) |
 | Doelen | `#page-goals` | Grade/count goals, competitions countdown | `switchDoelenTab()`: Doelen · **Projecten** (boulder project tracking) |
-| Meer | `#page-gyms` | Manage gyms, backup/restore, rival mode, setter, language toggle | `switchMeerTab()`: Gyms · **Hangboard** (hang training logging + timer + PR tracking) |
+| Meer | `#page-gyms` | Manage gyms, beta boards, gym-stats opt-out, backup/restore, rival mode, language toggle | `switchMeerTab()`: Gyms · **Hangboard** (hang training logging + timer + PR tracking) |
 
 Empty legacy shells kept for compatibility: `#page-hang`, `#page-sociaal`, `#page-coach` (all rendered via the subtab containers above, not directly navigated to).
 
 **`showPage(id, direction)` takes the short id, not the element id** — `showPage('home')`, not `showPage('page-home')`. It prepends `page-` internally. The three retired ids are redirected at the top of the function (`sociaal` → home + Sociaal subtab, `coach` → stats + Coach subtab, `hang` → gyms + Hangboard subtab), which is why old deep links still land somewhere sensible.
 
 `showPage()` also: guards navigation away from a half-filled log form (`showNavLeaveConfirm()`), resets edit mode, and picks a slide direction from `PAGE_ORDER` (`['home','log','stats','goals','gyms']`). Subtab switching within a page uses one of the five `switch*Tab()` wrappers (see [Tab-switching pattern](#code-consolidation-patterns)).
+
+**The nav-leave guard asks `_logFormHasUserInput()`, not `_isLogFormBlank()`, and not the route-card count.** It used to count `#route-cards .route-card`, which is always at least 1 — `_resetLogForm()` seeds an empty card — so the "unsaved routes" modal fired on *every* exit from the log page, including immediately after saving, leaving you stranded there with the session already stored. `_isLogFormBlank()` is also the wrong question here, because it counts a selected gym as content and `refreshGymSelect()` preselects your favourite gym by itself. Keep the two apart: `_logFormHasUserInput()` ignores the gym (guard), `_isLogFormBlank()` includes it (drafts).
 
 ### Data model
 
@@ -172,6 +174,15 @@ Shared route beta per gym, so climbers at the same wall see each other's tips. G
 
 **This is the one place in the app rendering text written by strangers.** Two rules hold here: `_s()` escapes `'` as well, and handlers receive an **array index** into `_betaRows`, never the text or the author name. Do not "simplify" that into interpolating the value.
 
+### Grade calibrator
+
+Answers "is my gym soft or hard?" from the `grade_calibration` RPC (see below for the privacy properties, which are the point of the design).
+
+- `_globalCurve(rows)` builds the success rate `p(g)` per grade across all gyms and forces it non-increasing — real data hobbles, and a non-monotonic curve cannot be inverted.
+- `_invertCurve(curve, p)` finds the global grade with success rate `p` by linear interpolation. For each grade in a gym, `g − g'` is the offset in grade steps; **positive means softer**. `computeGradeCalibration()` averages that over grades and needs at least 3 to report a gym.
+- Results are cached for 24 h in `flagit_calib_cache_v1` — a **global** key, no profile suffix, because gym data is not per-profile. `renderGradeCalibrator()` renders from cache synchronously and refreshes in the background; offline it shows the last cache rather than nothing.
+- `renderStatsOptOut()` (Meer → Gym-statistieken) drives `accounts.stats_opt_out` through `cloudGetStatsOptOut()` / `cloudSetStatsOptOut()`.
+
 ### Supabase Schema (supabase_schema.sql)
 
 17 tables with Row Level Security (RLS):
@@ -216,6 +227,7 @@ Users can create/switch/delete profiles. Each profile has its own isolated datas
 - `GRADE_COLORS` — a **separate parallel array** of 23 hex colors, indexed by grade position. The colors are not properties on the grade entries; look them up with `GRADE_COLORS[GRADES.indexOf(g)]`. Adding a grade means adding a color at the same index.
 - `CHART_TICK_COLOR` (`'#888'`) — use this for every Chart.js tick label. The older `#666`/`#555` values failed WCAG contrast against the dark chart surface.
 - `TYPES` — 9 route types (Slab, Verticaal, Overhang, etc.)
+- `ROUTE_COLORS` — 9 `{n, c}` entries for the **physical hold colour** on the wall (Geel, Groen, Blauw, …). Not to be confused with `GRADE_COLORS`, which is the difficulty ramp. Look a hex up with `routeColorHex(name)`; the stored value is the Dutch name, translated for display by an anchored `I18N_PATTERNS` regex.
 - `GRIPS` — 9 grip types for hangboard (Krim, Jug, Open hand, etc.)
 - `PAGE_ORDER` — nav order, drives the page-slide direction
 
@@ -235,7 +247,7 @@ Five Chart.js instances — destroy with `.destroy()` before re-creating to prev
 | `chartG` | Bar | `#chart-grades` | Routes per grade (completed) |
 | `stokeRadarChart` | Radar | (dynamic) | Stroke type distribution (Coach page) |
 
-All tick labels use `CHART_TICK_COLOR`.
+All tick labels use `CHART_TICK_COLOR`. Every `new Chart()` call sits behind `_chartsAvailable()` — Chart.js comes from a CDN and is simply absent on a first-ever offline load (see [Offline](#development-workflow)).
 
 ### Session editing
 
@@ -249,23 +261,41 @@ The log form autosaves so a half-entered session survives a reload or an acciden
 - `restoreDraftIfAny()` on load, surfaced via `showDraftBanner()` / `hideDraftBanner()`
 - `discardDraft()` clears it; `_isLogFormBlank()` avoids saving empty drafts
 
+`_isLogFormBlank()` is `!_logFormHasUserInput() && no gym selected`. The gym belongs in the draft check (a gym plus real input is worth saving) but not in the nav guard (the app preselects it) — see [Pages](#pages-bottom-nav).
+
 `saveDraft()` is deliberately a **silent** save — no toast (see [Feedback states](#ux-improvements)). Navigating away from a partly filled log page is separately guarded by `showNavLeaveConfirm()`.
+
+### Voice logging
+
+One microphone button on the log page turns *"zes b plus top overhang"* into a route card. Web Speech API, so no dependency — and the button only renders when the API is actually there.
+
+- `_voiceSupported()` tests the **value** (`window.SpeechRecognition || window.webkitSpeechRecognition`), not the key. `'SpeechRecognition' in window` is true for a browser that exposes the name and hands back nothing.
+- `parseVoiceRoute(transcript)` returns `{grade, result, type, color, attempts}` or `null`. It maps spoken digits and letters in both languages (`VOICE_NUMBERS`, `VOICE_LETTERS`) so `"zes b plus"`, `"six b plus"` and `"6b+"` collapse to the same token, then falls through a candidate chain until one is in `GRADES`. Type and colour go through `_voiceLookup()`, a Levenshtein match with a tighter budget for short words. No recognisable grade means `null` — never a guess.
+- `rec.lang` follows `LOCALE()`. Long-pressing the button sets continuous mode, which restarts on `onend` (Chrome cuts the stream by itself) and stops after 60 s of silence.
+- Permission is requested on first tap, never on load. Each error state gets its own toast; `no-speech` is deliberately ignored.
+- The recognised route is added immediately rather than behind a preview: the card lands expanded, so it is already the correction UI, and the toast underneath carries an undo.
 
 ### Generated content (seeded RNG)
 
-Two features generate narrative text client-side from a deterministic PRNG, so the same input always produces the same output (no API calls, no randomness across reloads):
+Four features derive their output from a deterministic PRNG, so the same input always produces the same result (no API calls, no randomness across reloads):
 
 - **Engine:** `_seededRand(seedStr)` (FNV-1a hash → mulberry32), plus `_pick(arr, rand)`, `_shuffle(arr, rand)` and `_seedFor()`.
 - **Klimverhaal** (session stories): `computeStorySignals()` → `generateSessionStory()` → `showStoryModal()`, with `_setStoryTone()`, `_shuffleStory()` and `_shareStory()`. Reachable from the feed card and the session detail modal.
 - **Project Quest Lore**: `computeLoreSignals()` → `generateProjectLore()` → `showProjectLoreModal()`. Results are cached in `projectLoreCache`; `regenerateProjectLore()` bumps a stored `nonce` to reroll, and deleting a project clears its cache entry.
+- **Weekly bingo**: seed is `profileId|bingo|<ISO week>`, so the card is the same on every device and cannot go stale. **Nothing is persisted** — the card falls out of the seed and the progress falls out of that week's `sessions`, which is why there is no bingo storage key and no sync. `bingoStreak()` replays earlier weeks the same way.
+- **Climbing DNA**: seed is a hash of the style vector itself (`_dnaSeed(vec)`), so the image is stable while your numbers are and shifts the moment they change. Deliberate: it must evolve, not shuffle.
 
-Both write into the DOM, so the i18n observer covers them — but the `navigator.share` payloads they produce do not (see below).
+The first three write into the DOM, so the i18n observer covers them. The DNA draws to canvas and does not — see below.
+
+**Choosing a seed:** include `activeProfileId` (profiles must not share output) plus whatever the result should be pinned to — a week key when it must stay put for a week, a hash of the data when it should track the data.
 
 ### Klimkaart share card (canvas)
 
 `generateShareCard()` draws a shareable PNG on a `<canvas>` via `ctx.fillText`, then `downloadShareCard()` / `shareShareCard()` save or share it (`navigator.share` with a `File`).
 
-**Canvas text is invisible to the i18n MutationObserver.** Every label drawn with `fillText` must branch on `currentLang` (or go through `i18nTranslate()`) explicitly — e.g. the grade-pyramid heading does `currentLang==='en'?'GRADE PYRAMID':'GRADE PYRAMIDE'`. This is the most common way a string ends up untranslated for English users.
+There is a second canvas surface: **Climbing DNA**. `computeDnaVector()` builds a style vector (type distribution, flash ratio, weekly volume, median/max grade, average feel, streak, hangboard volume), `drawDna(ctx, vec, size, cx, cy)` renders it, `renderDnaCard()` paints the card plus a four-snapshot evolution strip, and `buildDnaShareCanvas()` / `shareDnaCard()` produce the 1080×1080 share image. `dnaArchetype()` picks the label.
+
+**Canvas text is invisible to the i18n MutationObserver.** Every label drawn with `fillText` must branch on `currentLang` (or go through `i18nTranslate()`) explicitly — e.g. the grade-pyramid heading does `currentLang==='en'?'GRADE PYRAMID':'GRADE PYRAMIDE'`, and the DNA card runs its archetype and trait through `i18nTranslate()` including the `navigator.share` title. This is the most common way a string ends up untranslated for English users.
 
 ### Marketing attribution
 
@@ -419,6 +449,7 @@ A single generic `switchTab(prefix, tabs, active)` does the button/panel work vi
 
 - `.is-loading` (in CSS) is applied to every button that starts a network round-trip: auth flows (both screens), kudos, follow/unfollow, posting a comment, sending feedback. New async buttons follow the same pattern.
 - Toast audit: every `save*()` function toasts `'Opslaan mislukt'` on a localStorage error, and every user action gives feedback (a toast, or visible navigation/re-render). Deliberate choice: **no** success toast inside the low-level save functions themselves — backup-restore and delete flows call several saves in a row and already show their own feedback; a toast per save would spam. `saveDraft()` stays a silent autosave.
+- `toast(msg, color, action)` takes an optional `{label, fn}` that makes the toast clickable and stretches it from 2.2 s to 6 s — this is what `deleteWithUndo()` and voice logging hang their undo on. `toast()` owns a single `_toastTimer`, because before that each call set its own timeout and a short toast fired during a longer one hid it early. Anything that pokes `#toast` directly (the service-worker update notice does) must `clearTimeout(_toastTimer)` first.
 
 **Empty states — done:**
 
