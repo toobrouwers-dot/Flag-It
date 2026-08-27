@@ -89,6 +89,16 @@ body.nav-transitioning{overflow:hidden}
 .activity-routes{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px 14px}
 .route-chip{display:flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px 4px 6px;font-size:13px;font-weight:500}
 .route-chip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.chip-hold{width:7px;height:7px;border-radius:2px;flex-shrink:0;border:.5px solid rgba(255,255,255,.3)}
+.rc-color-row{display:flex;flex-wrap:wrap;gap:8px}
+.rc-color-dot{width:28px;height:28px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.25);padding:0;cursor:pointer;transition:transform .12s,border-color .12s}
+.rc-color-dot.sel{border-color:var(--text);transform:scale(1.1)}
+.qrc-label{font-size:11px;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px}
+.qrc-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;-webkit-overflow-scrolling:touch}
+.qrc-chip{display:flex;align-items:center;gap:6px;flex-shrink:0;background:var(--surface2);border:.5px solid var(--border);border-radius:12px;padding:7px 12px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer;transition:border-color .15s}
+.qrc-chip:active{border-color:var(--accent)}
+.qrc-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;border:.5px solid rgba(255,255,255,.3)}
+.qrc-type{color:var(--muted);font-size:12px}
 .chip-top .dot{background:var(--success)}.chip-flash .dot{background:var(--flash)}.chip-poging .dot{background:var(--attempt)}
 
 .btn-delete{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s,border-color .2s;min-width:44px;min-height:44px}
@@ -428,6 +438,13 @@ select option{background:#1e1e1e}
 .filter-bar select{flex:1;min-width:100px;font-size:13px;padding:8px 10px}
 .btn-filter-clear{background:var(--surface2);border:.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;padding:8px 14px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:color .2s,border-color .2s;text-transform:uppercase;letter-spacing:.5px}
 .btn-filter-clear.active{color:var(--danger);border-color:var(--danger)}
+.feed-search{width:100%;box-sizing:border-box;background:var(--surface);border:.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:11px 14px;margin-bottom:8px;outline:none;transition:border-color .15s}
+.feed-search:focus{border-color:var(--accent)}
+.feed-chip-row{display:flex;align-items:center;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;-webkit-overflow-scrolling:touch}
+.feed-chip{flex-shrink:0;background:var(--surface2);border:.5px solid var(--border);border-radius:12px;color:var(--muted);font-family:'Barlow',sans-serif;font-size:13px;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s,background .15s}
+.feed-chip.sel{color:var(--text);border-color:var(--accent);background:rgba(127,119,221,.14)}
+.feed-chip-sep{flex-shrink:0;width:1px;height:18px;background:var(--border);margin:0 2px}
+.feed-result-count{font-size:12px;color:var(--muted);margin-bottom:8px}
 .btn-edit-session{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s;margin-top:2px;min-width:44px;min-height:44px}
 .btn-edit-session:active{color:var(--accent);background:rgba(127,119,221,.12)}
 .goal-card.overdue{border-color:rgba(229,57,53,.4)}
@@ -970,6 +987,8 @@ select option{background:#1e1e1e}
     <button class="feed-toggle-btn" id="tab-feed-sociaal" onclick="switchFeedTab('sociaal')">Sociaal</button>
   </div>
   <div id="feed-tab-feed">
+    <input type="search" id="feed-search" class="feed-search" placeholder="Zoek in gym, notitie, graad, kleur…" aria-label="Zoek in je sessies" oninput="_feedSearchDebounced()">
+    <div class="feed-chip-row" id="feed-chip-row"></div>
     <div id="filter-bar" class="filter-bar">
       <select id="filter-gym" onchange="renderFeed()" aria-label="Filter op gym"><option value="">Alle gyms</option></select>
       <select id="filter-grade" onchange="renderFeed()" aria-label="Filter op minimale graad"><option value="">Min. graad</option></select>
@@ -977,6 +996,7 @@ select option{background:#1e1e1e}
     </div>
     <div id="nudge-section"></div>
     <div class="section-title">Recente sessies</div>
+    <div id="feed-result-count" class="feed-result-count"></div>
     <div id="feed"></div>
   </div>
   <div id="feed-tab-dagboek" style="display:none">
@@ -1014,7 +1034,7 @@ select option{background:#1e1e1e}
       <div class="input-row">
         <div class="field"><label>Gym</label>
           <div class="gym-selector">
-            <select id="inp-gym-select" onchange="saveDraft()"><option value="">— Kies een gym —</option></select>
+            <select id="inp-gym-select" onchange="saveDraft();refreshSectorDatalist()"><option value="">— Kies een gym —</option></select>
             <button class="btn-manage-gyms" onclick="openGymPickerModal()">⚙ Gyms</button>
           </div>
         </div>
@@ -1038,6 +1058,8 @@ select option{background:#1e1e1e}
       </div>
       <div id="route-cards"></div>
       <div class="sess-stats-bar" id="sess-stats-bar"></div>
+      <datalist id="sector-options"></datalist>
+      <div id="quick-route-chips"></div>
       <div style="display:flex;gap:8px;margin-bottom:12px">
         <button class="btn-add-route" style="flex:1;margin-bottom:0" onclick="addRouteCard(getSmartDefaultGrade());saveDraft()">+ Route toevoegen</button>
         <button onclick="openSetterModal()" style="padding:13px 16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:12px;color:var(--accent);font-family:'Barlow',sans-serif;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0" onmousedown="this.style.background='rgba(127,119,221,.08)'" onmouseup="this.style.background='none'">🏗️ Setter</button>
@@ -1089,6 +1111,7 @@ select option{background:#1e1e1e}
     <div id="pyramid-audit-section"></div>
     <div id="stoke-radar-section"></div>
     <div class="chart-card"><div class="chart-card-title">Per gym</div><div id="stats-gyms"><div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sessies</div></div></div>
+    <div id="color-stat-section"></div>
     <div id="grade-norm-section"></div>
     <div id="weakness-section"></div>
     <div id="oracle-section"></div>
@@ -1328,6 +1351,15 @@ const GRADE_COLORS=['#9FE1CB','#5DCAA5','#1D9E75','#0F6E56','#7EC8A0','#50B090',
 const CHART_TICK_COLOR='#888'; // matches --muted; old #666/#555 tick labels fell below WCAG contrast vs the dark chart surface
 const TYPES=['Slab','Verticaal','Overhang','Cave','Dyno','Mantle','Pinch','Crimp','Sloper'];
 const GRIPS=['Volgreep','Half-krim','Krim','Sleuf','Mono','Twee-vinger','Pinch','Open hand','Jug'];
+// Greepkleuren zoals gyms ze aan de muur hangen. Los van GRADE_COLORS: dat is
+// de graadschaal, dit is de fysieke kleur van de grepen. Opgeslagen wordt de
+// Nederlandse naam (brontaal); de weergave vertaalt via I18N_PATTERNS.
+const ROUTE_COLORS=[
+  {n:'Geel',c:'#f2c31d'},{n:'Groen',c:'#3ea15e'},{n:'Blauw',c:'#3082d8'},
+  {n:'Rood',c:'#d93a3a'},{n:'Zwart',c:'#2f2f37'},{n:'Wit',c:'#e9e9ef'},
+  {n:'Paars',c:'#8b5cd6'},{n:'Oranje',c:'#e8802a'},{n:'Roze',c:'#e35d9c'}
+];
+const routeColorHex=n=>{const f=ROUTE_COLORS.find(c=>c.n===n);return f?f.c:''};
 
 /* ══════════════════════════════════════════
    MARKETING ATTRIBUTION (utm_source, lang)
@@ -1375,6 +1407,13 @@ const I18N_PATTERNS=[
   [/^Je trainingsbelasting deze week \((\d+)\) is (-?\d+)% hoger dan je 4-weeksgemiddelde \((\d+)\)\. Plan een rustdag of lichte sessie\.$/,
     'Your training load this week ($1) is $2% higher than your 4-week average ($3). Plan a rest day or a light session.'],
   [/^of$/,'or'],
+  [/^Geel$/,'Yellow'],[/^Groen$/,'Green'],[/^Blauw$/,'Blue'],[/^Rood$/,'Red'],
+  [/^Zwart$/,'Black'],[/^Wit$/,'White'],[/^Paars$/,'Purple'],[/^Oranje$/,'Orange'],
+  [/^Roze$/,'Pink'],
+  [/^Alles$/,'All'],[/^30 dagen$/,'30 days'],[/^90 dagen$/,'90 days'],[/^Dit jaar$/,'This year'],
+  [/^Alle routes$/,'All routes'],[/^Alleen flash$/,'Flash only'],[/^Alleen top$/,'Sends only'],
+  [/^Met poging$/,'With attempt'],
+  [/^(\d+) van (\d+) sessies$/,'$1 of $2 sessions'],
   [/^Week (\d+) van (\d+) · /,'Week $1 of $2 · '],
 ];
 const I18N_PHRASES=[
@@ -1870,6 +1909,11 @@ const I18N_PHRASES=[
   [' weken resterend',' weeks left'],['Laatste week!','Last week!'],
   ['% boven gemiddeld','% above average'],
   ['Ongedaan maken','Undo'],
+  ['Greepkleur','Hold colour'],['Route-notitie','Route note'],
+  ['hiel rechts, dan crossen','right heel, then cross'],['bijv. Kolom','e.g. Pillar'],
+  ['Vaak gelogd','Logged often'],['Per kleur','By colour'],
+  ['Zoek in gym, notitie, graad, kleur…','Search gym, note, grade, colour…'],
+  ['Zoek in je sessies','Search your sessions'],
   ['Grafieken zijn offline niet beschikbaar. Ze komen terug zodra je weer verbinding hebt.','Charts are unavailable offline. They come back as soon as you are online again.'],
   ['sessie','session'],
 ];
@@ -2429,7 +2473,7 @@ function _doPageRender(id){
   if(id==='stats'){if(analyseTab==='stats')renderStats();else renderCoach();}
   if(id==='goals'){renderGoals();if(doelenTab==='projects')renderProjects();}
   if(id==='gyms'){if(meerTab==='gyms'){renderGymsPage();renderProfileMgmt();renderOwnerControls();renderFeedbackAdmin();}else renderHangPage();}
-  if(id==='log'){refreshGymSelect();refreshNotePlaceholder();_ensureLogFormSeeded();}
+  if(id==='log'){refreshGymSelect();refreshNotePlaceholder();_ensureLogFormSeeded();renderQuickRouteChips();refreshSectorDatalist();}
   // Legacy: werking bij directe showPage calls naar verwijderde tabs
   if(id==='sociaal')renderSociaalPage();
   if(id==='hang')renderHangPage();
@@ -2451,9 +2495,14 @@ function showPage(id,direction){
   if(id==='coach'){analyseTab='coach';id='stats';}
   if(id==='hang'){meerTab='hang';id='gyms';}
   if(_navTransitioning)return;
-  // Guard: intercept navigation away from log page when routes have been entered
+  // Guard: intercept navigation away from log page when routes have been entered.
+  // Tellen op het aantal routekaarten kan niet: een verse logpagina heeft er
+  // altijd precies één (leeg), dus dan waarschuwde hij ook als je niets had
+  // ingevuld — en direct na het opslaan, want _resetLogForm() zet die lege
+  // kaart meteen terug. _isLogFormBlank() is de bestaande definitie van
+  // "er staat niets in".
   const onLogPage=document.querySelector('.page.active')?.id==='page-log';
-  if(id!=='log'&&onLogPage&&!editMode&&document.querySelectorAll('#route-cards .route-card').length>0){
+  if(id!=='log'&&onLogPage&&!editMode&&!_isLogFormBlank()){
     pendingNavTarget=id;showNavLeaveConfirm();return;
   }
   haptic();
@@ -2789,6 +2838,71 @@ function getMilestones(){
 /* ══════════════════════════════════════════
    FEED
 ══════════════════════════════════════════ */
+/* ── FEED FILTERS ──────────────────────────────────────
+   Gym en min. graad staan al in twee selects; zoekterm, periode en
+   resultaat komen daarbovenop. Bewust niet in localStorage: een filter
+   hoort niet te overleven tot je volgende bezoek. */
+const FEED_PERIODS=[['all','Alles'],['30','30 dagen'],['90','90 dagen'],['year','Dit jaar']];
+const FEED_RESULTS=[['all','Alle routes'],['flash','Alleen flash'],['top','Alleen top'],['poging','Met poging']];
+let feedFilter={q:'',period:'all',result:'all'};
+let _feedSearchTimer=null;
+function _feedSearchDebounced(){
+  clearTimeout(_feedSearchTimer);
+  _feedSearchTimer=setTimeout(()=>{
+    feedFilter.q=document.getElementById('feed-search')?.value||'';
+    renderFeed();
+  },400);
+}
+function setFeedFilter(key,val){
+  feedFilter[key]=val;
+  haptic();
+  renderFeed();
+}
+function renderFeedChips(){
+  const el=document.getElementById('feed-chip-row');
+  if(!el)return;
+  const chip=(k,v,l)=>`<button type="button" class="feed-chip${feedFilter[k]===v?' sel':''}" onclick="setFeedFilter('${k}','${v}')">${l}</button>`;
+  el.innerHTML=FEED_PERIODS.map(([v,l])=>chip('period',v,l)).join('')
+    +'<span class="feed-chip-sep"></span>'
+    +FEED_RESULTS.map(([v,l])=>chip('result',v,l)).join('');
+}
+function _currentFeedFilter(){
+  return{
+    q:(feedFilter.q||'').trim().toLowerCase(),
+    period:feedFilter.period,
+    result:feedFilter.result,
+    gym:document.getElementById('filter-gym')?.value||'',
+    grade:document.getElementById('filter-grade')?.value||''
+  };
+}
+function _feedFilterActive(f){
+  return!!(f.q||f.gym||f.grade||f.period!=='all'||f.result!=='all');
+}
+function matchesFeedFilter(s,f){
+  if(f.gym&&s.gym!==f.gym)return false;
+  if(f.grade){const mg=maxGrade(s.routes);if(!mg||gi(mg.grade)<gi(f.grade))return false;}
+  if(f.period==='year'){
+    if(s.date.slice(0,4)!==String(new Date().getFullYear()))return false;
+  }else if(f.period!=='all'){
+    const cut=new Date(Date.now()-parseInt(f.period,10)*86400000).toISOString().slice(0,10);
+    if(s.date<cut)return false;
+  }
+  if(f.result==='flash'&&!s.routes.some(r=>r.result==='flash'))return false;
+  if(f.result==='top'&&!s.routes.some(r=>r.result==='top'||r.result==='flash'))return false;
+  if(f.result==='poging'&&!s.routes.some(r=>r.result==='poging'))return false;
+  if(f.q){
+    // Type- en kleurnamen staan in het Nederlands opgeslagen; in de Engelse
+    // modus zoeken we ook op de vertaling, zodat "blue" net zo goed werkt.
+    const parts=[s.gym||'',s.note||''];
+    s.routes.forEach(r=>{
+      parts.push(r.grade||'',r.type||'',r.color||'',r.sector||'',r.note||'');
+      if(currentLang==='en')parts.push(i18nTranslate(r.type||''),i18nTranslate(r.color||''));
+    });
+    if(!parts.join(' ').toLowerCase().includes(f.q))return false;
+  }
+  return true;
+}
+
 function renderFeed(){
   const pt=getPR('top'),streak=calcStreak();
   document.getElementById('hs-sessions').textContent=sessions.length;
@@ -2812,15 +2926,15 @@ function renderFeed(){
   }
 
   // Apply filters
-  const fg=document.getElementById('filter-gym')?.value||'';
-  const fgr=document.getElementById('filter-grade')?.value||'';
-  const hasFilter=!!(fg||fgr);
+  renderFeedChips();
+  const filt=_currentFeedFilter();
+  const hasFilter=_feedFilterActive(filt);
   const clearBtn=document.getElementById('filter-clear-btn');
   if(clearBtn)clearBtn.className='btn-filter-clear'+(hasFilter?' active':'');
 
-  let visible=[...sessions].reverse();
-  if(fg)visible=visible.filter(s=>s.gym===fg);
-  if(fgr)visible=visible.filter(s=>{const mg=maxGrade(s.routes);return mg&&gi(mg.grade)>=gi(fgr)});
+  const visible=[...sessions].reverse().filter(s=>matchesFeedFilter(s,filt));
+  const countEl=document.getElementById('feed-result-count');
+  if(countEl)countEl.textContent=hasFilter?`${visible.length} van ${sessions.length} sessies`:'';
 
   const feed=document.getElementById('feed');
   if(!sessions.length){
@@ -2853,7 +2967,7 @@ function renderFeed(){
     const s=item.s;
     const idx=cardIdx++;
     const mg=maxGrade(s.routes);
-    const chips=s.routes.map(r=>{const gc=GRADE_COLORS[GRADES.indexOf(r.grade)]||'#555';return`<div class="route-chip chip-${r.result}" style="background:${gc}22;border:.5px solid ${gc}55"><div class="dot"></div>${esc(r.grade)}${r.type?' · '+esc(r.type):''}</div>`;}).join('');
+    const chips=s.routes.map(r=>{const gc=GRADE_COLORS[GRADES.indexOf(r.grade)]||'#555';const hc=routeColorHex(r.color);return`<div class="route-chip chip-${r.result}" style="background:${gc}22;border:.5px solid ${gc}55"><div class="dot"></div>${hc?`<span class="chip-hold" style="background:${hc}"></span>`:''}${esc(r.grade)}${r.type?' · '+esc(r.type):''}</div>`;}).join('');
     const heat=s.routes.map(r=>{const gc=GRADE_COLORS[GRADES.indexOf(r.grade)]||'#555';return`<div class="heat-block" style="background:${gc}"></div>`;}).join('');
     const feelEmojis=['😓','😐','💪','🔥'];
     const feelStr=s.feel!=null?` · <span class="feed-feel">${feelEmojis[s.feel]}</span>`:'';
@@ -2932,6 +3046,9 @@ function showSessionSummary(routes,wasEdit,durSecs=null){
 function clearFilters(){
   const fg=document.getElementById('filter-gym');const fgr=document.getElementById('filter-grade');
   if(fg)fg.value='';if(fgr)fgr.value='';
+  const q=document.getElementById('feed-search');if(q)q.value='';
+  clearTimeout(_feedSearchTimer);
+  feedFilter={q:'',period:'all',result:'all'};
   renderFeed();
 }
 
@@ -2966,7 +3083,7 @@ function editSession(id){
   currentFeel=s.feel!=null?s.feel:null;
   document.querySelectorAll('.feel-btn').forEach((b,i)=>b.classList.toggle('selected',i===currentFeel));
   document.getElementById('route-cards').innerHTML='';routeCount=0;
-  s.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type,r.projectId));
+  s.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type,r.projectId,r));
   document.querySelector('#page-log .page-title').textContent='Sessie bewerken';
   document.querySelector('#page-log .btn-save').textContent='Wijzigingen opslaan';
   const pubEl=document.getElementById('inp-public');if(pubEl)pubEl.checked=!!(s.is_public);
@@ -3060,13 +3177,51 @@ function selectRouteGrade(id,grade,btn){
   haptic();
   saveDraft();
 }
+// De vijf vaakst gelogde graad+type+kleur-combinaties van de laatste 90 dagen.
+// Eén tik voegt zo'n route toe — de grootste tijdwinst tijdens een sessie.
+function _recentRouteCombos(){
+  const cut=new Date(Date.now()-90*86400000).toISOString().slice(0,10);
+  const counts={};
+  sessions.forEach(s=>{
+    if(s.date<cut)return;
+    s.routes.forEach(r=>{
+      const key=[r.grade,r.type||'',r.color||''].join('|');
+      counts[key]=(counts[key]||0)+1;
+    });
+  });
+  return Object.keys(counts)
+    .sort((a,b)=>counts[b]-counts[a])
+    .slice(0,5)
+    .map(k=>{const p=k.split('|');return{grade:p[0],type:p[1],color:p[2],n:counts[k]}});
+}
+function renderQuickRouteChips(){
+  const el=document.getElementById('quick-route-chips');
+  if(!el)return;
+  const combos=_recentRouteCombos();
+  if(combos.length<2){el.innerHTML='';el._combos=null;return;}
+  el.innerHTML=`<div class="qrc-label">Vaak gelogd</div><div class="qrc-row">${combos.map((c,i)=>{
+    const hex=routeColorHex(c.color);
+    return`<button type="button" class="qrc-chip" onclick="addFromCombo(${i})">${hex?`<span class="qrc-dot" style="background:${hex}"></span>`:''}<span>${esc(c.grade)}</span>${c.type?`<span class="qrc-type">${esc(c.type)}</span>`:''}</button>`;
+  }).join('')}</div>`;
+  el._combos=combos;
+}
+// Index in plaats van de waarden zelf doorgeven: niets van de gebruiker
+// belandt zo in een inline handler.
+function addFromCombo(i){
+  const el=document.getElementById('quick-route-chips');
+  const c=el&&el._combos&&el._combos[i];
+  if(!c)return;
+  addRouteCard(c.grade,1,'poging',c.type,null,{color:c.color});
+  saveDraft();
+}
 function getSmartDefaultGrade(){
   const cards=document.querySelectorAll('#route-cards .route-card');
   if(cards.length){const lastId=cards[cards.length-1].id.replace('rc-','');const sel=document.getElementById('rg-'+lastId);if(sel)return sel.value;}
   if(sessions.length){const freq={};[...sessions].slice(-5).forEach(s=>s.routes.forEach(r=>{freq[r.grade]=(freq[r.grade]||0)+1}));const best=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];if(best)return best[0];}
   return'6a';
 }
-function addRouteCard(grade='6a',attempts=1,result='poging',type='',projectId=null){
+function addRouteCard(grade='6a',attempts=1,result='poging',type='',projectId=null,extra={}){
+  const color=extra&&extra.color||'',sector=extra&&extra.sector||'',rnote=extra&&extra.note||'';
   if(!editMode&&routeCount===0)startSessionTimer();
   document.querySelectorAll('#route-cards .route-card.expanded').forEach(c=>c.classList.remove('expanded'));
   routeCount++;const id=routeCount;
@@ -3105,6 +3260,13 @@ function addRouteCard(grade='6a',attempts=1,result='poging',type='',projectId=nu
       </div>
       <div class="field"><label>Type</label><select id="rt-${id}" onchange="saveDraft()"><option value="">— type —</option>${TYPES.map(t=>`<option ${t===type?'selected':''}>${t}</option>`).join('')}</select></div>
       <div class="field"><label>Pogingen</label><div class="attempts-stepper"><button class="stepper-btn" onclick="event.stopPropagation();stepAttempts(${id},-1)">−</button><span class="stepper-val" id="ra-${id}">${attempts}</span><button class="stepper-btn" onclick="event.stopPropagation();stepAttempts(${id},1)">+</button><button class="stepper-btn stepper-btn-bulk" onclick="event.stopPropagation();stepAttempts(${id},5)">+5</button></div></div>
+      <div class="field full">
+        <label>Greepkleur</label>
+        <div class="rc-color-row" id="rcc-${id}">${ROUTE_COLORS.map(c=>`<button type="button" class="rc-color-dot${c.n===color?' sel':''}" style="background:${c.c}" title="${c.n}" aria-label="${c.n}" onclick="event.stopPropagation();selectRouteColor(${id},'${c.n}',this)"></button>`).join('')}</div>
+        <input type="hidden" id="rcl-${id}" value="${esc(color)}">
+      </div>
+      <div class="field"><label>Sector</label><input type="text" id="rsec-${id}" list="sector-options" value="${esc(sector)}" placeholder="bijv. Kolom" onclick="event.stopPropagation()" oninput="_saveDraftDebounced()"></div>
+      <div class="field"><label>Route-notitie</label><input type="text" id="rnote-${id}" value="${esc(rnote)}" placeholder="hiel rechts, dan crossen" onclick="event.stopPropagation()" oninput="_saveDraftDebounced()"></div>
       ${projectRow}
     </div>
   </div>
@@ -3153,6 +3315,27 @@ function _initCardSwipe(card,wrap,delBg){
   },{passive:false});
 }
 function toggleRC(id){document.getElementById('rc-'+id).classList.toggle('expanded')}
+function selectRouteColor(id,name,btn){
+  const inp=document.getElementById('rcl-'+id);
+  if(!inp)return;
+  const on=inp.value!==name;
+  inp.value=on?name:'';
+  btn.closest('.rc-color-row').querySelectorAll('.rc-color-dot').forEach(b=>b.classList.remove('sel'));
+  if(on)btn.classList.add('sel');
+  haptic();saveDraft();
+}
+// Sectorsuggesties komen uit wat je bij deze gym eerder hebt getypt.
+function refreshSectorDatalist(){
+  const dl=document.getElementById('sector-options');
+  if(!dl)return;
+  const gym=document.getElementById('inp-gym-select')?.value||'';
+  const seen=new Set();
+  sessions.forEach(s=>{
+    if(gym&&s.gym!==gym)return;
+    s.routes.forEach(r=>{if(r.sector)seen.add(r.sector)});
+  });
+  dl.innerHTML=[...seen].sort().map(v=>`<option value="${esc(v)}"></option>`).join('');
+}
 function stepAttempts(id,delta){const el=document.getElementById('ra-'+id);if(!el)return;const v=Math.min(99,Math.max(1,(parseInt(el.textContent)||1)+delta));el.textContent=v;const rsa=document.getElementById('rsa-'+id);if(rsa)rsa.textContent=v>1?`· ${v}×`:'';haptic();saveDraft();}
 function updRS(id){const g=document.getElementById('rg-'+id).value,res=document.getElementById('rr-'+id).value,s=document.getElementById('rs-'+id);s.querySelector('.rs-grade').textContent=g;s.querySelector('.rs-dot').style.background=getResultColor(res);updateSessStatsBar();}
 function _isNewGradeRecord(grade,result){
@@ -3183,7 +3366,11 @@ function duplicateRouteCard(id){
   const a=parseInt(document.getElementById('ra-'+id)?.textContent)||1;
   const r=document.getElementById('rr-'+id)?.value||'top';
   const p=document.getElementById('rp-'+id)?.value||null;
-  addRouteCard(g,a,r,t,p);
+  addRouteCard(g,a,r,t,p,{
+    color:document.getElementById('rcl-'+id)?.value||'',
+    sector:document.getElementById('rsec-'+id)?.value||'',
+    note:document.getElementById('rnote-'+id)?.value||''
+  });
   saveDraft();
 }
 function updateSessStatsBar(){
@@ -3201,13 +3388,22 @@ function _collectRoutes(){
   const routes=[];
   cards.forEach(c=>{
     const id=c.id.replace('rc-','');
-    routes.push({
+    const route={
       grade:document.getElementById('rg-'+id).value,
       type:document.getElementById('rt-'+id).value,
       attempts:parseInt(document.getElementById('ra-'+id).textContent)||1,
       result:document.getElementById('rr-'+id).value,
       projectId:document.getElementById('rp-'+id)?.value||null
-    });
+    };
+    // Alleen wegschrijven wat ingevuld is — lege strings zouden elke oude
+    // sessie onnodig laten groeien in localStorage en in de cloud-jsonb.
+    const col=document.getElementById('rcl-'+id)?.value||'';
+    const sec=(document.getElementById('rsec-'+id)?.value||'').trim();
+    const rn=(document.getElementById('rnote-'+id)?.value||'').trim();
+    if(col)route.color=col;
+    if(sec)route.sector=sec;
+    if(rn)route.note=rn;
+    routes.push(route);
   });
   return routes;
 }
@@ -3223,6 +3419,9 @@ function _isLogFormBlank(){
   if(!cards.length)return true;
   const id=cards[0].id.replace('rc-','');
   const g=document.getElementById('rg-'+id)?.value,t=document.getElementById('rt-'+id)?.value,a=parseInt(document.getElementById('ra-'+id)?.textContent)||1,r=document.getElementById('rr-'+id)?.value;
+  if(document.getElementById('rcl-'+id)?.value)return false;
+  if((document.getElementById('rsec-'+id)?.value||'').trim())return false;
+  if((document.getElementById('rnote-'+id)?.value||'').trim())return false;
   return g==='6a'&&t===''&&a===1&&r==='poging';
 }
 let _draftSaveTimer=null;
@@ -3255,7 +3454,7 @@ function restoreDraftIfAny(){
   applyVibe(currentFeel);
   const pubEl=document.getElementById('inp-public');if(pubEl)pubEl.checked=!!draft.is_public;
   document.getElementById('route-cards').innerHTML='';routeCount=0;
-  draft.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type,r.projectId));
+  draft.routes.forEach(r=>addRouteCard(r.grade,r.attempts,r.result,r.type,r.projectId,r));
   sessionTimerStart=draft.sessionTimerStart||null;
   sessionTimerElapsed=draft.sessionTimerElapsed||0;
   sessionTimerPaused=!!draft.sessionTimerPaused;
@@ -4029,9 +4228,31 @@ function renderStats(){
       return`<div class="stats-gym-row"><div><div class="stats-gym-name">${esc(gym)}</div><div class="stats-gym-sub">${st.count} sessie${st.count!==1?'s':''} · ${pct}% geslaagd</div></div><div class="stats-gym-grade">${st.best||'—'}</div></div>`;
     }).join('')
     :'<div style="color:var(--muted);font-size:13px;padding:8px 0">Nog geen sessies</div>';
+  renderColorStats();
   renderGradeNorm();
   renderWeaknessDetector();
   renderRivalSection();
+}
+
+function renderColorStats(){
+  const el=document.getElementById('color-stat-section');
+  if(!el)return;
+  const stats={};
+  allRoutes().forEach(r=>{
+    if(!r.color)return;
+    const st=stats[r.color]||(stats[r.color]={total:0,sent:0,best:null});
+    st.total++;
+    if(r.result!=='poging'){
+      st.sent++;
+      if(!st.best||gi(r.grade)>gi(st.best))st.best=r.grade;
+    }
+  });
+  const keys=Object.keys(stats).sort((a,b)=>stats[b].total-stats[a].total);
+  if(!keys.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="chart-card"><div class="chart-card-title">Per kleur</div>${keys.map(k=>{
+    const st=stats[k],pct=Math.round(st.sent/st.total*100),hex=routeColorHex(k)||'#888';
+    return`<div class="stats-gym-row"><div style="display:flex;align-items:center;gap:10px"><span style="width:18px;height:18px;border-radius:50%;flex-shrink:0;background:${hex};box-shadow:inset 0 0 0 .5px rgba(255,255,255,.25)"></span><div><div class="stats-gym-name">${esc(k)}</div><div class="stats-gym-sub">${st.total} route${st.total!==1?'s':''} · ${pct}% geslaagd</div></div></div><div class="stats-gym-grade">${st.best||'—'}</div></div>`;
+  }).join('')}</div>`;
 }
 
 function showSessionDetailModal(s){
