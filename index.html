@@ -99,6 +99,12 @@ body.nav-transitioning{overflow:hidden}
 .qrc-chip:active{border-color:var(--accent)}
 .qrc-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;border:.5px solid rgba(255,255,255,.3)}
 .qrc-type{color:var(--muted);font-size:12px}
+/* ── VOICE-LOGGEN ────────────────────────────────────── */
+.btn-voice{padding:13px 16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:12px;color:var(--accent);font-family:'Barlow',sans-serif;font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.btn-voice.listening{background:rgba(229,57,53,.14);border-style:solid;border-color:var(--danger);color:var(--danger);animation:voicePulse 1.3s ease-in-out infinite}
+.btn-voice.continuous{border-color:var(--accent);background:rgba(127,119,221,.14);color:var(--accent);animation:voicePulse 1.3s ease-in-out infinite}
+@keyframes voicePulse{0%,100%{opacity:1}50%{opacity:.55}}
+.voice-hint{font-size:11px;color:var(--muted);margin:-6px 0 12px;line-height:1.4}
 .chip-top .dot{background:var(--success)}.chip-flash .dot{background:var(--flash)}.chip-poging .dot{background:var(--attempt)}
 
 .btn-delete{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:color .2s,background .2s,border-color .2s;min-width:44px;min-height:44px}
@@ -1088,7 +1094,9 @@ select option{background:#1e1e1e}
       <div style="display:flex;gap:8px;margin-bottom:12px">
         <button class="btn-add-route" style="flex:1;margin-bottom:0" onclick="addRouteCard(getSmartDefaultGrade());saveDraft()">+ Route toevoegen</button>
         <button onclick="openSetterModal()" style="padding:13px 16px;background:none;border:.5px dashed rgba(127,119,221,.4);border-radius:12px;color:var(--accent);font-family:'Barlow',sans-serif;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0" onmousedown="this.style.background='rgba(127,119,221,.08)'" onmouseup="this.style.background='none'">🏗️ Setter</button>
+        <button id="btn-voice-log" class="btn-voice" style="display:none" onclick="toggleVoiceLog()" aria-label="Route inspreken">🎤 Inspreken</button>
       </div>
+      <div id="voice-hint" class="voice-hint" style="display:none"></div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 16px">
       <div>
@@ -1975,6 +1983,15 @@ const I18N_PHRASES=[
   ['weken op rij bingo','weeks of bingo in a row'],
   ['Weekbingo','Weekly bingo'],['Rij compleet','Line complete'],
   ['Klim-DNA','Climbing DNA'],['Mijn Klim-DNA','My Climbing DNA'],
+  ['🎤 Inspreken','🎤 Speak'],['🎤 Luistert…','🎤 Listening…'],['🎤 Blijft luisteren','🎤 Staying on'],
+  ['Route inspreken','Speak a route'],
+  ['Zeg bijvoorbeeld "zes b plus top overhang". Spraakherkenning loopt via je browser.','Say for example "six b plus top overhang". Speech recognition runs through your browser.'],
+  ['Niet verstaan — probeer "zes b plus top"','Did not catch that — try "six b plus top"'],
+  ['Spraakherkenning werkt niet in deze browser','Speech recognition does not work in this browser'],
+  ['Spraakherkenning werkt even niet','Speech recognition is not working right now'],
+  ['Geen toegang tot de microfoon','No access to the microphone'],
+  ['Geen microfoon gevonden','No microphone found'],
+  ['Microfoon uit na een minuut stilte','Microphone off after a minute of silence'],
   ['Je DNA is nog aan het vormen — log 10 sessies.','Your DNA is still forming — log 10 sessions.'],
   ['Zo groeide het','How it grew'],['Deel je DNA','Share your DNA'],
   ['Nog te weinig historie voor een tijdlijn.','Not enough history for a timeline yet.'],
@@ -3741,6 +3758,183 @@ function quickLogRoute(grade,result='top',attempts=1){
   const n=document.querySelectorAll('#route-cards .route-card').length;
   const label=result==='top'?'Top':result==='flash'?'Flash':'Poging';
   toast(`${label} genoteerd — ${n} route${n!==1?'s':''} vandaag`,getResultColor(result));
+}
+
+/* ══════════════════════════════════════════
+   VOICE-LOGGEN
+   Zeg "zes b plus top" en de routekaart staat er. Web Speech API, dus
+   geen dependency — en de knop verschijnt alleen op browsers die hem
+   hebben. De kaart die eruit rolt staat open, dus corrigeren kan direct;
+   de toast eronder geeft bovendien een 'Weg' om hem meteen te wissen.
+══════════════════════════════════════════ */
+const VOICE_NUMBERS={vier:'4',vijf:'5',zes:'6',zeven:'7',acht:'8',four:'4',five:'5',six:'6',seven:'7',eight:'8',
+  een:'1',één:'1',twee:'2',drie:'3',one:'1',two:'2',three:'3'};
+const VOICE_LETTERS={bee:'b',cee:'c',see:'c',aa:'a',ay:'a',be:'b',ce:'c'};
+const VOICE_TYPES={slab:'Slab',verticaal:'Verticaal',vertical:'Verticaal',overhang:'Overhang',cave:'Cave',grot:'Cave',
+  dyno:'Dyno',mantle:'Mantle',mantel:'Mantle',pinch:'Pinch',knijp:'Pinch',crimp:'Crimp',krim:'Crimp',sloper:'Sloper'};
+const VOICE_COLORS={geel:'Geel',yellow:'Geel',groen:'Groen',green:'Groen',blauw:'Blauw',blue:'Blauw',rood:'Rood',red:'Rood',
+  zwart:'Zwart',black:'Zwart',wit:'Wit',white:'Wit',paars:'Paars',purple:'Paars',oranje:'Oranje',orange:'Oranje',roze:'Roze',pink:'Roze'};
+function _lev(a,b){
+  if(a===b)return 0;
+  if(!a.length||!b.length)return Math.max(a.length,b.length);
+  let prev=Array.from({length:b.length+1},(_,i)=>i);
+  for(let i=1;i<=a.length;i++){
+    const cur=[i];
+    for(let j=1;j<=b.length;j++){
+      cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    }
+    prev=cur;
+  }
+  return prev[b.length];
+}
+// Fuzzy: spraakherkenning hoort "krimp" waar "crimp" staat. Korte woorden
+// krijgen minder speling, anders matcht alles op alles.
+function _voiceLookup(word,table){
+  if(table[word])return table[word];
+  let best=null,bestD=99;
+  for(const k in table){
+    const d=_lev(word,k);
+    const max=k.length<=4?1:2;
+    if(d<=max&&d<bestD){best=table[k];bestD=d;}
+  }
+  return best;
+}
+function parseVoiceRoute(transcript){
+  const raw=String(transcript||'').toLowerCase().replace(/[.,!?;:]/g,' ');
+  const words=raw.split(/\s+/).filter(Boolean);
+  if(!words.length)return null;
+
+  // 1) Graad. Getal- en letterwoorden eerst naar tekens, dan aan elkaar
+  //    plakken zodat "zes b plus" en "6b+" hetzelfde opleveren.
+  const norm=words.map(w=>VOICE_NUMBERS[w]||VOICE_LETTERS[w]||(w==='plus'?'+':w)).join(' ');
+  const compact=norm.replace(/\s+/g,'');
+  const m=compact.match(/([45678])\s*([abc])?\s*(\+)?/);
+  if(!m)return null;
+  const[,d,letter,plus]=m;
+  const candidates=[d+(letter||'')+(plus||''),d+(letter||''),d+(plus||''),d,d+'a'];
+  const grade=candidates.find(c=>GRADES.includes(c));
+  if(!grade)return null;
+
+  // 2) Resultaat — flash vóór top, want "flash" impliceert ook een top.
+  let result='poging';
+  if(/flash|geflash/.test(raw))result='flash';
+  else if(/\btop\b|gestuurd|stuur|\bsend\b|\bsent\b|gedaan/.test(raw))result='top';
+
+  // 3) Type, kleur en pogingen
+  let type='',color='';
+  words.forEach(w=>{
+    if(!type){const t=_voiceLookup(w,VOICE_TYPES);if(t)type=t;}
+    if(!color){const c=_voiceLookup(w,VOICE_COLORS);if(c)color=c;}
+  });
+  let attempts=1;
+  const am=norm.match(/(\d+)\s+(pogingen|poging|attempts|attempt|tries|try|keer)/);
+  if(am)attempts=Math.min(99,Math.max(1,parseInt(am[1],10)));
+  else if(result==='poging')attempts=1;
+
+  return{grade,result,type,color,attempts};
+}
+let _voiceRec=null,_voiceContinuous=false,_voiceStopping=false,_voiceIdleTimer=null,_voiceHoldTimer=null;
+// Op de waarde testen, niet op het bestaan van de key: een browser kan
+// de naam wel kennen en toch niets leveren.
+function _voiceSupported(){
+  return typeof window!=='undefined'&&!!(window.SpeechRecognition||window.webkitSpeechRecognition);
+}
+function initVoiceLog(){
+  const btn=document.getElementById('btn-voice-log');
+  if(!btn||!_voiceSupported())return;
+  btn.style.display='';
+  // Lang indrukken = doorluisteren tijdens de hele sessie.
+  const hold=()=>{_voiceHoldTimer=setTimeout(()=>{_voiceHoldTimer=null;startVoiceLog(true);},600);};
+  const release=()=>{if(_voiceHoldTimer){clearTimeout(_voiceHoldTimer);_voiceHoldTimer=null;}};
+  btn.addEventListener('pointerdown',hold);
+  ['pointerup','pointerleave','pointercancel'].forEach(e=>btn.addEventListener(e,release));
+}
+function _voiceSetState(state){
+  const btn=document.getElementById('btn-voice-log');
+  const hint=document.getElementById('voice-hint');
+  if(btn){
+    btn.classList.toggle('listening',state==='listening');
+    btn.classList.toggle('continuous',state==='continuous');
+    btn.textContent=state==='listening'?'🎤 Luistert…':state==='continuous'?'🎤 Blijft luisteren':'🎤 Inspreken';
+  }
+  if(hint){
+    if(state==='off'){hint.style.display='none';hint.textContent='';}
+    else{
+      hint.style.display='';
+      hint.textContent='Zeg bijvoorbeeld "zes b plus top overhang". Spraakherkenning loopt via je browser.';
+    }
+  }
+}
+function toggleVoiceLog(){
+  if(_voiceRec){stopVoiceLog();return;}
+  startVoiceLog(false);
+}
+function startVoiceLog(continuous){
+  if(!_voiceSupported()){toast('Spraakherkenning werkt niet in deze browser','#e53935');return;}
+  if(_voiceRec)stopVoiceLog();
+  const Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const rec=new Rec();
+  _voiceRec=rec;_voiceContinuous=!!continuous;_voiceStopping=false;
+  rec.lang=LOCALE();
+  rec.continuous=!!continuous;
+  rec.interimResults=false;
+  rec.maxAlternatives=3;
+  rec.onresult=e=>{
+    _voiceResetIdle();
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const res=e.results[i];
+      if(!res.isFinal)continue;
+      let parsed=null;
+      for(let a=0;a<res.length&&!parsed;a++)parsed=parseVoiceRoute(res[a].transcript);
+      if(parsed)_voiceAddRoute(parsed);
+      else toast('Niet verstaan — probeer "zes b plus top"','#e53935');
+    }
+  };
+  rec.onerror=ev=>{
+    const err=ev&&ev.error;
+    if(err==='no-speech')return;                        // stilte is geen fout
+    if(err==='not-allowed'||err==='service-not-allowed')toast('Geen toegang tot de microfoon','#e53935');
+    else if(err==='audio-capture')toast('Geen microfoon gevonden','#e53935');
+    else if(err!=='aborted')toast('Spraakherkenning werkt even niet','#e53935');
+    stopVoiceLog();
+  };
+  rec.onend=()=>{
+    // Chrome kapt de sessie vanzelf af; in doorluister-modus opnieuw starten.
+    if(_voiceContinuous&&!_voiceStopping&&_voiceRec===rec){
+      try{rec.start();return;}catch(e){}
+    }
+    if(_voiceRec===rec)stopVoiceLog();
+  };
+  try{rec.start();}
+  catch(e){_voiceRec=null;toast('Spraakherkenning werkt even niet','#e53935');return;}
+  _voiceSetState(continuous?'continuous':'listening');
+  if(continuous)_voiceResetIdle();
+  haptic();
+}
+function _voiceResetIdle(){
+  clearTimeout(_voiceIdleTimer);
+  if(!_voiceContinuous)return;
+  _voiceIdleTimer=setTimeout(()=>{stopVoiceLog();toast('Microfoon uit na een minuut stilte');},60000);
+}
+function stopVoiceLog(){
+  clearTimeout(_voiceIdleTimer);_voiceIdleTimer=null;
+  const rec=_voiceRec;
+  _voiceRec=null;_voiceContinuous=false;_voiceStopping=true;
+  if(rec){try{rec.stop()}catch(e){}}
+  _voiceSetState('off');
+}
+function _voiceAddRoute(p){
+  addRouteCard(p.grade,p.attempts,p.result,p.type,null,{color:p.color});
+  saveDraft();
+  haptic();
+  const wrapId=document.querySelector('#route-cards .route-card-wrap:last-child')?.id;
+  const label=p.result==='flash'?'Flash':p.result==='top'?'Top':'Poging';
+  const bits=[p.grade,label];
+  if(p.type)bits.push(p.type);
+  if(p.color)bits.push(p.color);
+  toast(bits.join(' · '),getResultColor(p.result),{label:'Ongedaan maken',fn:()=>{
+    if(wrapId)removeRouteCard(wrapId);
+  }});
 }
 
 /* -- Inline sessie hangsets -- */
@@ -6990,6 +7184,7 @@ function initApp(profileId){
     initPullToRefresh();
     initInstallPrompt();
     initOfflineBadge();
+    initVoiceLog();
     if(typeof cloudInitAuthListener==='function')cloudInitAuthListener();
   }
 
